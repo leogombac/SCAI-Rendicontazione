@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* [Descritpion](#quick-start)
+* [Descritpion](#description)
 * [Documentation](#documentation)
 * [Resources](#resources)
 * [Reporting Issues](#reporting-issues)
