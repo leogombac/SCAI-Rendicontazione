@@ -1,0 +1,1264 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "RendicontazioneConsuntivazioneGitHubPackage",
+      "version": "1.0"
+    },
+    "paths": {
+      "/consuntivazione/aziende": {
+        "get": {
+          "tags": [
+            "Aziende"
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/aziende/{idAzienda}": {
+        "get": {
+          "tags": [
+            "Aziende"
+          ],
+          "parameters": [
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/aziende/{idAzienda}/utente/{idUtente}/festivita": {
+        "get": {
+          "tags": [
+            "Aziende"
+          ],
+          "parameters": [
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/aziende/{idAzienda}/utente/{idUtente}/trasferte": {
+        "get": {
+          "tags": [
+            "Aziende"
+          ],
+          "parameters": [
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idAttivita",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Aziende"
+          ],
+          "parameters": [
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserisciTrasfertaInput"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserisciTrasfertaInput"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserisciTrasfertaInput"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/commesse": {
+        "get": {
+          "tags": [
+            "Commesse"
+          ],
+          "parameters": [
+            {
+              "name": "IdCommessa",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "IdAttivita",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "IdAzienda",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "Commessa",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "CodiceCommessa",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "Azienda",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "Inizio",
+              "in": "query",
+              "schema": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            {
+              "name": "Fine",
+              "in": "query",
+              "schema": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            {
+              "name": "Page",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "PageSize",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "Skip",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/commesse/presenze/tipi-modalita-lavoro": {
+        "get": {
+          "tags": [
+            "Commesse"
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/commesse/{idCommessa}/presenze/utente/{idUtente}/{anno}-{mese}-{giorno}": {
+        "get": {
+          "tags": [
+            "Commesse"
+          ],
+          "parameters": [
+            {
+              "name": "idCommessa",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/commesse/{idCommessa}/presenze/utente/{idUtente}": {
+        "post": {
+          "tags": [
+            "Commesse"
+          ],
+          "parameters": [
+            {
+              "name": "idCommessa",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresenzaInserimentoInput"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresenzaInserimentoInput"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresenzaInserimentoInput"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/commesse/{idCommessa}/presenze/utente/{idUtente}/{anno}-{mese}-{giorno}/{idAttivita}/{progressivo}": {
+        "delete": {
+          "tags": [
+            "Commesse"
+          ],
+          "parameters": [
+            {
+              "name": "idCommessa",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idAttivita",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "progressivo",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/login": {
+        "post": {
+          "tags": [
+            "Login"
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                },
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                },
+                "text/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/consuntivazione/referente/{idReferente}/azienda/{idAzienda}/utenti": {
+        "get": {
+          "tags": [
+            "Referente"
+          ],
+          "parameters": [
+            {
+              "name": "idReferente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "filtro",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/aziende": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/dati-operativi": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "filtro",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "aziendaAssunzione",
+              "in": "query",
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/presenze/{idAzienda}/{anno}-{mese}-{giorno}": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "idAzienda",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/presenze/{anno}-{mese}-{giorno}": {
+        "post": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserimentoPresenza"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserimentoPresenza"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InserimentoPresenza"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/commesse": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "filtro",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/commesse/{anno}-{mese}-{giorno}": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "filtro",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/bollature/{anno}-{mese}-{giorno}": {
+        "get": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/bollature/{anno}-{mese}-{giorno}/{ore}-{minuti}-{secondi}/{tipo}": {
+        "post": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "ore",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "minuti",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "secondi",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "tipo",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/EnumTipiBollatura"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/consuntivazione/utente/{idUtente}/bollature/{anno}-{mese}-{giorno}/{ore}-{minuti}-{secondi}": {
+        "delete": {
+          "tags": [
+            "Utente"
+          ],
+          "parameters": [
+            {
+              "name": "idUtente",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "anno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "mese",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "giorno",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "ore",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "minuti",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "secondi",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "EnumTipiBollatura": {
+          "enum": [
+            1,
+            2
+          ],
+          "type": "integer",
+          "format": "int32"
+        },
+        "EnumTipoModalitaLavoro": {
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "type": "integer",
+          "format": "int32"
+        },
+        "EnumTipoStraordinari": {
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "type": "integer",
+          "format": "int32"
+        },
+        "InserimentoPresenza": {
+          "type": "object",
+          "properties": {
+            "idAttivita": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "progressivo": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "codiceCommessa": {
+              "type": "string",
+              "nullable": true
+            },
+            "data": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "inizio": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "fine": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "modalita": {
+              "$ref": "#/components/schemas/EnumTipoModalitaLavoro"
+            },
+            "inserimentoAutomatico": {
+              "type": "boolean"
+            },
+            "minuti": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "tipoStraordinari": {
+              "$ref": "#/components/schemas/EnumTipoStraordinari"
+            },
+            "minutiStraordinario": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "minutiBancaOre": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "idTipoTrasferta": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "reperibilita": {
+              "type": "boolean"
+            },
+            "turni": {
+              "type": "boolean"
+            },
+            "note": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "InserisciTrasfertaInput": {
+          "type": "object",
+          "properties": {
+            "idTipoTrasferta": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "idCommessa": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "idCliente": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "inizio": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "fine": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "LoginRequest": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "type": "string",
+              "nullable": true
+            },
+            "token": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "LoginResponse": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "nullable": true
+            },
+            "expire": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "PresenzaInserimentoInput": {
+          "type": "object",
+          "properties": {
+            "idAttivita": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "progressivo": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "codiceCommessa": {
+              "type": "string",
+              "nullable": true
+            },
+            "data": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "inizio": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "fine": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "modalita": {
+              "$ref": "#/components/schemas/EnumTipoModalitaLavoro"
+            },
+            "inserimentoAutomatico": {
+              "type": "boolean"
+            },
+            "minuti": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "tipoStraordinari": {
+              "$ref": "#/components/schemas/EnumTipoStraordinari"
+            },
+            "minutiStraordinario": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "minutiBancaOre": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "idTipoTrasferta": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "reperibilita": {
+              "type": "boolean"
+            },
+            "turni": {
+              "type": "boolean"
+            },
+            "note": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }

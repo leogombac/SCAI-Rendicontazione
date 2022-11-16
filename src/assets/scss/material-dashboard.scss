@@ -1,0 +1,143 @@
+/*!
+
+ =========================================================
+ * Material Dashboard PRO Angular - v2.7.0
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/material-dashboard-pro-angular2
+ * Copyright 2018 Creative Tim (https://www.creative-tim.com)
+
+ * Designed by www.invisionapp.com Coded by www.creative-tim.com
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+@import "core/variables";
+@import "core/mixins";
+@import "~bootstrap/scss/bootstrap";
+@import "core/reboot";
+
+// Core Components
+@import "core/layout";
+@import "core/buttons";
+@import "core/checkboxes";
+@import "dashboard/cards";
+@import "core/custom-forms";
+@import "core/switches";
+@import "core/example-pages";
+@import "core/radios";
+@import "core/carousel";
+@import "dashboard/forms";
+@import "core/input-group";
+@import "core/list-group";
+@import "core/nav";
+@import "core/images";
+@import "dashboard/navbar";
+@import "core/badges";
+@import "dashboard/alerts";
+@import "core/pagination";
+@import "core/pills";
+@import "core/info-areas";
+@import "core/type";
+@import "core/tabs";
+@import "core/footers";
+@import "core/tooltip";
+@import "core/popover";
+@import "core/modal";
+@import "core/dropdown";
+@import "core/headers";
+@import "core/drawer";
+@import "core/progress";
+@import "core/togglebutton";
+@import "core/ripples";
+@import "dashboard/rtl";
+@import "dashboard/sidebar-and-main-panel";
+@import "dashboard/timeline";
+@import "dashboard/fixed-plugin";
+@import "dashboard/tables";
+@import "dashboard/misc";
+@import "dashboard/pages";
+
+// Components for PRO
+@import "dashboard/social-buttons";
+@import "dashboard/fileupload";
+
+//plugin css
+@import "plugins/plugin-nouislider";
+@import "plugins/animate";
+@import "plugins/sweetalert2";
+// @import "plugins/datatables.net";
+@import "plugins/jquery.jvectormap";
+@import "plugins/plugin-datetime-picker";
+@import "plugins/fullcalendar";
+@import "plugins/wizard-card";
+@import "plugins/chartist";
+@import "~chartist/dist/scss/chartist";
+@import "plugins/select-bootstrap";
+@import "plugins/perfect-scrollbar";
+@import "plugins/plugin-tagsinput";
+
+@import "dashboard/responsive";
+
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 2000 !important;
+}
+
+.calendar-container {
+  height: 55vh;
+  position: fixed;
+  overflow-y: scroll;
+  width: 95%;
+  z-index: 500;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.calendar-week {
+  display: block;
+}
+.calendar-day {
+  display: none;
+}
+
+.cal-day-headers {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 501 !important;
+  background-color: white;
+}
+
+.modal-open .mat-form-field-infix{
+  background-color: #f5f5f5f5 !important;
+}
+
+.modal-open .mat-select{
+  background-color: #f5f5f5f5 !important;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.modal-open textarea{
+  background-color: #f5f5f5f5 !important;
+
+}
+
+@media screen and (max-width: 992px) {
+  .calendar-container {
+    position: fixed;
+    width: 100%;
+    left: 0;
+  }
+  .calendar-week {
+    display: none;
+  }
+  .calendar-day {
+    display: block;
+  }
+}
