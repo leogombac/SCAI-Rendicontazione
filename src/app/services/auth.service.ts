@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     if (!username) {
-      this.toasterService.addToast(ToastLevel.Info, `Effettua l'accesso per poter accedere alle pagine.`);
+      this.toasterService.addToast(ToastLevel.Warning, `Effettua l'accesso per poter accedere all'applicativo.`);
       this.router.navigate(['pages', 'login']);
       return;
     }

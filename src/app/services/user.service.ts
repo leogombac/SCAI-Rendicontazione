@@ -35,7 +35,7 @@ export class UserService {
           this.utenteService.consuntivazioneUtenteIdUtenteDatiOperativiGet({ idUtente: +loginData.username.slice(-4) })
         ),
         map((d: any) => JSON.parse(d)[0]),
-        tap(x => console.log("Dati Operativi", x))
+        tap(datiOperativi => console.log("Dati Operativi", datiOperativi))
       );
   }
 
@@ -49,7 +49,7 @@ export class UserService {
         ),
         map((d: any) => JSON.parse(d)),
         tap(aziende => this._azienda$.next(aziende[0])),
-        tap(x => console.log("Aziende", x))
+        tap(aziende => console.log("Aziende", aziende))
       );
   }
 
