@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastLevel } from '../models/toast';
+import { UserService } from '../services/user.service';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { DialogComponent } from './dialog.component';
 
@@ -16,8 +17,11 @@ export class HomepageComponent {
   
   constructor(
     private toasterService: ToasterService,
-    public dialog: MatDialog
-  ) { }
+    public dialog: MatDialog,
+    private userService: UserService
+  ) {
+    this.userService.datiOperativi$.subscribe();
+  }
 
   launchToast(level: ToastLevel) {
     console.log(this.toasterService);

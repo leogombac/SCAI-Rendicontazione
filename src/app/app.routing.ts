@@ -14,7 +14,7 @@ export const AppRoutes: Routes = [
         children: [{
             path: 'homepage',
             loadChildren: () => import('./homepage/homepage.module').then(m => m.HomepageModule)
-        }]
+        }],
     },
     {
         path: '',

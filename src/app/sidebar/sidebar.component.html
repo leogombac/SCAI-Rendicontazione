@@ -8,6 +8,39 @@
 </div>
 
 <div class="sidebar-wrapper">
+
+  <div class="user">
+    <div class="image">
+      <i class="fa fa-building" aria-hidden="true"></i>
+    </div>
+    <div class="user-info">
+      <a data-toggle="collapse" href="#collapse-user" class="collapsed">
+        <span>Scegli azienda <b class="caret"></b></span>
+      </a>
+      <div id="collapse-user" class="collapse">
+        <ul class="nav">
+          <li *ngFor="let azienda of (userService.aziende$ | async)" class="nav-item" (click)="userService.selectAzienda(azienda)">
+            <a href="javascript:void(0)" class="nav-link" [class.active]="(userService.azienda$ | async) === azienda">
+              <span class="sidebar-mini">{{ azienda.acronimo }}</span>
+              <span class="sidebar-normal">{{ azienda.descrizione }}</span>
+              </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isMobileMenu()">
+    <ul class="nav navbar-nav nav-mobile-menu">
+      <li class="nav-item">
+        <a class="nav-link" (click)="logout()">
+          <i class="fa fa-power-off" aria-hidden="true"></i>
+          <p>Logout</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+
   <ul class="nav">
     <li routerLinkActive="active" *ngFor="let menuitem of menuItems" class="nav-item">
       <!--If is a single link-->

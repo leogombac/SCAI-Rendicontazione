@@ -3,6 +3,11 @@ import { HttpContext } from '@angular/common/http';
 import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
 import { first } from 'rxjs';
 import { addHours } from 'date-fns';
+import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import { ToasterService } from 'src/app/shared/toaster/toaster.service';
+import { ToastLevel } from 'src/app/models/toast';
+import { Router } from '@angular/router';
 
 declare var $: any;
 
@@ -17,7 +22,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     private sidebarVisible: boolean;
     private nativeElement: Node;
 
-    constructor(private element: ElementRef) {
+    constructor(
+        private element: ElementRef,
+        private authService: AuthService,
+        private userService: UserService,
+        private router: Router,
+        private toasterService: ToasterService
+    ) {
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
     }
@@ -54,6 +65,17 @@ export class LoginComponent implements OnInit, OnDestroy {
         const body = document.getElementsByTagName('body')[0];
         body.classList.remove('login-page');
         body.classList.remove('off-canvas-sidebar');
+    }
+
+    async login(username) {
+        try {
+            await this.authService.login(username);
+            this.toasterService.addToast(ToastLevel.Success, "Login effettuato con successo!");
+            this.router.navigate(['/homepage']);
+        }
+        catch(e) {
+            this.toasterService.addToast(ToastLevel.Danger, "Qualcosa è andato storto durante il login.");
+        }
     }
 
 }

@@ -72,24 +72,25 @@ export class AuthLayoutComponent implements OnInit {
   };
   sidebarClose() {
     var $toggle = document.getElementsByClassName('navbar-toggler')[0];
-      const body = document.getElementsByTagName('body')[0];
-      this.toggleButton.classList.remove('toggled');
-      var $layer = document.createElement('div');
-      $layer.setAttribute('class', 'close-layer');
+    const body = document.getElementsByTagName('body')[0];
+    if (!this.toggleButton) return;
+    this.toggleButton.classList.remove('toggled');
+    var $layer = document.createElement('div');
+    $layer.setAttribute('class', 'close-layer');
 
-      this.sidebarVisible = false;
-      body.classList.remove('nav-open');
-      // $('html').removeClass('nav-open');
-      body.classList.remove('nav-open');
-      if ($layer) {
-          $layer.remove();
-      }
+    this.sidebarVisible = false;
+    body.classList.remove('nav-open');
+    // $('html').removeClass('nav-open');
+    body.classList.remove('nav-open');
+    if ($layer) {
+        $layer.remove();
+    }
 
-      setTimeout(function() {
-          $toggle.classList.remove('toggled');
-      }, 400);
+    setTimeout(function() {
+        $toggle.classList.remove('toggled');
+    }, 400);
 
-      this.mobile_menu_visible = 0;
+    this.mobile_menu_visible = 0;
   };
   sidebarToggle() {
       if (this.sidebarVisible === false) {

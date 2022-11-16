@@ -1,6 +1,6 @@
 <div class="toasts">
     <div
-        class="toast show align-items-center text-bg-primary border-0 pr-3"
+        class="toast show align-items-center border-0 pr-3"
         [class.bg-danger]="toast.level === ToastLevel.Danger"
         [class.bg-warning]="toast.level === ToastLevel.Warning"
         [class.bg-success]="toast.level === ToastLevel.Success"
@@ -13,7 +13,7 @@
             <div class="toast-body">
                 {{ toast.message }}
             </div>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <button type="button" class="ml-2 mb-1 close" (click)="ts.removeToast(toast)">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>

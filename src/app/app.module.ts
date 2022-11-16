@@ -88,6 +88,7 @@ import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { AppRoutes } from './app.routing';
 import { ToasterComponent } from './shared/toaster/toaster.component';
+import { TokenInterceptor } from './token.interceptor';
 
 @NgModule({
     imports:      [
@@ -116,6 +117,7 @@ import { ToasterComponent } from './shared/toaster/toaster.component';
     ],
     providers : [
       MatNativeDateModule,
+      { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     ],
     bootstrap:    [ AppComponent ]
 })

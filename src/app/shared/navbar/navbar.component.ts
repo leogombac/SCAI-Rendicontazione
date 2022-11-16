@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { FormControl } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
 const misc: any = {
     navbar_menu_visible: 0,
     active_collapse: true,
@@ -34,6 +35,7 @@ export class NavbarComponent implements OnInit {
         private renderer: Renderer2,
         private element: ElementRef,
         private router: Router,
+        private authService: AuthService
     ) {
         this.location = location;
         this.nativeElement = element.nativeElement;
@@ -218,5 +220,9 @@ export class NavbarComponent implements OnInit {
     }
     getPath() {
         return this.location.prepareExternalUrl(this.location.path());
+    }
+
+    logout() {
+        this.authService.logout();
     }
 }

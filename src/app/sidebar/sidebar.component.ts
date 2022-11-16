@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import PerfectScrollbar from 'perfect-scrollbar';
+import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 declare const $: any;
 
@@ -45,8 +47,10 @@ export class SidebarComponent implements OnInit {
     public menuItems: any[];
     ps: any;
 
-
-    constructor() { }
+    constructor(
+        private authService: AuthService,
+        public userService: UserService
+    ) { }
 
     isMobileMenu() {
         if ($(window).width() > 991) {
@@ -76,5 +80,9 @@ export class SidebarComponent implements OnInit {
             bool = true;
         }
         return bool;
+    }
+
+    logout() {
+        this.authService.logout();
     }
 }
