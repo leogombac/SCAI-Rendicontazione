@@ -4,7 +4,6 @@ import { HomepageComponent } from './homepage.component';
 
 export const HomepageRoutes: Routes = [
   {
-
     path: '',
     children: [
       {

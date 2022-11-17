@@ -68,10 +68,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     async login(username) {
+        console.warn(username);
         try {
             await this.authService.login(username);
             this.toasterService.addToast(ToastLevel.Success, "Login effettuato con successo!");
-            this.router.navigate(['/homepage']);
+            this.router.navigate(['/']);
         }
         catch(e) {
             this.toasterService.addToast(ToastLevel.Danger, "Qualcosa è andato storto durante il login.");

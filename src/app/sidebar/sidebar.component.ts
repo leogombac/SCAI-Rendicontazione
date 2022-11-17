@@ -25,10 +25,10 @@ export interface ChildrenItems {
 //Menu Items
 export const ROUTES: RouteInfo[] = [
     {
-        path: '/homepage',
-        title: 'Homepage',
+        path: '/consuntivi',
+        title: 'Consuntivi',
         type: 'link',
-        icontype: 'image'
+        icontype: 'calendar_month'
     },
     {
         path: 'pages/login',

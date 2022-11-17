@@ -5,7 +5,7 @@ import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
 export const AppRoutes: Routes = [
     {
         path: '',
-        redirectTo: 'homepage',
+        redirectTo: 'consuntivi',
         pathMatch: 'full',
     },
     {
@@ -14,6 +14,14 @@ export const AppRoutes: Routes = [
         children: [{
             path: 'homepage',
             loadChildren: () => import('./homepage/homepage.module').then(m => m.HomepageModule)
+        }],
+    },
+    {
+        path: '',
+        component: AdminLayoutComponent,
+        children: [{
+            path: 'consuntivi',
+            loadChildren: () => import('./consuntivi/consuntivi.module').then(m => m.ConsuntiviModule)
         }],
     },
     {

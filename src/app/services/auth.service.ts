@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { LoginService } from '../api/services';
+import { LoginData } from '../models/auth';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 
@@ -13,7 +14,7 @@ const LOGIN_LS = 'LOGIN_DATA'
 })
 export class AuthService {
 
-  private _loginData$ = new BehaviorSubject<any>(null);
+  private _loginData$ = new BehaviorSubject<LoginData>(null);
   loginData$ = this._loginData$.asObservable();
 
   constructor(
@@ -24,28 +25,42 @@ export class AuthService {
     this.login(); // Auto-login
   }
 
-  async login(username?) {
+  login(username?) {
 
-    if (this.isLoggedIn()) {
+    // Call to the login at backend
+    const login = async () => {
+      const response = await lastValueFrom(
+        this.loginService.consuntivazioneLoginPost$Json({
+          context: new HttpContext(),
+          body: { user: username, token: 'empty' }
+        })
+      );
+      response['username'] = username;
+      localStorage.setItem(LOGIN_LS, JSON.stringify(response));
       this._loginData$.next(this.getLoginData());
-      return;
     }
 
+    // If user is already logged in...
+    if (this.isLoggedIn()) {
+      const loginData = this.getLoginData();
+
+      // ...but with a different account, then make a new login
+      if (username && username !== loginData.username)
+        return login();
+
+      // Else take the old login
+      return this._loginData$.next(loginData);
+    }
+
+    // If it's auto-login but no login data is present, then launch a toast and route to login page
     if (!username) {
       this.toasterService.addToast(ToastLevel.Warning, `Effettua l'accesso per poter accedere all'applicativo.`);
       this.router.navigate(['pages', 'login']);
       return;
     }
 
-    const response = await lastValueFrom(
-      this.loginService.consuntivazioneLoginPost$Json({
-        context: new HttpContext(),
-        body: { user: username, token: 'empty' }
-      })
-    );
-    response['username'] = username;
-    localStorage.setItem(LOGIN_LS, JSON.stringify(response));
-    this._loginData$.next(this.getLoginData());
+    // If the user just submitted the login page form, then login
+    login();
   }
 
   logout() {

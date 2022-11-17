@@ -1,0 +1,41 @@
+.table-wrap {
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.table-inner {
+    overflow-y: auto;
+    min-height: 15vh;
+    max-height: 50vh
+}
+
+.loading-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #0002;
+    z-index: 900;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+}
+
+.loading-inner {
+    text-align: center;
+}
+
+thead {
+    background-color: #fff;
+    border-bottom: 2px solid #eee;
+    box-shadow: 0 0 4px 2px #0001;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.no-consuntivi {
+    display: grid;
+    height: 10vh;
+    place-items: center;
+}
