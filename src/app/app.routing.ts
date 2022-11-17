@@ -12,14 +12,6 @@ export const AppRoutes: Routes = [
         path: '',
         component: AdminLayoutComponent,
         children: [{
-            path: 'homepage',
-            loadChildren: () => import('./homepage/homepage.module').then(m => m.HomepageModule)
-        }],
-    },
-    {
-        path: '',
-        component: AdminLayoutComponent,
-        children: [{
             path: 'consuntivi',
             loadChildren: () => import('./consuntivi/consuntivi.module').then(m => m.ConsuntiviModule)
         }],

@@ -23,7 +23,7 @@
             <a
               href="javascript:void(0)"
               class="nav-link"
-              [class.active]="userService.azienda === azienda"
+              [class.active]="userService.azienda?.idAzienda === azienda.idAzienda"
               (click)="userService.azienda = azienda"
             >
               <span class="sidebar-mini">{{ azienda.acronimo }}</span>

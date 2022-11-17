@@ -9,15 +9,22 @@
     </div>
     <div class="card-body">
 
-        <div class="container">
-            <div class="row text-right">
-                <div class="col-12">
-                    <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
-                        Refresh
-                        <i class="material-icons">refresh</i>
-                    </button>
-                </div>
-            </div>
+        <div class="align-items-center d-flex flex-wrap justify-content-between">
+            <mat-form-field floatLabel="never" class="no-label no-hint w-auto">
+                <input
+                    matInput
+                    [matDatepicker]="picker"
+                    placeholder="Cerca data"
+                    [value]="rendicontazioneService.viewDate"
+                    (dateChange)="rendicontazioneService.viewDate = $event.value"
+                >
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
+                Refresh
+                <i class="material-icons">refresh</i>
+            </button>
         </div>
 
         <div class="table-wrap">
@@ -36,6 +43,7 @@
                         <tr>
                             <th scope="col">Giorno</th>
                             <th scope="col">Commessa</th>
+                            <th scope="col">Ora Inizio</th>
                             <th scope="col" class="text-right">Durata</th>
                             <th scope="col" class="text-right">Azioni</th>
                         </tr>
@@ -44,9 +52,13 @@
                         <tr *ngFor="let consuntivo of rendicontazioneService.consuntivi$ | async">
                             <td>{{ consuntivo.getGiorno() }}</td>
                             <td>{{ consuntivo.title }}</td>
+                            <td>{{ consuntivo.start | date: 'hh:mm' }}</td>
                             <td class="text-right">{{ consuntivo.getDurata() | number:1.0-1 }} ore</td>
                             <td class="text-right">
-                                <button class="btn btn-link p-0">Modifica <i class="material-icons">edit_note</i></button>
+                                <button
+                                    class="btn btn-link p-3"
+                                    (click)="openDialog(consuntivo)"
+                                >Modifica <i class="material-icons">edit_note</i></button>
                             </td>
                         </tr>
                     </tbody>

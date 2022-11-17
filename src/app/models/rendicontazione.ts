@@ -8,8 +8,9 @@ export interface PresenzaOrario {
 }
 
 export interface Presenza {
-    idCommessa: 266;
-    codiceCommessa: "Ferie";
+    idCommessa: number;
+    codiceCommessa: string;
+    numeroMinuti: number;
     presenzeOrario: PresenzaOrario[];
 }
 
@@ -23,10 +24,18 @@ export class ConsuntivoEvent implements CalendarEvent {
     resizable;
     meta = { tmpEvent: false };
 
-    constructor(presenza: Presenza) {
+    constructor(dataPresenza: Date, presenza: Presenza) {
         this.title = presenza.codiceCommessa;
-        this.start = new Date(presenza.presenzeOrario[0].inizio);
-        this.end = new Date(presenza.presenzeOrario[0].fine);
+
+        // Adjust start and end date to provide retro-compatibility
+        if (presenza.presenzeOrario.length) {
+            this.start = new Date(presenza.presenzeOrario[0].inizio);
+            this.end = new Date(presenza.presenzeOrario[0].fine);
+        }
+        else {
+            this.start = new Date(dataPresenza);
+            this.end = new Date(new Date(dataPresenza).getTime() + presenza.numeroMinuti * 60 * 1000);
+        }
         this.color = colors.blue;
         this.draggable = true;
         this.resizable = {

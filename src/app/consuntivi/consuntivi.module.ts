@@ -5,17 +5,21 @@ import { ConsuntiviRoutingModule } from './consuntivi-routing.module';
 import { ConsuntiviComponent } from './consuntivi/consuntivi.component';
 import { AppCalendarModule } from '../calendar/calendar.module';
 import { RiepilogoComponent } from './riepilogo/riepilogo.component';
+import { DialogGestionePresenzaComponent } from './dialog-gestione-presenza/dialog-gestione-presenza.component';
+import { MaterialModule } from '../app.module';
 
 
 @NgModule({
   declarations: [
     ConsuntiviComponent,
-    RiepilogoComponent
+    RiepilogoComponent,
+    DialogGestionePresenzaComponent
   ],
   imports: [
     CommonModule,
     ConsuntiviRoutingModule,
-    AppCalendarModule
+    AppCalendarModule,
+    MaterialModule,
   ]
 })
 export class ConsuntiviModule { }

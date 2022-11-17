@@ -56,8 +56,15 @@ export class CalendarComponent {
 
   ngOnInit() {
 
-    // Init view date
-    this.viewDate = this.rendicontazioneService.viewDate;
+    this.rendicontazioneService.viewDate$
+      .pipe(
+        takeUntil(this.destroy$),
+        tap(viewDate => {
+          this.viewDate = viewDate;
+          this.refresh();
+        })
+      )
+      .subscribe();
 
     this.rendicontazioneService.consuntivi$
       .pipe(
@@ -116,9 +123,10 @@ export class CalendarComponent {
     this.events = [...this.events, dragToSelectEvent];
     const segmentPosition = segmentElement.getBoundingClientRect();
     this.dragToCreateActive = true;
-    const endOfView = endOfWeek(this.viewDate, {
-      weekStartsOn: this.weekStartsOn,
-    });
+    const endOfView = endOfWeek(
+      this.viewDate,
+      { weekStartsOn: this.weekStartsOn, }
+    );
 
     fromEvent(document, 'mousemove')
       .pipe(
