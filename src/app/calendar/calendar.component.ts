@@ -2,7 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Injectable,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import { 
   CalendarEvent,
@@ -33,6 +34,8 @@ import { ceilToNearest, floorToNearest } from './utils/date.util';
   ],
 })
 export class CalendarComponent {
+
+  @ViewChild('scrollContainer') scrollContainer: ElementRef;
 
   CalendarView = CalendarView;
 
@@ -80,6 +83,11 @@ export class CalendarComponent {
       .pipe(
         takeUntil(this.destroy$),
         tap(loading => {
+
+          // Scroll after loading
+          const nativeEl = this.scrollContainer.nativeElement;
+          nativeEl.scroll(0, nativeEl.getBoundingClientRect().height / 2);
+
           this.loading = loading;
           this.refresh();
         }),

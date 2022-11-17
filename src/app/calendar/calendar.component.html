@@ -7,73 +7,72 @@
     </div>
     <div class="card-body">
 
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-xl-4">
-                    <div class="btn-group">
-                        <div class="btn btn-primary"
-                            mwlCalendarPreviousView
-                            [view]="view"
-                            [(viewDate)]="viewDate"
-                            (viewDateChange)="rendicontazioneService.viewDate = viewDate"
-                        >Previous</div>
-                        <div class="btn btn-primary"
-                            mwlCalendarToday
-                            [(viewDate)]="viewDate"
-                            (viewDateChange)="rendicontazioneService.viewDate = viewDate"
-                        >Today</div>
-                        <div class="btn btn-primary"
-                            mwlCalendarNextView
-                            [view]="view"
-                            [(viewDate)]="viewDate"
-                            (viewDateChange)="rendicontazioneService.viewDate = viewDate"
-                        >Next</div>
-                    </div>
-                </div>
-                <div class="col-xl-4">
-                    <h3>{{ viewDate | calendarDate: view + 'ViewTitle':locale }}</h3>
-                </div>
-                <div class="col-xl-4">
-                    <div class="btn-group">
-                        <div
-                            class="btn btn-primary"
-                            [class.active]="view === CalendarView.Month"
-                            (click)="view = CalendarView.Month"
-                        >Month</div>
-                        <div
-                            class="btn btn-primary"
-                            [class.active]="view === CalendarView.Week"
-                            (click)="view = CalendarView.Week"
-                        >Week</div>
-                        <div
-                            class="btn btn-primary"
-                            [class.active]="view === CalendarView.Day"
-                            (click)="view = CalendarView.Day"
-                        >Day</div>
-                    </div>
+        <div class="row text-center">
+            <div class="col-xl-4">
+                <div class="btn-group">
+                    <div class="btn btn-primary"
+                        mwlCalendarPreviousView
+                        [view]="view"
+                        [(viewDate)]="viewDate"
+                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                    >Previous</div>
+                    <div class="btn btn-primary"
+                        mwlCalendarToday
+                        [(viewDate)]="viewDate"
+                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                    >Today</div>
+                    <div class="btn btn-primary"
+                        mwlCalendarNextView
+                        [view]="view"
+                        [(viewDate)]="viewDate"
+                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                    >Next</div>
                 </div>
             </div>
-            <div class="align-items-center d-flex flex-wrap justify-content-between">
-                <mat-form-field floatLabel="never" class="no-label no-hint w-auto">
-                    <input
-                        matInput
-                        [matDatepicker]="picker"
-                        placeholder="Cerca data"
-                        [value]="viewDate"
-                        (dateChange)="viewDate = $event.value; rendicontazioneService.viewDate = viewDate"
-                    >
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
-                <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
-                    Refresh
-                    <i class="material-icons">refresh</i>
-                </button>
+            <div class="col-xl-4">
+                <h3>{{ viewDate | calendarDate: view + 'ViewTitle':locale }}</h3>
             </div>
+            <div class="col-xl-4">
+                <div class="btn-group">
+                    <div
+                        class="btn btn-primary"
+                        [class.active]="view === CalendarView.Month"
+                        (click)="view = CalendarView.Month"
+                    >Month</div>
+                    <div
+                        class="btn btn-primary"
+                        [class.active]="view === CalendarView.Week"
+                        (click)="view = CalendarView.Week"
+                    >Week</div>
+                    <div
+                        class="btn btn-primary"
+                        [class.active]="view === CalendarView.Day"
+                        (click)="view = CalendarView.Day"
+                    >Day</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="align-items-center d-flex flex-wrap justify-content-center justify-content-md-between my-3 my-md-0 px-3">
+            <mat-form-field floatLabel="never" class="no-label no-hint w-auto">
+                <input
+                    matInput
+                    [matDatepicker]="picker"
+                    placeholder="Cerca data"
+                    [value]="viewDate"
+                    (dateChange)="viewDate = $event.value; rendicontazioneService.viewDate = viewDate"
+                >
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
+                Refresh
+                <i class="material-icons">refresh</i>
+            </button>
         </div>
 
         <div class="calendar-wrap">
-            <div class="calendar-inner">
+            <div class="calendar-inner" #scrollContainer>
                 <div *ngIf="loading" class="loading-wrap">
                     <div class="loading-inner">
                         <div class="spinner-border" role="status"></div>
