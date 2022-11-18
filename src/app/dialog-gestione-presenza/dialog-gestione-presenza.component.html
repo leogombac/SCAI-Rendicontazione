@@ -39,6 +39,21 @@
         </mat-form-field>
       </div>
       <div class="col-md-6">
+        <mat-form-field appearance="fill">
+          <mat-label>Modalità Lavoro</mat-label>
+          <input
+            type="text" 
+            placeholder="Scegli una modalità lavoro"
+            matInput 
+            [formControl]="controlMap['modalitaLavoro']"
+            [matAutocomplete]="auto3"
+          >
+          <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete">
+            <mat-option *ngFor="let option of (filteredArrayMap['modalitaLavoro'] | async)" [value]="option.descrizione">
+              {{ option.descrizione }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
       </div>
     </div>
   </form>

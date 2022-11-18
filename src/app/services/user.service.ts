@@ -1,6 +1,7 @@
+import { HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, share, switchMap, tap } from 'rxjs';
-import { AziendeService, ReferenteService, UtenteService } from '../api/services';
+import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, switchMap, tap } from 'rxjs';
+import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
 import { Azienda, DatoOperativo, Diaria, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 
@@ -14,6 +15,9 @@ export class UserService {
 
   private _diarie$ = new BehaviorSubject<Diaria[]>([]);
   diarie$ = this._diarie$.asObservable();
+
+  private _modalitaLavoro$ = new BehaviorSubject<Diaria[]>([]);
+  modalitaLavoro$ = this._modalitaLavoro$.asObservable();
 
   private _datoOperativo$ = new ReplaySubject<DatoOperativo>(1);
   datoOperativo$ = this._datoOperativo$.asObservable();
@@ -30,6 +34,7 @@ export class UserService {
   constructor(
     private utenteService: UtenteService,
     private aziendeService: AziendeService,
+    private commesseService: CommesseService,
     private referenteService: ReferenteService,
     private authService: AuthService
   ) {
@@ -37,6 +42,7 @@ export class UserService {
     this.createPipelineDatiOperativi();
     this.createPipelineUtentiAzienda();
     this.createPipelineTrasferte();
+    this.createPipelineModalitaLavoro();
   }
 
   get idReferente() {
@@ -64,6 +70,7 @@ export class UserService {
     this._user$.next(user);
   }
 
+  // Trying next style of coding with these getters and setters
   get aziende() {
     return this._aziende$.getValue();
   }
@@ -88,7 +95,6 @@ export class UserService {
         switchMap(loginData => 
           this.utenteService.consuntivazioneUtenteIdUtenteAziendeGet({ idUtente: +loginData.username.slice(-4) })
         ),
-        share(),
         map((d: any) => JSON.parse(d)),
         tap(aziende => this.aziende = aziende),
         tap(() => console.log("Aziende", this.aziende)),
@@ -100,7 +106,7 @@ export class UserService {
         }),
         tap(() => console.log("Selected azienda", this.azienda)),
       )
-      .subscribe()
+      .subscribe();
   }
 
   private createPipelineDatiOperativi() {
@@ -162,6 +168,21 @@ export class UserService {
       tap(diarie => console.log("Diarie", diarie)),
     )
     .subscribe();
+  }
+
+  private createPipelineModalitaLavoro() {
+
+    this.authService.loginData$
+      .pipe(
+        filter(loginData => !!loginData),
+        switchMap(() =>
+          this.commesseService.consuntivazioneCommessePresenzeTipiModalitaLavoroGet({ context: new HttpContext() })
+        ),
+        map((d: any) => JSON.parse(d)),
+        tap(modalitaLavoro => this._modalitaLavoro$.next(modalitaLavoro)),
+        tap(modalitaLavoro => console.log("Modalita Lavoro", modalitaLavoro)),
+      )
+      .subscribe();
   }
 
 }

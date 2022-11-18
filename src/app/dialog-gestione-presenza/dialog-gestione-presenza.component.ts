@@ -41,6 +41,12 @@ export class DialogGestionePresenzaComponent implements OnInit {
       this.userService.diarie$,
       'tipoTrasferta'
     );
+
+    this.createSelectLogic(
+      'modalitaLavoro',
+      this.userService.modalitaLavoro$,
+      'descrizione'
+    );
   }
 
   private createSelectLogic(controlName, observableArray, filterKey) {
