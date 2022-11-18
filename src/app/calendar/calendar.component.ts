@@ -43,7 +43,7 @@ export class CalendarComponent {
   locale = 'it-IT';
   weekStartsOn = DAYS_OF_WEEK.MONDAY;
 
-  viewDate: Date;
+  viewDate = new Date();
   events: CalendarEvent[] = [];
   
   loading = false;

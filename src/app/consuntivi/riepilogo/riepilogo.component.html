@@ -9,23 +9,7 @@
     </div>
     <div class="card-body">
 
-        <div class="align-items-center d-flex flex-wrap justify-content-center justify-content-md-between my-3 my-md-0 px-3">
-            <mat-form-field floatLabel="never" class="no-label no-hint w-auto">
-                <input
-                    matInput
-                    [matDatepicker]="picker"
-                    placeholder="Cerca data"
-                    [value]="rendicontazioneService.viewDate"
-                    (dateChange)="rendicontazioneService.viewDate = $event.value"
-                >
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-            <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
-                Refresh
-                <i class="material-icons">refresh</i>
-            </button>
-        </div>
+        <app-refreshing-header></app-refreshing-header>
 
         <div class="table-wrap">
             <div class="table-inner">

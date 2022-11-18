@@ -5,6 +5,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'src/app/app.module';
 import { CalendarComponent } from './calendar.component';
+import { RefreshingHeaderComponent } from './utils/refreshing-header/refreshing-header.component';
 
 @NgModule({
   imports: [
@@ -20,8 +21,12 @@ import { CalendarComponent } from './calendar.component';
     MaterialModule
   ],
   declarations: [
-    CalendarComponent
+    CalendarComponent,
+    RefreshingHeaderComponent
   ],
-  exports: [CalendarComponent],
+  exports: [
+    CalendarComponent,
+    RefreshingHeaderComponent
+  ],
 })
 export class AppCalendarModule {}
