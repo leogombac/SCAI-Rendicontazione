@@ -100,7 +100,7 @@ export class RendicontazioneService {
         const consuntivi = [];
         _consuntivi.giorni.map(giorno =>
           giorno.presenze.map((presenza: Presenza) =>
-            consuntivi.push(new ConsuntivoEvent(giorno.dataPresenza, presenza))
+            consuntivi.push(new ConsuntivoEvent({ dataPresenza: giorno.dataPresenza, presenza }))
           )
         )
         return consuntivi;

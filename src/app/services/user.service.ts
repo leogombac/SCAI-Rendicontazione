@@ -80,7 +80,7 @@ export class UserService {
     this.authService.loginData$
       .pipe(
         filter(loginData => !!loginData),
-        switchMap(loginData =>
+        switchMap(loginData => 
           this.utenteService.consuntivazioneUtenteIdUtenteAziendeGet({ idUtente: +loginData.username.slice(-4) })
         ),
         share(),

@@ -14,45 +14,73 @@ export interface Presenza {
     presenzeOrario: PresenzaOrario[];
 }
 
-export class ConsuntivoEvent implements CalendarEvent {
+export interface ConsuntivoEventConfig {
+    start?: Date,
+    end?: Date;
+    dataPresenza?: Date,
+    presenza?: Presenza
+}
 
+export class ConsuntivoEvent implements CalendarEvent, Presenza {
+
+    // From CalendarEvent (title via set/get)
     title;
-    start: Date;
-    end: Date;
-    color;
-    draggable;
-    resizable;
+    start;
+    end;
+    resizable = { beforeStart: true, afterEnd: true };
     meta = { tmpEvent: false };
 
-    constructor(dataPresenza: Date, presenza: Presenza) {
+    // From Presenza
+    idCommessa;
+    codiceCommessa;
+    numeroMinuti;
+    presenzeOrario;
+
+    constructor(config: ConsuntivoEventConfig) {
+        if (config.dataPresenza && config.presenza)
+            this.fromServer(config.dataPresenza, config.presenza);
+        else if (config.start)
+            this.fromCalendar(config.start);
+        else
+            throw new Error("Cannot create ConsuntivoEvent: missing data."); 
+    }
+
+    private fromServer(dataPresenza, presenza) {
+        this.idCommessa = presenza.idCommessa;
+        this.codiceCommessa = presenza.codiceCommessa;
+        this.presenzeOrario = presenza.presenzeOrario
 
         // Adjust start and end date to provide retro-compatibility
-        if (presenza.presenzeOrario.length) {
-            this.start = new Date(presenza.presenzeOrario[0].inizio);
-            this.end = new Date(presenza.presenzeOrario[0].fine);
+        if (this.presenzeOrario.length) {
+            this.start = new Date(this.presenzeOrario[0].inizio);
+            this.end = new Date(this.presenzeOrario[0].fine);
         }
         else {
             this.start = new Date(dataPresenza);
             this.end = new Date(new Date(dataPresenza).getTime() + presenza.numeroMinuti * 60 * 1000);
         }
-        this.color = colors.blue;
-        this.draggable = true;
-        this.resizable = {
-            beforeStart: true,
-            afterEnd: true,
-        };
-
-        this.title = `Consuntivo salvato
-<br>
-<span class="badge badge-primary">${presenza.codiceCommessa}</span>
-<span class="badge badge-primary">${(this.end.getTime() - this.start.getTime()) / 60 / 60 / 1000} ore</span>`;
+        this.setTitle();
     }
 
-    getDurata() {
+    private fromCalendar(start: Date) {
+        this.start = start;
+        this.meta.tmpEvent = true;
+        this.setTitle();
+    }
+
+    get color() {
+        if (this.meta.tmpEvent)
+            return colors.yellow;
+        else
+            return colors.blue;
+    }
+
+    get durataOre() {
+        if (!this.end) return 0;
         return (this.end.getTime() - this.start.getTime()) / 1000 / 60 / 60;
     }
 
-    getGiorno() {
+    get giorno() {
         const inizioGiorno = this.start.getDay();
         const fineGiorno = this.end.getDay();
         if (inizioGiorno === fineGiorno) {
@@ -69,5 +97,17 @@ export class ConsuntivoEvent implements CalendarEvent {
                 + ' '
                 + this.end.getDate();
         }
+    }
+
+    setTitle() {
+        let html = '';
+        if (this.meta.tmpEvent)
+            html += 'Consuntivo Locale<br>';
+        else
+            html += 'Consuntivo Remoto<br>'
+        if (this.codiceCommessa)
+            html += '<span class="badge badge-primary">' + this.codiceCommessa + '</span>'
+        html += '<span class="badge badge-primary">' + this.durataOre + ' ore</span>'
+        this.title = html;
     }
 }

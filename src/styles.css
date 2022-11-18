@@ -43,9 +43,11 @@
 }
 
 .cal-event-title {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: 0.25rem;
+    justify-content: start;
+    justify-items: start;
+    padding: 0.25rem 0;
 }
 
 .cal-event {

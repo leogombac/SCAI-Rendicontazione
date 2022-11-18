@@ -33,9 +33,9 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let consuntivo of rendicontazioneService.consuntivi$ | async">
-                            <td>{{ consuntivo.getGiorno() }}</td>
+                            <td>{{ consuntivo.giorno }}</td>
                             <td>{{ consuntivo.start | date: 'hh:mm' }}</td>
-                            <td [innerHTML]="consuntivo.title"></td>
+                            <td class="cal-event-title" [innerHTML]="consuntivo.title"></td>
                             <td class="text-right">
                                 <button
                                     class="btn btn-link p-3"

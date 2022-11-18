@@ -21,6 +21,7 @@ import { colors } from './utils/colors';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
 import { isMobile } from '../utils/mobile.utils';
+import { ConsuntivoEvent } from '../models/rendicontazione';
 
 @Component({
   selector: 'app-calendar',
@@ -117,61 +118,41 @@ export class CalendarComponent {
     mouseDownEvent: MouseEvent,
     segmentElement: HTMLElement
   ) {
-    const dragToSelectEvent: CalendarEvent = {
-      id: this.events.length,
-      title: 'Nuovo consuntivo',
-      start: segment.date,
-      color: colors.yellow,
-      draggable: true,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      meta: {
-        tmpEvent: true,
-      },
-    };
+
+    const dragToSelectEvent = new ConsuntivoEvent({ start: segment.date });
     this.events = [...this.events, dragToSelectEvent];
     const segmentPosition = segmentElement.getBoundingClientRect();
     this.dragToCreateActive = true;
-    const endOfView = endOfWeek(
-      this.viewDate,
-      { weekStartsOn: this.weekStartsOn, }
-    );
+    const endOfView = endOfWeek(this.viewDate, { weekStartsOn: this.weekStartsOn });
 
     fromEvent(document, 'mousemove')
       .pipe(
         finalize(() => {
-          delete dragToSelectEvent.meta.tmpEvent;
           this.dragToCreateActive = false;
           this.refresh();
         }),
         takeUntil(fromEvent(document, 'mouseup'))
       )
       .subscribe((mouseMoveEvent: MouseEvent) => {
-        const minutesDiff = ceilToNearest(
-          mouseMoveEvent.clientY - segmentPosition.top,
-          30
-        );
-
-        const daysDiff =
-          floorToNearest(
-            mouseMoveEvent.clientX - segmentPosition.left,
-            segmentPosition.width
-          ) / segmentPosition.width;
-
+        
+        const minutesDiff = ceilToNearest(mouseMoveEvent.clientY - segmentPosition.top, 30);
+        const daysDiff = floorToNearest(mouseMoveEvent.clientX - segmentPosition.left, segmentPosition.width) / segmentPosition.width;
         const newEnd = addDays(addMinutes(segment.date, minutesDiff), daysDiff);
+
         if (newEnd > segment.date && newEnd < endOfView) {
           dragToSelectEvent.end = newEnd;
-          dragToSelectEvent.title = `Nuovo consuntivo<br><span class="badge badge-primary">${minutesDiff / 60} ore</span>`;
+          dragToSelectEvent.setTitle();
         }
+
         this.refresh();
       });
   }
 
-  eventTimesChanged({ event, newStart, newEnd, }: CalendarEventTimesChangedEvent): void {
+  eventTimesChanged({ event, newStart, newEnd, }): void {
     event.start = newStart;
     event.end = newEnd;
+    event.meta.tmpEvent = true;
+    event.setTitle();
     this.refresh();
   }
 
