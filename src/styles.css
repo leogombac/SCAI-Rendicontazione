@@ -15,6 +15,7 @@
     background: #0d47a1;
 }
 
+/* Bootstrap fixes */
 .pointer {
     cursor: pointer;
 }
@@ -28,10 +29,9 @@
     margin-right: -1px;
 }
 
-.main-panel .main-content {
-    margin-top: 70px;
-    padding: 30px 15px;
-    min-height: calc(100vh - 155px);
+/* Angular Material fixes */
+.cdk-overlay-connected-position-bounding-box {
+    z-index: 9999;
 }
 
 .no-label .mat-form-field-wrapper {
@@ -42,6 +42,20 @@
     margin-bottom: -1.25em;
 }
 
+/* Material Dashboard fixes */
+.main-panel .main-content {
+    margin-top: 70px;
+    padding: 30px 15px;
+    min-height: calc(100vh - 155px);
+}
+
+@media (max-width: 768px) {
+    .main-panel .main-content {
+        padding: 1rem 0;
+    }
+}
+
+/* Angular calendar fixes */
 .cal-event-title {
     display: grid;
     gap: 0.25rem;
@@ -60,10 +74,4 @@
 
 .cal-bg-blue {
     background-color: rgb(209, 232, 255);
-}
-
-@media (max-width: 768px) {
-    .main-panel .main-content {
-        padding: 1rem 0;
-    }
 }

@@ -15,6 +15,13 @@ export interface UtenteAzienda {
     idUtente: number
 }
 
+export interface Diaria {
+    idTipoTrasferta: number;
+    tipoTrasferta: string;
+    idDiaria: number;
+    diaria: number;
+}
+
 export interface Profilo {
     idProfilo: number;
     descrizione: string;

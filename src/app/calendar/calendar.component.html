@@ -82,6 +82,7 @@
                         [viewDate]="viewDate"
                         [events]="events"
                         [activeDayIsOpen]="true"
+                        (dayClicked)="dayClicked($event.day)"
                         (eventTimesChanged)="eventTimesChanged($event)"
                         (eventClicked)="onEventClicked($event)">
                     </mwl-calendar-month-view>

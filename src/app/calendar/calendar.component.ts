@@ -13,7 +13,7 @@ import {
 import { WeekViewHourSegment } from 'calendar-utils';
 import { fromEvent, Subject } from 'rxjs';
 import { finalize, take, takeUntil, tap } from 'rxjs/operators';
-import { addDays, addMinutes, endOfWeek } from 'date-fns';
+import { addDays, addMinutes, endOfWeek, isSameDay, isSameMonth } from 'date-fns';
 import { RendicontazioneService } from './../services/rendicontazione.service';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
@@ -48,6 +48,8 @@ export class CalendarComponent {
 
   viewDate = new Date();
   events: ConsuntivoEvent[] = [];
+
+  activeDayIsOpen: boolean = true;
   
   loading = false;
   initialized = false;
@@ -171,6 +173,16 @@ export class CalendarComponent {
       });
   }
 
+  dayClicked({ date, events }: { date: Date; events: ConsuntivoEvent[] }): void {
+    if (isSameMonth(date, this.viewDate)) {
+      if (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true || events.length === 0)
+        this.activeDayIsOpen = false;
+      else
+        this.activeDayIsOpen = true;
+      this.viewDate = date;
+    }
+  }
+
   eventTimesChanged({ event, newStart, newEnd, }): void {
     event.start = newStart;
     event.end = newEnd;
@@ -192,7 +204,8 @@ export class CalendarComponent {
         width: '90%',
         maxWidth: '800px',
         enterAnimationDuration: '0ms',
-        exitAnimationDuration: '0ms'
+        exitAnimationDuration: '0ms',
+        autoFocus: false
       }
     );
   }

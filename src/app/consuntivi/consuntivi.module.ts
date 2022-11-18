@@ -8,7 +8,7 @@ import { RiepilogoComponent } from './riepilogo/riepilogo.component';
 import { DialogGestionePresenzaComponent } from '../dialog-gestione-presenza/dialog-gestione-presenza.component';
 import { MaterialModule } from '../app.module';
 import { UserPanelModule } from '../user-panel/user-panel.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -23,7 +23,8 @@ import { FormsModule } from '@angular/forms';
     AppCalendarModule,
     MaterialModule,
     UserPanelModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class ConsuntiviModule { }

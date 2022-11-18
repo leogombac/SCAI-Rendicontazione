@@ -40,7 +40,8 @@ export class RiepilogoComponent implements OnInit {
         width: '90%',
         maxWidth: '800px',
         enterAnimationDuration: '0ms',
-        exitAnimationDuration: '0ms'
+        exitAnimationDuration: '0ms',
+        autoFocus: false
       }
     );
   }

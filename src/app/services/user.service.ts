@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, share, switchMap, tap } from 'rxjs';
-import { ReferenteService, UtenteService } from '../api/services';
-import { Azienda, DatoOperativo, User, UtenteAzienda } from '../models/user';
+import { AziendeService, ReferenteService, UtenteService } from '../api/services';
+import { Azienda, DatoOperativo, Diaria, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -11,6 +11,9 @@ export class UserService {
 
   private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
   utentiAzienda$ = this._utentiAzienda$.asObservable();
+
+  private _diarie$ = new BehaviorSubject<Diaria[]>([]);
+  diarie$ = this._diarie$.asObservable();
 
   private _datoOperativo$ = new ReplaySubject<DatoOperativo>(1);
   datoOperativo$ = this._datoOperativo$.asObservable();
@@ -26,12 +29,14 @@ export class UserService {
 
   constructor(
     private utenteService: UtenteService,
+    private aziendeService: AziendeService,
     private referenteService: ReferenteService,
     private authService: AuthService
   ) {
     this.createPipelineAziende();
     this.createPipelineDatiOperativi();
     this.createPipelineUtentiAzienda();
+    this.createPipelineTrasferte();
   }
 
   get idReferente() {
@@ -135,6 +140,26 @@ export class UserService {
       map((d: any) => JSON.parse(d)),
       tap(utentiAzienda => this._utentiAzienda$.next(utentiAzienda)),
       tap(utentiAzienda => console.log("Utenti Azienda", utentiAzienda)),
+    )
+    .subscribe();
+  }
+
+  private createPipelineTrasferte() {
+
+    combineLatest([
+      this.user$,
+      this.azienda$,
+    ]).pipe(
+      filter(([ user ]) => !!user),
+      switchMap(([ user, azienda ]) =>
+        this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet({
+          idUtente: user.idUtente,
+         idAzienda: azienda.idAzienda
+        })
+      ),
+      map((d: any) => JSON.parse(d)),
+      tap(diarie => this._diarie$.next(diarie)),
+      tap(diarie => console.log("Diarie", diarie)),
     )
     .subscribe();
   }

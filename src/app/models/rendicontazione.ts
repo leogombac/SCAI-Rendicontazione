@@ -1,6 +1,13 @@
 import { CalendarEvent } from "angular-calendar";
 import { colors } from "../calendar/utils/colors";
 
+export interface Commessa {
+    codiceCommessa: string;
+    idAttivita: number;
+    idAzienda: number;
+    idCommessa: number;
+}
+
 export interface PresenzaOrario {
     progressivo: number;
     inizio: string;
@@ -124,8 +131,4 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         html += '<span class="badge badge-primary">' + this.durataOre + ' ore</span>'
         this.title = html;
     }
-}
-
-export interface Commessa {
-
 }

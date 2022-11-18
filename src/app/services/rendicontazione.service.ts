@@ -136,6 +136,31 @@ export class RendicontazioneService {
   }
 
   private createPipelineCommesse() {
-    // TODO
+    
+    combineLatest([
+      this.userService.user$,
+      this.viewDate$,
+      this._update$, // TODO: if not necessary, then remove it
+    ]).pipe(
+      filter(([ user ]) => !!user),
+      tap(() => this._loading$.next(true)),
+      switchMap(([ { idUtente } ]) =>
+        this.utenteService.consuntivazioneUtenteIdUtenteCommesseIdAziendaAnnoMeseGiornoGet({
+          idUtente,
+          idAzienda: this.userService.azienda.idAzienda,
+          anno: this.viewDate.getFullYear(),
+          mese: this.viewDate.getMonth() + 1,
+          giorno: this.viewDate.getDate(),
+        })
+      ),
+      share(),
+      map((d: any) => JSON.parse(d)),
+      map(_commesse => ([..._commesse.utente, ..._commesse.obbligatorie])),
+      tap(commesse => this._commesse$.next(commesse)),
+      tap(commesse => {
+        console.log('Commesse', commesse)
+      }),
+    )
+    .subscribe();
   }
 }
