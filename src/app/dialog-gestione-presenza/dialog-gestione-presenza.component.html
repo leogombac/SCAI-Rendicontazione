@@ -56,6 +56,60 @@
         </mat-form-field>
       </div>
     </div>
+    <div class="row mb-3">
+      <div class="col-12 modalita-modifica-wrap">
+          <label>Modalità modifica orario:</label>
+          <mat-radio-group [(ngModel)]="modalitaModifica">
+            <mat-radio-button value="inizioDurata">Inizio - Durata</mat-radio-button>
+            <mat-radio-button value="inizioFine">Inizio - Fine</mat-radio-button>
+          </mat-radio-group>
+      </div>
+    </div>
+    <ng-container [ngSwitch]="modalitaModifica">
+      <div *ngSwitchCase="'inizioDurata'" class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="fill">
+            <mat-label>Data Inizio</mat-label>
+            <input
+                matInput
+                placeholder="Data inizio"
+            >
+            <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="fill">
+            <mat-label>Numero Ore</mat-label>
+            <input type="number" matInput placeholder="Numero ore">
+          </mat-form-field>
+        </div>
+      </div>
+      <div *ngSwitchCase="'inizioFine'" class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="fill">
+            <mat-label>Data Inizio</mat-label>
+            <input
+                matInput
+                placeholder="Data inizio"
+            >
+            <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="fill">
+            <mat-label>Data Fine</mat-label>
+            <input
+                matInput
+                placeholder="Data fine"
+            >
+            <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+    </ng-container>
   </form>
 </div>
 <mat-dialog-actions class="actions-container" align="end">
