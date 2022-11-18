@@ -1,0 +1,47 @@
+<div
+    *ngIf="{ 
+        user: userService.user$ | async
+    } as page"
+    class="card inherited-styles-for-exported-element"
+>
+    <ng-container *ngIf="page.user">
+        <div class="card-header card-header-primary card-header-icon">
+            <div class="card-icon">
+                <i *ngIf="!page.user.isReferente" class="material-icons">person</i>
+                <i *ngIf="page.user.isReferente" class="material-icons">supervisor_account</i>
+            </div>
+            <h4 class="card-title">Ciao {{ page.user.nome }} {{ page.user.cognome }}</h4>
+        </div>
+        <div class="card-body">
+    
+            <div class="swap-user-wrap">
+                <div class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</div>
+                
+                <form novalidate>
+                    <mat-form-field>
+                        <mat-label>Utente consuntivi</mat-label>
+                        <input
+                            type="text" 
+                            placeholder="Scegli un utente"
+                            matInput 
+                            [formControl]="myControl"
+                            [matAutocomplete]="auto"
+                            #input
+                        >
+                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                            <mat-option *ngFor="let option of filteredOptions | async" [value]="option.idUtente">
+                                {{ option.nome }}
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-hint>
+                            <ng-container *ngIf="page.user.idUtente === page.user.idReferente">L'utente selezionato sei tu</ng-container>
+                            <ng-container *ngIf="page.user.idUtente !== page.user.idReferente">L'utente selezionato è {{ page.user.idUtente }}</ng-container>
+                        </mat-hint>
+                        <mat-icon matPrefix>search</mat-icon>
+                    </mat-form-field>
+                </form>
+            </div>
+    
+        </div>
+    </ng-container>
+</div>

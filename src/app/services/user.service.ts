@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, share, switchMap, tap } from 'rxjs';
-import { UtenteService } from '../api/services';
-import { Azienda, DatiOperativi } from '../models/user';
+import { ReferenteService, UtenteService } from '../api/services';
+import { Azienda, DatoOperativo, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -9,8 +9,14 @@ import { AuthService } from './auth.service';
 })
 export class UserService {
 
-  private _datiOperativi$ = new ReplaySubject<DatiOperativi>();
-  datiOperativi$ = this._datiOperativi$.asObservable();
+  private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
+  utentiAzienda$ = this._utentiAzienda$.asObservable();
+
+  private _datoOperativo$ = new ReplaySubject<DatoOperativo>(1);
+  datoOperativo$ = this._datoOperativo$.asObservable();
+
+  private _user$ = new BehaviorSubject<User>(null);
+  user$ = this._user$.asObservable();
 
   private _aziende$ = new BehaviorSubject<Azienda[]>([]);
   aziende$ = this._aziende$.asObservable();
@@ -20,10 +26,37 @@ export class UserService {
 
   constructor(
     private utenteService: UtenteService,
+    private referenteService: ReferenteService,
     private authService: AuthService
   ) {
     this.createPipelineAziende();
     this.createPipelineDatiOperativi();
+    this.createPipelineUtentiAzienda();
+  }
+
+  get idReferente() {
+    const user = this._user$.getValue();
+    if (!user) return;
+    return user.idReferente;
+  }
+
+  get idUtente() {
+    const user = this._user$.getValue();
+    if (!user) return;
+    return user.idUtente;
+  }
+
+  set idUtente(idUtente: number) {
+    const user = this._user$.getValue();
+    if (!user) return;
+
+    // Check to see if given idUtente exists in utentiAzienda
+    const utentiAzienda = this._utentiAzienda$.getValue();
+    if (idUtente !== this.idReferente && !utentiAzienda.some(utenteAzienda => utenteAzienda.idUtente === idUtente))
+      return;
+
+    user.idUtente = idUtente;
+    this._user$.next(user);
   }
 
   get aziende() {
@@ -67,20 +100,41 @@ export class UserService {
 
   private createPipelineDatiOperativi() {
 
-    combineLatest(
+    combineLatest([
       this.authService.loginData$,
       this.azienda$
-    )
+    ])
     .pipe(
       filter(([ loginData, azienda ]) => !!loginData && !!azienda),
       switchMap(([ loginData ]) =>
         this.utenteService.consuntivazioneUtenteIdUtenteDatiOperativiGet({ idUtente: +loginData.username.slice(-5) })
-          .pipe(
-            map((d: any) => JSON.parse(d)[this.aziende.findIndex(_azienda => _azienda.idAzienda === this.azienda.idAzienda)])
-          )
       ),
-      tap(datiOperativi => this._datiOperativi$.next(datiOperativi)),
-      tap(datiOperativi => console.log("Dati Operativi", datiOperativi)),
+      map((d: any) => JSON.parse(d)),
+      map(datiOperativi => datiOperativi.find(datoOperativo => datoOperativo.idAziendaAssunzione === this.azienda.idAzienda)),
+      tap(datoOperativo => this._datoOperativo$.next(datoOperativo)),
+      tap(datoOperativo => console.log("Dato Operativo", datoOperativo)),
+      tap(datoOperativo => {
+        const newUser = new User(datoOperativo);
+        this._user$.next(newUser);
+        console.log("User", newUser);
+      }),
+    )
+    .subscribe();
+  }
+
+  private createPipelineUtentiAzienda() {
+
+    combineLatest([
+      this.user$,
+      this.azienda$,
+    ]).pipe(
+      filter(([ user ]) => !!user && user.isReferente),
+      switchMap(([ user, azienda ]) =>
+        this.referenteService.consuntivazioneReferenteIdReferenteAziendaIdAziendaUtentiGet({ idReferente: user.idReferente, idAzienda: azienda.idAzienda })
+      ),
+      map((d: any) => JSON.parse(d)),
+      tap(utentiAzienda => this._utentiAzienda$.next(utentiAzienda)),
+      tap(utentiAzienda => console.log("Utenti Azienda", utentiAzienda)),
     )
     .subscribe();
   }

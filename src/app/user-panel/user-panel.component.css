@@ -1,0 +1,9 @@
+.swap-user-wrap {
+    align-items: center;
+    display: grid;
+    gap: 0.75rem;
+    font-size: 1rem;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 768px;
+}

@@ -20,6 +20,7 @@ import { RendicontazioneService } from './../services/rendicontazione.service';
 import { colors } from './utils/colors';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
+import { isMobile } from '../utils/mobile.utils';
 
 @Component({
   selector: 'app-calendar',
@@ -55,7 +56,9 @@ export class CalendarComponent {
   constructor(
     public rendicontazioneService: RendicontazioneService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {
+    this.view = isMobile() ? CalendarView.Day : CalendarView.Week;
+  }
 
   ngOnInit() {
 
@@ -160,6 +163,7 @@ export class CalendarComponent {
         const newEnd = addDays(addMinutes(segment.date, minutesDiff), daysDiff);
         if (newEnd > segment.date && newEnd < endOfView) {
           dragToSelectEvent.end = newEnd;
+          dragToSelectEvent.title = `Nuovo consuntivo<br><span class="badge badge-primary">${minutesDiff / 60} ore</span>`;
         }
         this.refresh();
       });

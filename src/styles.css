@@ -42,6 +42,12 @@
     margin-bottom: -1.25em;
 }
 
+.cal-event-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
 .cal-event {
     user-select: none;
 }

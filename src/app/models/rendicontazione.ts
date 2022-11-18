@@ -25,7 +25,6 @@ export class ConsuntivoEvent implements CalendarEvent {
     meta = { tmpEvent: false };
 
     constructor(dataPresenza: Date, presenza: Presenza) {
-        this.title = presenza.codiceCommessa;
 
         // Adjust start and end date to provide retro-compatibility
         if (presenza.presenzeOrario.length) {
@@ -42,6 +41,11 @@ export class ConsuntivoEvent implements CalendarEvent {
             beforeStart: true,
             afterEnd: true,
         };
+
+        this.title = `Consuntivo salvato
+<br>
+<span class="badge badge-primary">${presenza.codiceCommessa}</span>
+<span class="badge badge-primary">${(this.end.getTime() - this.start.getTime()) / 60 / 60 / 1000} ore</span>`;
     }
 
     getDurata() {

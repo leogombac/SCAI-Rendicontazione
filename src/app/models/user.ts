@@ -1,4 +1,4 @@
-export interface DatiOperativiStorico {
+export interface DatoOperativoStorico {
     idTerzePartiStraordinari: number;
     idTerzePartiReperibilita: number;
     terzePartiReperibilitaInizio: String;
@@ -9,7 +9,18 @@ export interface DatiOperativiStorico {
     terzePartiReperibilitaValore: any;
 }
 
-export interface DatiOperativi {
+export interface UtenteAzienda {
+    nome: string;
+    cognome: string;
+    idUtente: number
+}
+
+export interface Profilo {
+    idProfilo: number;
+    descrizione: string;
+}
+
+export interface DatoOperativo {
     idUtente: number;
     nome: string;
     cognome: string;
@@ -34,7 +45,8 @@ export interface DatiOperativi {
         giovedi: number;
         venerdi: number
     };
-    storico: DatiOperativiStorico[];
+    profili: Profilo[];
+    storico: DatoOperativoStorico[];
     terzaParte: any;
     visibile: boolean;
     turni: boolean;
@@ -50,4 +62,29 @@ export interface Azienda {
     idAzienda: number,
     acronimo: string,
     descrizione: string
+}
+
+export class User {
+
+    // From DatoOperativo
+    idUtente: number;
+    nome: string;
+    cognome: string;
+    turni: boolean;
+
+    // Application level
+    idReferente: number;
+    isReferente: boolean;
+
+    constructor(datoOperativo: DatoOperativo) {
+        
+        this.idUtente = datoOperativo.idUtente;
+        this.nome = datoOperativo.nome;
+        this.cognome = datoOperativo.cognome;
+        this.turni = datoOperativo.turni;
+
+        // If user is referente, then he/she can change idUtente at will
+        this.idReferente = this.idUtente;
+        this.isReferente = datoOperativo.profili && datoOperativo.profili.length > 1;
+    }
 }

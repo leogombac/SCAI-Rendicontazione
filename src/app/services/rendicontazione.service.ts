@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, share, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, share, switchMap, tap } from 'rxjs';
 import { UtenteService } from '../api/services';
 import { ConsuntivoEvent, Presenza } from '../models/rendicontazione';
 import { UserService } from './user.service';
@@ -76,11 +76,12 @@ export class RendicontazioneService {
 
   private createPipelineConsultivi() {
 
-    combineLatest(
-      this.userService.datiOperativi$,
+    combineLatest([
+      this.userService.user$,
       this.viewDate$,
       this._update$,
-    ).pipe(
+    ]).pipe(
+      filter(([ user ]) => !!user),
       tap(() => this._loading$.next(true)),
       switchMap(([ { idUtente } ]) =>
         this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGet({

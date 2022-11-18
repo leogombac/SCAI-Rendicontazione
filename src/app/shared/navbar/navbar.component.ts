@@ -2,7 +2,7 @@ import { Component, OnInit, Renderer2, ViewChild, ElementRef, Directive } from '
 import { ROUTES } from '../.././sidebar/sidebar.component';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, map, startWith } from 'rxjs/operators';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
@@ -19,6 +19,10 @@ declare var $: any;
 })
 
 export class NavbarComponent implements OnInit {
+    myControl = new FormControl('');
+    options: string[] = ['One', 'Two', 'Three'];
+    filteredOptions: Observable<string[]>;
+
     private listTitles: any[];
     location: Location;
     mobile_menu_visible: any = 0;
@@ -100,7 +104,18 @@ export class NavbarComponent implements OnInit {
         }, 1000);
     }
 
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+    
+        return this.options.filter(option => option.toLowerCase().includes(filterValue));
+      }
+
     ngOnInit() {
+        this.filteredOptions = this.myControl.valueChanges.pipe(
+            startWith(''),
+            map(value => this._filter(value || '')),
+          );
+          
         this.listTitles = ROUTES.filter(listTitle => listTitle);
 
         const navbar: HTMLElement = this.element.nativeElement;
