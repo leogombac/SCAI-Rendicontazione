@@ -8,6 +8,7 @@ export interface PresenzaOrario {
 }
 
 export interface Presenza {
+    progressivo: number;
     idCommessa: number;
     codiceCommessa: string;
     numeroMinuti: number;
@@ -15,6 +16,7 @@ export interface Presenza {
 }
 
 export interface ConsuntivoEventConfig {
+    id?: string | number;
     start?: Date,
     end?: Date;
     dataPresenza?: Date,
@@ -23,32 +25,40 @@ export interface ConsuntivoEventConfig {
 
 export class ConsuntivoEvent implements CalendarEvent, Presenza {
 
-    // From CalendarEvent (title via set/get)
+    // CalendarEvent
+    id;
     title;
     start;
     end;
     resizable = { beforeStart: true, afterEnd: true };
     meta = { tmpEvent: false };
 
-    // From Presenza
+    // Presenza
+    progressivo;
     idCommessa;
     codiceCommessa;
     numeroMinuti;
     presenzeOrario;
 
+    // Applicative level fields
+    isLocal;
+
     constructor(config: ConsuntivoEventConfig) {
         if (config.dataPresenza && config.presenza)
             this.fromServer(config.dataPresenza, config.presenza);
-        else if (config.start)
-            this.fromCalendar(config.start);
+        else if (config.id && config.start)
+            this.fromCalendar(config.id, config.start);
         else
             throw new Error("Cannot create ConsuntivoEvent: missing data."); 
     }
 
-    private fromServer(dataPresenza, presenza) {
+    private fromServer(dataPresenza, presenza: Presenza) {
+        this.isLocal = false;
+        this.progressivo = this.id;
         this.idCommessa = presenza.idCommessa;
         this.codiceCommessa = presenza.codiceCommessa;
-        this.presenzeOrario = presenza.presenzeOrario
+        this.presenzeOrario = presenza.presenzeOrario;
+        
 
         // Adjust start and end date to provide retro-compatibility
         if (this.presenzeOrario.length) {
@@ -62,7 +72,9 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.setTitle();
     }
 
-    private fromCalendar(start: Date) {
+    private fromCalendar(id, start: Date) {
+        this.isLocal = true;
+        this.id = id;
         this.start = start;
         this.meta.tmpEvent = true;
         this.setTitle();
@@ -81,14 +93,17 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     }
 
     get giorno() {
+        if (!this.end)
+            return this.start.toLocaleString(window.navigator.language, { weekday: 'long' });
+        
         const inizioGiorno = this.start.getDay();
         const fineGiorno = this.end.getDay();
-        if (inizioGiorno === fineGiorno) {
+        if (inizioGiorno === fineGiorno)
             return this.start.toLocaleString(window.navigator.language, { weekday: 'long' })
                 + ' '
                 + this.start.getDate();
-        }
-        else {
+        
+        else
             return this.start.toLocaleString(window.navigator.language, { weekday: 'short' })
                 + ' '
                 + this.start.getDate()
@@ -96,7 +111,6 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
                 + this.end.toLocaleString(window.navigator.language, { weekday: 'short' })
                 + ' '
                 + this.end.getDate();
-        }
     }
 
     setTitle() {
@@ -106,7 +120,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         else
             html += 'Consuntivo Remoto<br>'
         if (this.codiceCommessa)
-            html += '<span class="badge badge-primary">' + this.codiceCommessa + '</span>'
+            html += '<span class="badge badge-primary mr-1">' + this.codiceCommessa + '</span>'
         html += '<span class="badge badge-primary">' + this.durataOre + ' ore</span>'
         this.title = html;
     }

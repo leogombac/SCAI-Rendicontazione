@@ -54,6 +54,14 @@
     user-select: none;
 }
 
+.cal-bg-yellow {
+    background-color: rgb(253, 241, 186);
+}
+
+.cal-bg-blue {
+    background-color: rgb(209, 232, 255);
+}
+
 @media (max-width: 768px) {
     .main-panel .main-content {
         padding: 1rem 0;

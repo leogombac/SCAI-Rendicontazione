@@ -32,10 +32,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let consuntivo of rendicontazioneService.consuntivi$ | async">
+                        <tr 
+                            *ngFor="let consuntivo of (consuntivi$ | async)"
+                            [class.cal-bg-yellow]="consuntivo.isLocal"
+                            [class.cal-bg-blue]="!consuntivo.isLocal"
+                        >
                             <td>{{ consuntivo.giorno }}</td>
                             <td>{{ consuntivo.start | date: 'hh:mm' }}</td>
-                            <td class="cal-event-title" [innerHTML]="consuntivo.title"></td>
+                            <td [innerHTML]="consuntivo.title"></td>
                             <td class="text-right">
                                 <button
                                     class="btn btn-link p-3"
@@ -46,7 +50,7 @@
                     </tbody>
                 </table>
 
-                <div *ngIf="(rendicontazioneService.consuntivi$ | async)?.length === 0" class="no-consuntivi">
+                <div *ngIf="(consuntivi$ | async)?.length === 0" class="no-consuntivi">
                     <p>Nessun consuntivo</p>
                 </div>
             </div>

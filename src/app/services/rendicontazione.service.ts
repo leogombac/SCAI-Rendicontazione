@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, map, share, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs';
 import { UtenteService } from '../api/services';
+import { CalendarService } from '../calendar/calendar.service';
 import { Commessa, ConsuntivoEvent, Presenza } from '../models/rendicontazione';
 import { UserService } from './user.service';
 
@@ -9,8 +10,7 @@ import { UserService } from './user.service';
 })
 export class RendicontazioneService {
 
-  private _consuntivi$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
-  consuntivi$ = this._consuntivi$.asObservable();
+  _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
 
   private _commesse$ = new BehaviorSubject<Commessa[]>([]);
   commesse$ = this._commesse$.asObservable();
@@ -27,6 +27,7 @@ export class RendicontazioneService {
   constructor(
     private utenteService: UtenteService,
     private userService: UserService,
+    private calendarService: CalendarService
   ) {
     this.createPipelineConsultivi();
     this.createPipelineCommesse();
@@ -80,6 +81,20 @@ export class RendicontazioneService {
 
   private createPipelineConsultivi() {
 
+    // Clear consuntiviLocal$ on idUtente or idAzienda change
+    combineLatest([
+      this.userService.user$,
+      this.userService.azienda$
+    ]).pipe(
+        filter(([ user, azienda ]) => !!user && !!azienda),
+        distinctUntilChanged(
+          (x, y) => x[0].idUtente !== y[0].idUtente
+                && x[1].idAzienda !== y[1].idAzienda
+        ),
+        tap(() => this.calendarService._consuntiviLocal$.next([]))
+      )
+      .subscribe();
+
     combineLatest([
       this.userService.user$,
       this.viewDate$,
@@ -110,7 +125,7 @@ export class RendicontazioneService {
         return consuntivi;
 
       }),
-      tap(consuntivi => this._consuntivi$.next(consuntivi)),
+      tap(consuntivi => this._consuntiviRemote$.next(consuntivi)),
       tap(consuntivi => {
         this._loading$.next(false);
         this._initialized$.next(true);
@@ -121,6 +136,6 @@ export class RendicontazioneService {
   }
 
   private createPipelineCommesse() {
-
+    // TODO
   }
 }

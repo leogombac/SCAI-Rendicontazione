@@ -5,15 +5,14 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { 
-  CalendarEvent,
+import {
   CalendarEventTitleFormatter,
   CalendarView,
   DAYS_OF_WEEK,
 } from 'angular-calendar';
 import { WeekViewHourSegment } from 'calendar-utils';
 import { fromEvent, Subject } from 'rxjs';
-import { finalize, takeUntil, tap } from 'rxjs/operators';
+import { finalize, take, takeUntil, tap } from 'rxjs/operators';
 import { addDays, addMinutes, endOfWeek } from 'date-fns';
 import { RendicontazioneService } from './../services/rendicontazione.service';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
@@ -22,6 +21,8 @@ import { isMobile } from '../utils/mobile.utils';
 import { ConsuntivoEvent } from '../models/rendicontazione';
 import { DialogGestionePresenzaComponent } from '../dialog-gestione-presenza/dialog-gestione-presenza.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CalendarService } from './calendar.service';
+import { UUID } from '../utils/uuid.utils';
 
 @Component({
   selector: 'app-calendar',
@@ -46,7 +47,7 @@ export class CalendarComponent {
   weekStartsOn = DAYS_OF_WEEK.MONDAY;
 
   viewDate = new Date();
-  events: CalendarEvent[] = [];
+  events: ConsuntivoEvent[] = [];
   
   loading = false;
   initialized = false;
@@ -56,6 +57,7 @@ export class CalendarComponent {
 
   constructor(
     public rendicontazioneService: RendicontazioneService,
+    private calendarService: CalendarService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
@@ -74,7 +76,7 @@ export class CalendarComponent {
       )
       .subscribe();
 
-    this.rendicontazioneService.consuntivi$
+    this.rendicontazioneService._consuntiviRemote$
       .pipe(
         takeUntil(this.destroy$),
         tap(consuntivi => {
@@ -84,15 +86,17 @@ export class CalendarComponent {
       )
       .subscribe();
 
+    this.calendarService._consuntiviLocal$
+      .pipe(
+        takeUntil(this.destroy$),
+        tap(() => this.refresh()),
+      )
+      .subscribe();
+
     this.rendicontazioneService.loading$
       .pipe(
         takeUntil(this.destroy$),
         tap(loading => {
-
-          // Scroll after loading
-          const nativeEl = this.scrollContainer.nativeElement;
-          nativeEl.scroll(0, nativeEl.getBoundingClientRect().height / 2);
-
           this.loading = loading;
           this.refresh();
         }),
@@ -108,23 +112,18 @@ export class CalendarComponent {
         }),
       )
       .subscribe();
+
+    // Scroll once after init
+    this.rendicontazioneService.initialized$
+      .pipe(
+        tap(() => this.scrollContainer.nativeElement.scroll(0, 540)),
+        take(1),
+      )
+      .subscribe();
   }
 
   ngOnDestroy() {
     this.destroy$.next();
-  }
-
-  private openDialog(consuntivo: ConsuntivoEvent) {
-    this.dialog.open(
-      DialogGestionePresenzaComponent,
-      {
-        data: consuntivo,
-        width: '90%',
-        maxWidth: '800px',
-        enterAnimationDuration: '0ms',
-        exitAnimationDuration: '0ms'
-      }
-    );
   }
 
   startDragToCreate(
@@ -133,8 +132,17 @@ export class CalendarComponent {
     segmentElement: HTMLElement
   ) {
 
-    const dragToSelectEvent = new ConsuntivoEvent({ start: segment.date });
-    this.events = [...this.events, dragToSelectEvent];
+    const dragToSelectEvent = new ConsuntivoEvent({
+      id: UUID(),
+      start: segment.date
+    });
+
+    // Emit on consuntiviLocal$ and refresh
+    const consuntivi = this.calendarService._consuntiviLocal$.getValue();
+    consuntivi.push(dragToSelectEvent);
+    this.calendarService._consuntiviLocal$
+      .next(consuntivi);
+
     const segmentPosition = segmentElement.getBoundingClientRect();
     this.dragToCreateActive = true;
     const endOfView = endOfWeek(this.viewDate, { weekStartsOn: this.weekStartsOn });
@@ -143,7 +151,7 @@ export class CalendarComponent {
       .pipe(
         finalize(() => {
           this.dragToCreateActive = false;
-          this.openDialog(dragToSelectEvent);
+          // this.openDialog(dragToSelectEvent);
           this.refresh();
         }),
         takeUntil(fromEvent(document, 'mouseup'))
@@ -168,7 +176,7 @@ export class CalendarComponent {
     event.end = newEnd;
     event.meta.tmpEvent = true;
     event.setTitle();
-    this.openDialog(event);
+    // this.openDialog(event);
     this.refresh();
   }
 
@@ -176,8 +184,24 @@ export class CalendarComponent {
     this.openDialog(event);
   }
 
+  private openDialog(event: ConsuntivoEvent, events?: ConsuntivoEvent[]) {
+    this.dialog.open(
+      DialogGestionePresenzaComponent,
+      {
+        data: { event, events },
+        width: '90%',
+        maxWidth: '800px',
+        enterAnimationDuration: '0ms',
+        exitAnimationDuration: '0ms'
+      }
+    );
+  }
+
   refresh() {
-    this.events = [...this.events];
+    this.events = [
+      ...this.calendarService._consuntiviLocal$.getValue(),
+      ...this.rendicontazioneService._consuntiviRemote$.getValue()
+    ];
     this.cdr.detectChanges();
   }
 }

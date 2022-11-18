@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { UtenteAzienda } from '../models/user';
 import { UserService } from '../services/user.service';
 
@@ -11,6 +11,8 @@ import { UserService } from '../services/user.service';
 })
 export class UserPanelComponent implements OnInit {
   
+  destroy$ = new Subject<void>();
+
   filteredOptions: Observable<UtenteAzienda[]>;
   optionSet = new Set<number>();
   myControl = new FormControl('', control => {
@@ -19,19 +21,24 @@ export class UserPanelComponent implements OnInit {
     else
       return { utenteAzienda: 'Utente non trovato' };
   });
-  
 
   constructor(
     public userService: UserService
   ) {
 
     this.userService.utentiAzienda$
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe(utentiAzienda => {
         this.optionSet.clear();
         utentiAzienda.map(utenteAzienda => this.optionSet.add(utenteAzienda.idUtente));
       });
 
     this.myControl.valueChanges
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe(value => {
         if (!value)
           return this.userService.idUtente = this.userService.idReferente;

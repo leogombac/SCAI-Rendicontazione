@@ -128,5 +128,10 @@
 <mat-dialog-actions class="actions-container" align="end">
   <button class="btn btn-link" mat-button mat-dialog-close>Annulla</button>
   <button class="btn btn-primary" mat-button>Salva</button>
-  <button class="btn btn-danger" mat-button [mat-dialog-close]="true">Elimina</button>
+  <button
+    class="btn btn-danger"
+    mat-button
+    [mat-dialog-close]="true"
+    (click)="delete()"
+  >Elimina</button>
 </mat-dialog-actions>
