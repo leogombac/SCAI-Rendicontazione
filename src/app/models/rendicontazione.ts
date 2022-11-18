@@ -111,3 +111,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.title = html;
     }
 }
+
+export interface Commessa {
+
+}

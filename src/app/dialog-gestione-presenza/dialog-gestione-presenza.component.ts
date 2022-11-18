@@ -9,6 +9,8 @@ import { ConsuntivoEvent } from 'src/app/models/rendicontazione';
 })
 export class DialogGestionePresenzaComponent implements OnInit {
 
+  modalitaModifica: 'inizioDurata' | 'inizioFine' = 'inizioDurata';
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConsuntivoEvent
   ) { }

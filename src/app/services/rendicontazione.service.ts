@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, share, switchMap, tap } from 'rxjs';
 import { UtenteService } from '../api/services';
-import { ConsuntivoEvent, Presenza } from '../models/rendicontazione';
+import { Commessa, ConsuntivoEvent, Presenza } from '../models/rendicontazione';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -11,6 +11,9 @@ export class RendicontazioneService {
 
   private _consuntivi$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
   consuntivi$ = this._consuntivi$.asObservable();
+
+  private _commesse$ = new BehaviorSubject<Commessa[]>([]);
+  commesse$ = this._commesse$.asObservable();
 
   private _viewDate$ = new BehaviorSubject<Date>(new Date());
   viewDate$ = this._viewDate$.asObservable();
@@ -26,6 +29,7 @@ export class RendicontazioneService {
     private userService: UserService,
   ) {
     this.createPipelineConsultivi();
+    this.createPipelineCommesse();
   }
 
   get viewDate() {
@@ -114,5 +118,9 @@ export class RendicontazioneService {
       }),
     )
     .subscribe();
+  }
+
+  private createPipelineCommesse() {
+
   }
 }

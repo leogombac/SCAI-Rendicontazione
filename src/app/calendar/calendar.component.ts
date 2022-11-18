@@ -9,7 +9,6 @@ import {
   CalendarEvent,
   CalendarEventTitleFormatter,
   CalendarView,
-  CalendarEventTimesChangedEvent,
   DAYS_OF_WEEK,
 } from 'angular-calendar';
 import { WeekViewHourSegment } from 'calendar-utils';
@@ -17,11 +16,12 @@ import { fromEvent, Subject } from 'rxjs';
 import { finalize, takeUntil, tap } from 'rxjs/operators';
 import { addDays, addMinutes, endOfWeek } from 'date-fns';
 import { RendicontazioneService } from './../services/rendicontazione.service';
-import { colors } from './utils/colors';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
 import { isMobile } from '../utils/mobile.utils';
 import { ConsuntivoEvent } from '../models/rendicontazione';
+import { DialogGestionePresenzaComponent } from '../dialog-gestione-presenza/dialog-gestione-presenza.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-calendar',
@@ -56,6 +56,7 @@ export class CalendarComponent {
 
   constructor(
     public rendicontazioneService: RendicontazioneService,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
     this.view = isMobile() ? CalendarView.Day : CalendarView.Week;
@@ -113,6 +114,19 @@ export class CalendarComponent {
     this.destroy$.next();
   }
 
+  private openDialog(consuntivo: ConsuntivoEvent) {
+    this.dialog.open(
+      DialogGestionePresenzaComponent,
+      {
+        data: consuntivo,
+        width: '90%',
+        maxWidth: '800px',
+        enterAnimationDuration: '0ms',
+        exitAnimationDuration: '0ms'
+      }
+    );
+  }
+
   startDragToCreate(
     segment: WeekViewHourSegment,
     mouseDownEvent: MouseEvent,
@@ -129,6 +143,7 @@ export class CalendarComponent {
       .pipe(
         finalize(() => {
           this.dragToCreateActive = false;
+          this.openDialog(dragToSelectEvent);
           this.refresh();
         }),
         takeUntil(fromEvent(document, 'mouseup'))
@@ -153,7 +168,12 @@ export class CalendarComponent {
     event.end = newEnd;
     event.meta.tmpEvent = true;
     event.setTitle();
+    this.openDialog(event);
     this.refresh();
+  }
+
+  onEventClicked({ event }: { event: ConsuntivoEvent }): void {
+    this.openDialog(event);
   }
 
   refresh() {

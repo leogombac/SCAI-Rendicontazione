@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConsuntivoEvent } from 'src/app/models/rendicontazione';
 import { RendicontazioneService } from 'src/app/services/rendicontazione.service';
-import { DialogGestionePresenzaComponent } from '../dialog-gestione-presenza/dialog-gestione-presenza.component';
+import { DialogGestionePresenzaComponent } from '../../dialog-gestione-presenza/dialog-gestione-presenza.component';
 
 @Component({
   selector: 'app-riepilogo',

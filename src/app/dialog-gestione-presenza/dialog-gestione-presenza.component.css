@@ -1,0 +1,17 @@
+.modalita-modifica-wrap {
+    display: flex;
+    gap: 1rem;
+}
+
+.modalita-modifica-wrap mat-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media(max-width: 768px) {
+    .actions-container {
+        display: grid;
+        justify-content: stretch;
+    }
+}
