@@ -1,6 +1,23 @@
 import { CalendarEvent } from "angular-calendar";
 import { colors } from "../calendar/utils/colors";
 
+export interface SaveConsuntivoBody {
+    codiceAttivita: string;
+    codiceCommessa: string;
+    data: string;
+    fine: string;
+    idAttivita: number;
+    idCommessa: number;
+    inizio: string;
+    inserimentoAutomatico: boolean;
+    minuti: number;
+    modalita: number;
+    note?: string;
+    progressivo: number;
+    reperibilita: boolean;
+    turni: boolean;
+  }
+
 export interface Commessa {
     codiceCommessa: string;
     idAttivita: number;
@@ -25,6 +42,7 @@ export interface Presenza {
     idCommessa: number;
     idAttivita: number;
     codiceCommessa: string;
+    codiceAttivita: string;
     numeroMinuti: number;
     note: string;
     modalitaLavoro: ModalitaLavoro;
@@ -54,6 +72,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     idCommessa;
     idAttivita;
     codiceCommessa;
+    codiceAttivita;
     numeroMinuti;
     note;
     modalitaLavoro;
@@ -72,11 +91,15 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     }
 
     private fromServer(dataPresenza, presenza: Presenza) {
+
         this.isLocal = false;
-        this.progressivo = this.id;
+        this.id = presenza.progressivo;
+
+        this.progressivo = presenza.progressivo;
         this.idCommessa = presenza.idCommessa;
         this.idAttivita = presenza.idAttivita;
         this.codiceCommessa = presenza.codiceCommessa;
+        this.codiceAttivita = presenza.codiceAttivita;
         this.note = presenza.note;
         this.modalitaLavoro = presenza.modalitaLavoro;
         this.presenzeOrario = presenza.presenzeOrario;
@@ -94,6 +117,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     }
 
     private fromCalendar(id, start: Date) {
+
         this.isLocal = true;
         this.id = id;
         this.start = start;

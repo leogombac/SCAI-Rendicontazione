@@ -3,7 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { combineLatest, debounceTime, distinctUntilChanged, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { ConsuntivoEvent } from 'src/app/models/rendicontazione';
+import { ConsuntivoEvent, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
 import { CalendarService } from '../calendar/calendar.service';
 import { RendicontazioneService } from '../services/rendicontazione.service';
 import { UserService } from '../services/user.service';
@@ -105,6 +105,25 @@ export class DialogGestionePresenzaComponent implements OnInit {
           array.filter(item => item[filterKey].toString().toLowerCase().includes(value))
         ),
     );
+  }
+
+  save() {
+
+    // Extract codiceCommessa from input
+    // Extract tipoTrasferta from input
+    // Extract modalitaLavoro from input
+    // Extract dataInizio from input
+    // Extract numeroOre from input
+    // Extract descrizione from input
+
+    // const consuntivo: SaveConsuntivoBody = {};
+
+    // Create new
+    if (this.data.event.isLocal) {
+      return;
+    }
+
+    // Update old
   }
 
   delete() {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
-import { Commessa, ConsuntivoEvent, Presenza } from '../models/rendicontazione';
+import { Commessa, ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -46,31 +46,23 @@ export class RendicontazioneService {
     this._update$.next(true);
   }
 
-  async createConsuntivo(consuntivo: ConsuntivoEvent) {
-    try {
-      await this.getFakeHTTPCall();
-      this.refresh();
-    }
-    catch(e) {
-      throw new Error(e);
-    }
-  }
+  async saveConsuntivo(event: ConsuntivoEvent, saveConsuntivoBody: SaveConsuntivoBody) {
+    
+    if (event.isLocal) return;
 
-  async updateConsuntivo(consuntivo: ConsuntivoEvent) {
-    try {
-      await this.getFakeHTTPCall();
-      this.refresh();
-    }
-    catch(e) {
-      throw new Error(e);
-    }
+    this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
+      idUtente: this.userService.idUtente,
+      body: saveConsuntivoBody,
+      idCommessa: event.idCommessa
+    })
+    .subscribe(() => this.refresh());
   }
 
   async deleteConsuntivo(event: ConsuntivoEvent) {
 
     if (event.isLocal) return;
     
-    await this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
+    this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
       idCommessa: event.idCommessa,
       idAttivita: event.idAttivita,
       progressivo: event.progressivo,
@@ -79,6 +71,7 @@ export class RendicontazioneService {
       mese: event.start.getMonth() + 1,
       giorno: event.start.getDate()
     })
+    .subscribe(() => this.refresh());
   }
   
   private getFakeHTTPCall() {
