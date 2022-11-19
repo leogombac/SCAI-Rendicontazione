@@ -34,6 +34,10 @@ export class RendicontazioneService {
     this.createPipelineCommesse();
   }
 
+  get commesse() {
+    return this._commesse$.getValue();
+  }
+
   get viewDate() {
     return this._viewDate$.getValue();
   }

@@ -2,6 +2,7 @@ import { HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, switchMap, tap } from 'rxjs';
 import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
+import { ModalitaLavoro } from '../models/rendicontazione';
 import { Azienda, DatoOperativo, Diaria, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 
@@ -16,7 +17,7 @@ export class UserService {
   private _diarie$ = new BehaviorSubject<Diaria[]>([]);
   diarie$ = this._diarie$.asObservable();
 
-  private _modalitaLavoro$ = new BehaviorSubject<Diaria[]>([]);
+  private _modalitaLavoro$ = new BehaviorSubject<ModalitaLavoro[]>([]);
   modalitaLavoro$ = this._modalitaLavoro$.asObservable();
 
   private _datoOperativo$ = new ReplaySubject<DatoOperativo>(1);
@@ -43,6 +44,14 @@ export class UserService {
     this.createPipelineUtentiAzienda();
     this.createPipelineTrasferte();
     this.createPipelineModalitaLavoro();
+  }
+
+  get modalitaLavoro() {
+    return this._modalitaLavoro$.getValue();
+  }
+
+  get diarie() {
+    return this._diarie$.getValue();
   }
 
   get idReferente() {

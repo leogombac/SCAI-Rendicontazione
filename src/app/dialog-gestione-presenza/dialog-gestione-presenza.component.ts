@@ -109,12 +109,29 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
   save() {
 
-    // Extract codiceCommessa from input
-    // Extract tipoTrasferta from input
-    // Extract modalitaLavoro from input
-    // Extract dataInizio from input
-    // Extract numeroOre from input
-    // Extract descrizione from input
+    // Extract field values
+    const {
+      commessa,
+      dataInizio,
+      descrizione,
+      diaria,
+      modalitaLavoro,
+      numeroOre
+    } = this.form.value;
+
+    // Look for objects
+    const commessaObj = this.rendicontazioneService.commesse
+      .find(c => c.codiceCommessa === commessa);
+
+    const modalitaLavoroObj = this.userService.modalitaLavoro
+    .find(mL => mL.descrizione === modalitaLavoro);
+
+    const diariaObj = this.userService.diarie
+      .find(d => d.tipoTrasferta === diaria);
+
+    console.log('Commessa', commessaObj);
+    console.log('Modalita Lavoro', modalitaLavoroObj);
+    console.log('Diaria', diariaObj);
 
     // const consuntivo: SaveConsuntivoBody = {};
 
