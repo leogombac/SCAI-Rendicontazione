@@ -1,5 +1,5 @@
 <ng-container *ngIf="userService.user$ | async as user">
-    <div *ngIf="user.isReferente" class="card inherited-styles-for-exported-element">
+    <div *ngIf="user.isReferente" class="card user-panel-card">
         <div class="card-header card-header-primary card-header-icon">
             <div class="card-icon">
                 <i class="material-icons">supervisor_account</i>
@@ -7,35 +7,30 @@
             <h4 class="card-title">Ciao {{ user.nome }} {{ user.cognome }}</h4>
         </div>
         <div class="card-body">
-    
-            <div class="swap-user-wrap mb-5">
-                <div class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</div>
-                
-                <form novalidate>
-                    <mat-form-field appearance="fill">
-                        <mat-label>Utente consuntivi</mat-label>
-                        <input
-                            type="text" 
-                            placeholder="Scegli un utente"
-                            matInput 
-                            [formControl]="myControl"
-                            [matAutocomplete]="auto"
-                            #input
-                        >
-                        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                            <mat-option *ngFor="let option of filteredOptions | async" [value]="option.idUtente">
-                                {{ option.nome }}
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-hint>
-                            <ng-container *ngIf="user.idUtente === user.idReferente">L'utente selezionato sei tu</ng-container>
-                            <ng-container *ngIf="user.idUtente !== user.idReferente">L'utente selezionato è {{ user.idUtente }}</ng-container>
-                        </mat-hint>
-                        <mat-icon matPrefix>search</mat-icon>
-                    </mat-form-field>
-                </form>
-            </div>
-    
+            <p class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</p>
+            <form class="m-2" novalidate>
+                <mat-form-field appearance="fill">
+                    <mat-label>Utente consuntivi</mat-label>
+                    <input
+                        type="text" 
+                        placeholder="Scegli un utente"
+                        matInput 
+                        [formControl]="myControl"
+                        [matAutocomplete]="auto"
+                        #input
+                    >
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.idUtente">
+                            {{ option.nome }}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <mat-hint>
+                        <ng-container *ngIf="user.idUtente === user.idReferente">L'utente selezionato sei tu</ng-container>
+                        <ng-container *ngIf="user.idUtente !== user.idReferente">L'utente selezionato è {{ user.idUtente }}</ng-container>
+                    </mat-hint>
+                    <mat-icon matPrefix>search</mat-icon>
+                </mat-form-field>
+            </form>
         </div>
     </div>
 </ng-container>

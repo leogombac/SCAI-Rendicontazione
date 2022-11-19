@@ -8,6 +8,12 @@ export interface Commessa {
     idCommessa: number;
 }
 
+export interface ModalitaLavoro {
+    id: number;
+    descrizione: string;
+    inserimentoAutomatico: number;
+}
+
 export interface PresenzaOrario {
     progressivo: number;
     inizio: string;
@@ -17,8 +23,11 @@ export interface PresenzaOrario {
 export interface Presenza {
     progressivo: number;
     idCommessa: number;
+    idAttivita: number;
     codiceCommessa: string;
     numeroMinuti: number;
+    note: string;
+    modalitaLavoro: ModalitaLavoro;
     presenzeOrario: PresenzaOrario[];
 }
 
@@ -43,8 +52,11 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     // Presenza
     progressivo;
     idCommessa;
+    idAttivita;
     codiceCommessa;
     numeroMinuti;
+    note;
+    modalitaLavoro;
     presenzeOrario;
 
     // Applicative level fields
@@ -63,9 +75,11 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.isLocal = false;
         this.progressivo = this.id;
         this.idCommessa = presenza.idCommessa;
+        this.idAttivita = presenza.idAttivita;
         this.codiceCommessa = presenza.codiceCommessa;
+        this.note = presenza.note;
+        this.modalitaLavoro = presenza.modalitaLavoro;
         this.presenzeOrario = presenza.presenzeOrario;
-        
 
         // Adjust start and end date to provide retro-compatibility
         if (this.presenzeOrario.length) {

@@ -1,5 +1,6 @@
+import { formatDate } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { combineLatest, debounceTime, distinctUntilChanged, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { ConsuntivoEvent } from 'src/app/models/rendicontazione';
@@ -23,33 +24,51 @@ export class DialogGestionePresenzaComponent implements OnInit {
   controlMap = {};
   observableArrayMap = {};
 
+  form: FormGroup;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { event: ConsuntivoEvent, events?: ConsuntivoEvent[] },
     private calendarService: CalendarService,
     private rendicontazioneService: RendicontazioneService,
     private userService: UserService
-  ) {
+  ) {}
 
-    this.createSelectLogic(
+  ngOnInit(): void {
+
+    this.createSelectorLogic(
       'commessa',
       this.rendicontazioneService.commesse$,
-      'codiceCommessa'
+      'codiceCommessa',
+      this.data.event.codiceCommessa,
+      [ Validators.required ]
     );
-
-    this.createSelectLogic(
+    this.createSelectorLogic(
       'diaria',
       this.userService.diarie$,
       'tipoTrasferta'
     );
-
-    this.createSelectLogic(
+    this.createSelectorLogic(
       'modalitaLavoro',
       this.userService.modalitaLavoro$,
-      'descrizione'
+      'descrizione',
+      this.data.event.modalitaLavoro?.descrizione,
+      [ Validators.required ]
     );
+
+    const controlMap = {
+      ...this.controlMap,
+      dataInizio: new FormControl(this.data.event.start, [ Validators.required ]),
+      numeroOre: new FormControl(this.data.event.durataOre, [
+        Validators.required,
+        Validators.min(0.5),
+        Validators.max(14)
+      ]),
+      descrizione: new FormControl(this.data.event.note),
+    };
+    this.form = new FormGroup(controlMap);
   }
 
-  private createSelectLogic(controlName, observableArray, filterKey) {
+  private createSelectorLogic(controlName, observableArray, filterKey, defaultValue = '', validators = []) {
 
     this.observableArrayMap[controlName] = observableArray;
     this.optionSetMap[controlName] = new Set();
@@ -63,13 +82,13 @@ export class DialogGestionePresenzaComponent implements OnInit {
         array.map(item => this.optionSetMap[controlName].add(item[filterKey].toString()));
       });
     
-    this.controlMap[controlName] = new FormControl('', control => {
+    this.controlMap[controlName] = new FormControl(defaultValue, [control => {
       const valueFound = this.optionSetMap[controlName].has(control.value);
       if (control.value === '' || valueFound)
         return null;
       else
         return { [controlName]: 'Non trovato' };
-    });
+    }, ...validators]);
 
     this.filteredArrayMap[controlName] = this.controlMap[controlName].valueChanges
       .pipe(
@@ -88,9 +107,6 @@ export class DialogGestionePresenzaComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-  }
-
   delete() {
 
     // Delete local event
@@ -100,7 +116,11 @@ export class DialogGestionePresenzaComponent implements OnInit {
       events.splice(eventIndex, 1);
       this.calendarService._consuntiviLocal$
         .next(events);
+      return;
     }
+
+    // Delete remote event
+    this.rendicontazioneService.deleteConsuntivo(this.data.event);
   }
 
 }

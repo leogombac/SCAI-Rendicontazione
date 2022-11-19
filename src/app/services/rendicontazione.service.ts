@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs';
-import { UtenteService } from '../api/services';
+import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
 import { Commessa, ConsuntivoEvent, Presenza } from '../models/rendicontazione';
 import { UserService } from './user.service';
@@ -26,6 +26,7 @@ export class RendicontazioneService {
 
   constructor(
     private utenteService: UtenteService,
+    private commesseService: CommesseService,
     private userService: UserService,
     private calendarService: CalendarService
   ) {
@@ -65,14 +66,19 @@ export class RendicontazioneService {
     }
   }
 
-  async deleteConsuntivo(consuntivo: ConsuntivoEvent) {
-    try {
-      await this.getFakeHTTPCall();
-      this.refresh();
-    }
-    catch(e) {
-      throw new Error(e);
-    }
+  async deleteConsuntivo(event: ConsuntivoEvent) {
+
+    if (event.isLocal) return;
+    
+    await this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
+      idCommessa: event.idCommessa,
+      idAttivita: event.idAttivita,
+      progressivo: event.progressivo,
+      idUtente: this.userService.idUtente,
+      anno: event.start.getFullYear(),
+      mese: event.start.getMonth() + 1,
+      giorno: event.start.getDate()
+    })
   }
   
   private getFakeHTTPCall() {
