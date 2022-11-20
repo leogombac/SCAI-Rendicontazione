@@ -8,6 +8,7 @@ export interface SaveConsuntivoBody {
     fine: string;
     idAttivita: number;
     idCommessa: number;
+    idTipoTrasferta?: number;
     inizio: string;
     inserimentoAutomatico: boolean;
     minuti: number;
@@ -19,10 +20,11 @@ export interface SaveConsuntivoBody {
   }
 
 export interface Commessa {
-    codiceCommessa: string;
-    idAttivita: number;
     idAzienda: number;
     idCommessa: number;
+    codiceCommessa: string;
+    idAttivita: number;
+    descrizioneAttivita: string;
 }
 
 export interface ModalitaLavoro {
@@ -65,6 +67,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     start;
     end;
     resizable = { beforeStart: true, afterEnd: true };
+    draggable = true;
     meta = { tmpEvent: false };
 
     // Presenza
@@ -80,6 +83,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
 
     // Applicative level fields
     isLocal;
+    originalStart;
 
     constructor(config: ConsuntivoEventConfig) {
         if (config.dataPresenza && config.presenza)
@@ -92,8 +96,8 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
 
     private fromServer(dataPresenza, presenza: Presenza) {
 
-        this.isLocal = false;
         this.id = presenza.progressivo;
+        this.isLocal = false;
 
         this.progressivo = presenza.progressivo;
         this.idCommessa = presenza.idCommessa;
@@ -113,6 +117,10 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
             this.start = new Date(dataPresenza);
             this.end = new Date(new Date(dataPresenza).getTime() + presenza.numeroMinuti * 60 * 1000);
         }
+
+        // This is required to change date during save operation
+        this.originalStart = this.start;
+
         this.setTitle();
     }
 

@@ -54,8 +54,6 @@ export class RendicontazioneService {
   }
 
   async saveConsuntivo(event: ConsuntivoEvent, saveConsuntivoBody: SaveConsuntivoBody) {
-    
-    if (event.isLocal) return;
 
     const saveRequest = lastValueFrom(
       this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({

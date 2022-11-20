@@ -34,8 +34,8 @@
                     <tbody>
                         <tr 
                             *ngFor="let consuntivo of (consuntivi$ | async)"
-                            [class.cal-bg-yellow]="consuntivo.isLocal"
-                            [class.cal-bg-blue]="!consuntivo.isLocal"
+                            [class.cal-bg-yellow]="consuntivo.meta.tmpEvent"
+                            [class.cal-bg-blue]="!consuntivo.meta.tmpEvent"
                         >
                             <td>{{ consuntivo.giorno }}</td>
                             <td>{{ consuntivo.start | date: 'hh:mm' }}</td>

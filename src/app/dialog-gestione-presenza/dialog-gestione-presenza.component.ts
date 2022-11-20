@@ -1,12 +1,13 @@
 import { formatDate } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { combineLatest, debounceTime, distinctUntilChanged, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { ConsuntivoEvent, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
 import { CalendarService } from '../calendar/calendar.service';
 import { RendicontazioneService } from '../services/rendicontazione.service';
 import { UserService } from '../services/user.service';
+import { getTZOffsettedDate } from '../utils/time.utils';
 
 @Component({
   selector: 'app-dialog-gestione-presenza',
@@ -28,6 +29,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { event: ConsuntivoEvent, events?: ConsuntivoEvent[] },
+    private dialog: MatDialogRef<DialogGestionePresenzaComponent>,
     private calendarService: CalendarService,
     private rendicontazioneService: RendicontazioneService,
     private userService: UserService
@@ -57,12 +59,19 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     const controlMap = {
       ...this.controlMap,
-      dataInizio: new FormControl(this.data.event.start, [ Validators.required ]),
-      numeroOre: new FormControl(this.data.event.durataOre, [
-        Validators.required,
-        Validators.min(0.5),
-        Validators.max(14)
-      ]),
+      dataInizio: new FormControl(
+        getTZOffsettedDate(this.data.event.start)
+          .toISOString()
+          .slice(0, 16), // Required because we saved timestamp without timezone and type of input is datetime-local
+        [ Validators.required ]
+      ),
+      numeroOre: new FormControl(
+        this.data.event.durataOre, [
+          Validators.required,
+          Validators.min(0.5),
+          Validators.max(14)
+        ]
+      ),
       descrizione: new FormControl(this.data.event.note),
     };
     this.form = new FormGroup(controlMap);
@@ -107,7 +116,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
     );
   }
 
-  save() {
+  async save() {
 
     // Extract field values
     const {
@@ -120,6 +129,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
     } = this.form.value;
 
     // Look for objects
+    // TODO: fix codiceCommessa to idAttivita because of uniqueness
     const commessaObj = this.rendicontazioneService.commesse
       .find(c => c.codiceCommessa === commessa);
 
@@ -133,30 +143,69 @@ export class DialogGestionePresenzaComponent implements OnInit {
     console.log('Modalita Lavoro', modalitaLavoroObj);
     console.log('Diaria', diariaObj);
 
-    // const consuntivo: SaveConsuntivoBody = {};
+    // Calculate minuti and fine
+    const _dataInizio = getTZOffsettedDate(new Date(dataInizio));
+    const inizio = _dataInizio.toISOString();
+    const minuti = numeroOre * 60;
+    const fine = new Date(_dataInizio.getTime() + minuti * 60 * 1000).toISOString();
+
+    console.log('Inizio', inizio, 'minuti', minuti, 'fine', fine);
+
+    const consuntivo: SaveConsuntivoBody = {
+      progressivo: 0, // Set below
+      data: '', // Set below
+      inizio,
+      minuti,
+      fine,
+      inserimentoAutomatico: false,
+      idAttivita: commessaObj.idAttivita,
+      codiceAttivita: commessaObj.descrizioneAttivita,
+      idCommessa: commessaObj.idCommessa,
+      codiceCommessa: commessaObj.codiceCommessa,
+      modalita: modalitaLavoro.workType,
+      idTipoTrasferta: diaria?.idTipoTrasferta,
+      reperibilita: false,
+      turni: false,
+      note: descrizione
+    };
 
     // Create new
     if (this.data.event.isLocal) {
+      consuntivo.progressivo = 0;
+      consuntivo.data = inizio;
+      this.data.event.idCommessa = commessaObj.idCommessa;
+      try {
+        await this.rendicontazioneService.saveConsuntivo(this.data.event, consuntivo);
+        this.removeLocalEvent();
+        this.dialog.close();
+      }
+      catch (e) { } // Error already handled at service level
       return;
     }
 
     // Update old
+    consuntivo.progressivo = this.data.event.progressivo;
+    consuntivo.data = this.data.event.originalStart;
+    this.rendicontazioneService.saveConsuntivo(this.data.event, consuntivo);
+    this.dialog.close();
   }
 
   delete() {
 
     // Delete local event
     if (this.data.event.isLocal) {
-      const events = this.calendarService._consuntiviLocal$.getValue();
-      const eventIndex = events.findIndex(event => event.id === this.data.event.id);
-      events.splice(eventIndex, 1);
-      this.calendarService._consuntiviLocal$
-        .next(events);
-      return;
+      return this.removeLocalEvent();
     }
 
     // Delete remote event
     this.rendicontazioneService.deleteConsuntivo(this.data.event);
+  }
+
+  private removeLocalEvent() {
+    const events = this.calendarService._consuntiviLocal$.getValue();
+    const eventIndex = events.findIndex(event => event.id === this.data.event.id);
+    events.splice(eventIndex, 1);
+    this.calendarService._consuntiviLocal$.next(events);
   }
 
 }
