@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
 import { Commessa, ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
+import { ToastLevel } from '../models/toast';
+import { ToasterService } from '../shared/toaster/toaster.service';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -28,7 +30,8 @@ export class RendicontazioneService {
     private utenteService: UtenteService,
     private commesseService: CommesseService,
     private userService: UserService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private toasterService: ToasterService
   ) {
     this.createPipelineConsultivi();
     this.createPipelineCommesse();
@@ -54,32 +57,48 @@ export class RendicontazioneService {
     
     if (event.isLocal) return;
 
-    this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
-      idUtente: this.userService.idUtente,
-      body: saveConsuntivoBody,
-      idCommessa: event.idCommessa
-    })
-    .subscribe(() => this.refresh());
+    const saveRequest = lastValueFrom(
+      this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
+        idUtente: this.userService.idUtente,
+        body: saveConsuntivoBody,
+        idCommessa: event.idCommessa
+      })
+    );
+
+    try {
+      await saveRequest;
+      this.toasterService.addToast(ToastLevel.Success, "Consuntivo salvato con successo!");
+      this.refresh();
+    }
+    catch (e) {
+      this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante il salvataggio del consuntivo.");
+    }
   }
 
   async deleteConsuntivo(event: ConsuntivoEvent) {
 
     if (event.isLocal) return;
     
-    this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
-      idCommessa: event.idCommessa,
-      idAttivita: event.idAttivita,
-      progressivo: event.progressivo,
-      idUtente: this.userService.idUtente,
-      anno: event.start.getFullYear(),
-      mese: event.start.getMonth() + 1,
-      giorno: event.start.getDate()
-    })
-    .subscribe(() => this.refresh());
-  }
-  
-  private getFakeHTTPCall() {
-    return new Promise(resolve => setTimeout(() => resolve(true), 3000));
+    const deleteRequest = lastValueFrom(
+      this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
+        idCommessa: event.idCommessa,
+        idAttivita: event.idAttivita,
+        progressivo: event.progressivo,
+        idUtente: this.userService.idUtente,
+        anno: event.start.getFullYear(),
+        mese: event.start.getMonth() + 1,
+        giorno: event.start.getDate()
+      })
+    );
+
+    try {
+      await deleteRequest;
+      this.toasterService.addToast(ToastLevel.Success, "Consuntivo eliminato con successo!");
+      this.refresh();
+    }
+    catch (e) {
+      this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante l'eliminazione del consuntivo.");
+    }
   }
 
   private createPipelineConsultivi() {

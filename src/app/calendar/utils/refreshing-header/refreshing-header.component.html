@@ -1,9 +1,11 @@
-<div class="align-items-center d-flex flex-wrap justify-content-center justify-content-md-between my-3 my-md-0 px-3">
-    <mat-form-field floatLabel="never" class="no-label no-hint w-auto">
+<div class="align-items-center d-flex flex-wrap justify-content-center justify-content-md-between my-3">
+    <mat-form-field class="no-hint w-auto" appearance="fill">
+        <mat-label>Cerca Data</mat-label>
         <input
             matInput
-            [matDatepicker]="picker"
             placeholder="Cerca data"
+            readonly
+            [matDatepicker]="picker"
             [value]="rendicontazioneService.viewDate"
             (dateChange)="rendicontazioneService.viewDate = $event.value"
         >

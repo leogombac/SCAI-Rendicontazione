@@ -15,7 +15,7 @@
                         [view]="view"
                         [(viewDate)]="viewDate"
                         (viewDateChange)="rendicontazioneService.viewDate = viewDate"
-                    >Previous</div>
+                    ><i class="fa fa-caret-left" aria-hidden="true"></i></div>
                     <div class="btn btn-primary"
                         mwlCalendarToday
                         [(viewDate)]="viewDate"
@@ -26,7 +26,7 @@
                         [view]="view"
                         [(viewDate)]="viewDate"
                         (viewDateChange)="rendicontazioneService.viewDate = viewDate"
-                    >Next</div>
+                    ><i class="fa fa-caret-right" aria-hidden="true"></i></div>
                 </div>
             </div>
             <div class="col-xl-4">
@@ -38,17 +38,17 @@
                         class="btn btn-primary"
                         [class.active]="view === CalendarView.Month"
                         (click)="view = CalendarView.Month"
-                    >Month</div>
+                    ><i class="material-icons">calendar_view_month</i></div>
                     <div
                         class="btn btn-primary"
                         [class.active]="view === CalendarView.Week"
                         (click)="view = CalendarView.Week"
-                    >Week</div>
+                    ><i class="material-icons">calendar_view_week</i></div>
                     <div
                         class="btn btn-primary"
                         [class.active]="view === CalendarView.Day"
                         (click)="view = CalendarView.Day"
-                    >Day</div>
+                    ><i class="material-icons">calendar_view_day</i></div>
                 </div>
             </div>
         </div>

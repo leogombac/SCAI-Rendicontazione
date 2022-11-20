@@ -1,3 +1,4 @@
+/* Scrollbar styling */
 ::-webkit-scrollbar {
     height: 10px;
     width: 10px;
@@ -16,17 +17,8 @@
 }
 
 /* Bootstrap fixes */
-.pointer {
-    cursor: pointer;
-}
-
-.lh-1 {
-    line-height: 1;
-}
-
-.btn-group > .btn:not(:first-child),
-.btn-group > .btn-group:not(:first-child) {
-    margin-right: -1px;
+.btn-group > .btn {
+    margin: 0 -1px !important;
 }
 
 /* Angular Material fixes */
@@ -74,4 +66,13 @@
 
 .cal-bg-blue {
     background-color: rgb(209, 232, 255);
+}
+
+/* Generic styles */
+.pointer {
+    cursor: pointer;
+}
+
+.lh-1 {
+    line-height: 1;
 }
