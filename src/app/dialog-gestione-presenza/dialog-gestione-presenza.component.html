@@ -81,7 +81,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div class="row mb-3">
+    <div class="row mb-3" [hidden]="!data.event.isLocal">
       <div class="col-12">
         <mat-checkbox [value]="ripeti" (change)="ripeti = !ripeti">Ripeti</mat-checkbox>
       </div>

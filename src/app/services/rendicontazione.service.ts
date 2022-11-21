@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
+import { isMonday, previousMonday } from 'date-fns';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
 import { Commessa, ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
+import { getTZOffsettedDate } from '../utils/time.utils';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -71,6 +73,68 @@ export class RendicontazioneService {
     catch (e) {
       this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante il salvataggio del consuntivo.");
     }
+  }
+
+  async saveConsuntivoRecursive(
+    daysBitmap: boolean[],
+    event: ConsuntivoEvent,
+    saveConsuntivoBody: SaveConsuntivoBody
+  ) {
+
+    // Get monday of the week
+    let monday;
+    if (isMonday(event.start))
+      monday = event.start;
+    else
+      monday = previousMonday(event.start);
+
+    // Make an array of promises for parallel requests via Promise.all
+    const promises = daysBitmap
+      .map((day, index) => ({ day, index }))
+      .filter(x => x.day)
+      .map(({ day, index }) => {
+
+        const yyyy = monday.getFullYear();
+        const MM = monday.getMonth() + 1;
+        const dd = monday.getDate() + (index + 6) % 7;
+        const hh = ('' + event.start.getHours()).padStart(2, '0');
+        const mm = ('' + event.start.getMinutes()).padStart(2, '0');
+
+        const start = getTZOffsettedDate(new Date(`${yyyy}-${MM}-${dd}T${hh}:${mm}`));
+
+        saveConsuntivoBody.data = start.toISOString();
+        saveConsuntivoBody.inizio = saveConsuntivoBody.data;
+        saveConsuntivoBody.fine = new Date(start.getTime() + saveConsuntivoBody.minuti * 60 * 1000).toISOString();
+
+        return lastValueFrom(
+          this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
+            idUtente: this.userService.idUtente,
+            body: saveConsuntivoBody,
+            idCommessa: event.idCommessa
+          })
+        );
+      });
+
+      // Pluralize messages
+      let successTxt;
+      let errorTxt;
+      if (promises.length > 1) {
+        successTxt = 'Consuntivi salvati con successo!';
+        errorTxt = "C'è stato un errore durante il salvataggio del consuntivo.";
+      }
+      else {
+        successTxt = 'Consuntivo salvato con successo!';
+        errorTxt = "C'è stato un errore durante il salvataggio di uno o più consuntivi.";
+      }
+
+      try {
+        await Promise.all(promises);
+        this.toasterService.addToast(ToastLevel.Success, successTxt);
+        this.refresh();
+      }
+      catch (e) {
+        this.toasterService.addToast(ToastLevel.Danger, errorTxt);
+      }
   }
 
   async deleteConsuntivo(event: ConsuntivoEvent) {

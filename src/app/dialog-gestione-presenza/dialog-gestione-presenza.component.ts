@@ -173,7 +173,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
       codiceAttivita: commessaObj.descrizioneAttivita,
       idCommessa: commessaObj.idCommessa,
       codiceCommessa: commessaObj.codiceCommessa,
-      modalita: modalitaLavoro.workType,
+      modalita: modalitaLavoro.id,
       idTipoTrasferta: diaria?.idTipoTrasferta,
       reperibilita: false,
       turni: false,
@@ -186,7 +186,11 @@ export class DialogGestionePresenzaComponent implements OnInit {
       consuntivo.data = inizio;
       this.data.event.idCommessa = commessaObj.idCommessa;
       try {
-        await this.rendicontazioneService.saveConsuntivo(this.data.event, consuntivo);
+        await this.rendicontazioneService.saveConsuntivoRecursive(
+          this.days.map((x: any) => x[1]),
+          this.data.event,
+          consuntivo
+        );
         this.removeLocalEvent();
         this.dialog.close();
       }

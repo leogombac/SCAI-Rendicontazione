@@ -89,7 +89,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         if (config.dataPresenza && config.presenza)
             this.fromServer(config.dataPresenza, config.presenza);
         else if (config.id && config.start)
-            this.fromCalendar(config.id, config.start);
+            this.fromCalendar(config.id, config.start, config.end);
         else
             throw new Error("Cannot create ConsuntivoEvent: missing data."); 
     }
@@ -124,11 +124,12 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.setTitle();
     }
 
-    private fromCalendar(id, start: Date) {
+    private fromCalendar(id, start: Date, end: Date) {
 
         this.isLocal = true;
         this.id = id;
         this.start = start;
+        this.end = end;
         this.meta.tmpEvent = true;
         this.setTitle();
     }
