@@ -83,6 +83,18 @@
     </div>
     <div class="row mb-3">
       <div class="col-12">
+        <mat-checkbox [value]="ripeti" (change)="ripeti = !ripeti">Ripeti</mat-checkbox>
+      </div>
+      <div class="col-12 giorniRipetuti" #giorniRipetuti [hidden]="!ripeti">
+        <mat-checkbox
+          *ngFor="let day of days"
+          [checked]="day[1]"
+          (change)="day[1] = !day[1]"
+        >{{ day[0] }}</mat-checkbox>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-12">
         <mat-checkbox disabled>Reperibilità</mat-checkbox>
       </div>
       <div class="col-12">
@@ -104,6 +116,7 @@
   </form>
   <p class="text-right text-muted">Si prega di compilare tutti i campi contrassegnati dall'asterisco (<b>*</b>)</p>
 </div>
+
 <mat-dialog-actions class="actions-container" align="end">
   <button class="btn btn-link" mat-button mat-dialog-close>Annulla</button>
   <button

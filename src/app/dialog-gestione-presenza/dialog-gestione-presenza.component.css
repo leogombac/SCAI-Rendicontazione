@@ -1,9 +1,4 @@
-.modalita-modifica-wrap {
-    display: flex;
-    gap: 1rem;
-}
-
-.modalita-modifica-wrap mat-radio-group {
+.giorniRipetuti {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;

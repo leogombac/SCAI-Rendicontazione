@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -16,7 +15,16 @@ import { getTZOffsettedDate } from '../utils/time.utils';
 })
 export class DialogGestionePresenzaComponent implements OnInit {
 
-  modalitaModifica: 'inizioDurata' | 'inizioFine' = 'inizioDurata';
+  ripeti = false;
+  days = [
+    ["Domenica", false],
+    ["Lunedì", false],
+    ["Martedì", false],
+    ["Mercoledì", false],
+    ["Giovedì", false],
+    ["Venerdì", false],
+    ["Sabato", false]
+  ];
 
   destroy$ = new Subject<void>();
 
@@ -36,6 +44,9 @@ export class DialogGestionePresenzaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+    const currDay = this.data.event.start.getDay();
+    this.days[currDay][1] = true;
 
     this.createSelectorLogic(
       'commessa',
