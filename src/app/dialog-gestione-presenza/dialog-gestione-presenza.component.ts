@@ -1,11 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { Commessa, ConsuntivoEvent, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
+import { Commessa, ConsuntivoEvent, ModalitaLavoro, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
 import { CalendarService } from '../calendar/calendar.service';
+import { Diaria } from '../models/user';
 import { RendicontazioneService } from '../services/rendicontazione.service';
 import { UserService } from '../services/user.service';
+import { createAutocompleteLogic, AutocompleteLogic } from '../utils/form.utils';
 import { getTZOffsettedDate } from '../utils/time.utils';
 
 @Component({
@@ -26,13 +27,9 @@ export class DialogGestionePresenzaComponent implements OnInit {
     ["Sabato", false]
   ];
 
-  destroy$ = new Subject<void>();
-
-  filteredArrayMap = {};
-  optionSetMap = {};
-  controlMap = {};
-  observableArrayMap = {};
-  arrayMap = {}; // Unwrapped values from observables set above
+  commessaAutocomplete: AutocompleteLogic<Commessa>;
+  diariaAutocomplete: AutocompleteLogic<Diaria>;
+  modalitaLavoroAutocomplete: AutocompleteLogic<ModalitaLavoro>;
 
   form: FormGroup;
 
@@ -49,19 +46,21 @@ export class DialogGestionePresenzaComponent implements OnInit {
     const currDay = this.data.event.start.getDay();
     this.days[currDay][1] = true;
 
-    this.createSelectorLogic(
+    this.commessaAutocomplete = createAutocompleteLogic(
       'commessa',
       this.rendicontazioneService.getCommesse$(this.data.event.start),
       'codiceCommessa',
       this.data.event.codiceCommessa,
       [ Validators.required ]
     );
-    this.createSelectorLogic(
+
+    this.diariaAutocomplete = createAutocompleteLogic(
       'diaria',
       this.userService.diarie$,
-      'tipoTrasferta'
+      'tipoTrasferta',
     );
-    this.createSelectorLogic(
+
+    this.modalitaLavoroAutocomplete = createAutocompleteLogic(
       'modalitaLavoro',
       this.userService.modalitaLavoro$,
       'descrizione',
@@ -69,8 +68,11 @@ export class DialogGestionePresenzaComponent implements OnInit {
       [ Validators.required ]
     );
 
-    const controlMap = {
-      ...this.controlMap,
+    // Map controls to form
+    this.form = new FormGroup({
+      'commessa': this.commessaAutocomplete.control,
+      'diaria': this.diariaAutocomplete.control,
+      'modalitaLavoro': this.modalitaLavoroAutocomplete.control,
       dataInizio: new FormControl(
         getTZOffsettedDate(this.data.event.start)
           .toISOString()
@@ -85,46 +87,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
         ]
       ),
       descrizione: new FormControl(this.data.event.note),
-    };
-    this.form = new FormGroup(controlMap);
-  }
-
-  private createSelectorLogic(controlName, observableArray, filterKey, defaultValue = '', validators = []) {
-
-    this.observableArrayMap[controlName] = observableArray;
-    this.arrayMap[controlName] = []; // Set default empty array
-    this.optionSetMap[controlName] = new Set();
-
-    observableArray
-      .pipe(
-        takeUntil(this.destroy$)
-      )
-      .subscribe(array => {
-        this.arrayMap[controlName] = array;
-        this.optionSetMap[controlName].clear();
-        array.map(item => this.optionSetMap[controlName].add(item[filterKey].toString()));
-      });
-    
-    this.controlMap[controlName] = new FormControl(defaultValue, [control => {
-      const valueFound = this.optionSetMap[controlName].has(control.value);
-      if (control.value === '' || valueFound)
-        return null;
-      else
-        return { [controlName]: 'Non trovato' };
-    }, ...validators]);
-
-    this.filteredArrayMap[controlName] = this.controlMap[controlName].valueChanges
-      .pipe(
-        startWith(''),
-        debounceTime(100),
-        distinctUntilChanged(),
-        map((value) => 
-          this.arrayMap[controlName]
-            .filter(item =>
-              new RegExp('^' + value, 'i').test(item[filterKey].toString())
-            )
-        ),
-    );
+    });
   }
 
   async save() {
@@ -141,18 +104,18 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     // Look for objects
     // TODO: fix codiceCommessa to idAttivita because of uniqueness
-    const commessaObj = this.arrayMap['commesse']
+    const commessaObj = this.commessaAutocomplete.array
       .find(c => c.codiceCommessa === commessa);
 
-    const modalitaLavoroObj = this.arrayMap['diaria']
-      .find(mL => mL.descrizione === modalitaLavoro);
-
-    const diariaObj = this.arrayMap['modalitaLavoro']
+    const diariaObj = this.diariaAutocomplete.array
       .find(d => d.tipoTrasferta === diaria);
 
+    const modalitaLavoroObj = this.modalitaLavoroAutocomplete.array
+      .find(mL => mL.descrizione === modalitaLavoro);
+
     console.log('Commessa', commessaObj);
-    console.log('Modalita Lavoro', modalitaLavoroObj);
     console.log('Diaria', diariaObj);
+    console.log('Modalita Lavoro', modalitaLavoroObj);
 
     // Calculate minuti and fine
     const _dataInizio = getTZOffsettedDate(new Date(dataInizio));
@@ -172,7 +135,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
       idCommessa: commessaObj.idCommessa,
       codiceCommessa: commessaObj.codiceCommessa,
       modalita: modalitaLavoroObj.id,
-      idTipoTrasferta: diaria?.idTipoTrasferta,
+      idTipoTrasferta: diariaObj?.idTipoTrasferta,
       reperibilita: false,
       turni: false,
       note: descrizione

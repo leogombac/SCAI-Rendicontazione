@@ -13,8 +13,8 @@
             [matAutocomplete]="auto"
           >
           <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option *ngFor="let option of (filteredArrayMap['commessa'] | async)" [value]="option.codiceCommessa">
-              <b>{{ option.codiceCommessa }}</b> ({{ option.descrizioneCommessa }})
+            <mat-option *ngFor="let commessa of (commessaAutocomplete.filteredArray$ | async)" [value]="commessa.codiceCommessa">
+              <b>{{ commessa.codiceCommessa }}</b> ({{ commessa.descrizioneCommessa }})
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -32,8 +32,8 @@
             [matAutocomplete]="auto2"
           >
           <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
-            <mat-option *ngFor="let option of (filteredArrayMap['diaria'] | async)" [value]="option.tipoTrasferta">
-              {{ option.tipoTrasferta }}
+            <mat-option *ngFor="let diaria of (diariaAutocomplete.filteredArray$ | async)" [value]="diaria.tipoTrasferta">
+              {{ diaria.tipoTrasferta }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -49,8 +49,8 @@
             [matAutocomplete]="auto3"
           >
           <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete">
-            <mat-option *ngFor="let option of (filteredArrayMap['modalitaLavoro'] | async)" [value]="option.descrizione">
-              {{ option.descrizione }}
+            <mat-option *ngFor="let modalitaLavoro of (modalitaLavoroAutocomplete.filteredArray$ | async)" [value]="modalitaLavoro.descrizione">
+              {{ modalitaLavoro.descrizione }}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>

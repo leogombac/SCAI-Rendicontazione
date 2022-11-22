@@ -78,7 +78,7 @@ export class UserPanelComponent implements OnInit {
     const found = users.find(user => user.idUtente === idUtente);
     if (found)
       return found.nome + ' ' + found.cognome;
-    return 'te stesso';
+    return 'Te stesso';
   }
 
 }

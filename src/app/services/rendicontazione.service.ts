@@ -34,6 +34,7 @@ export class RendicontazioneService {
     private calendarService: CalendarService,
     private toasterService: ToasterService
   ) {
+    this.createPipelineUpdate();
     this.createPipelineConsultivi();
   }
 
@@ -46,9 +47,6 @@ export class RendicontazioneService {
   }
 
   refresh() {
-
-    // Set lastDate to 0 to bypass isSameMonth check
-    this.lastDate = new Date(0);
     this._update$.next(true);
   }
 
@@ -158,6 +156,21 @@ export class RendicontazioneService {
     catch (e) {
       this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante l'eliminazione del consuntivo.");
     }
+  }
+
+  private createPipelineUpdate() {
+
+    // This pipeline is used to force refresh of consuntivi when lastDate and viewDate are of the same month
+    combineLatest([
+      this.userService.user$,
+      this._update$
+    ])
+    .pipe(
+      tap(() =>
+        this.lastDate = new Date(0)
+      )
+    )
+    .subscribe();
   }
 
   private createPipelineConsultivi() {

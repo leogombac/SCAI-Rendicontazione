@@ -12,8 +12,9 @@
             <h4 class="card-title">Ciao {{ data.user.nome }} {{ data.user.cognome }}</h4>
         </div>
         <div class="card-body">
-            <p class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</p>
-            <form class="m-2" novalidate>
+            <!-- <p class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</p> -->
+            <p class="h4 text-center">Stai consuntivando<br><b>{{ getNomeCognome(data.users, data.user.idUtente) }}</b></p>
+            <form novalidate>
                 <mat-form-field appearance="fill">
                     <mat-label>Utente Consuntivi</mat-label>
                     <input
@@ -28,7 +29,7 @@
                             {{ option.nome }} {{ option.cognome }}
                         </mat-option>
                     </mat-autocomplete>
-                    <mat-hint>L'utente selezionato è: {{ getNomeCognome(data.users, data.user.idUtente) }}</mat-hint>
+                    <mat-hint>Usa questo campo per cambiare utente</mat-hint>
                     <mat-icon matPrefix>search</mat-icon>
                 </mat-form-field>
             </form>
