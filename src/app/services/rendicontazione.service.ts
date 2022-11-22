@@ -14,7 +14,7 @@ import { UserService } from './user.service';
 })
 export class RendicontazioneService {
 
-  private lastDate = new Date('2000/01/01');
+  private lastDate = new Date(0);
 
   _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
 
@@ -46,6 +46,9 @@ export class RendicontazioneService {
   }
 
   refresh() {
+
+    // Set lastDate to 0 to bypass isSameMonth check
+    this.lastDate = new Date(0);
     this._update$.next(true);
   }
 
@@ -178,7 +181,6 @@ export class RendicontazioneService {
       this.viewDate$,
       this._update$,
     ]).pipe(
-      tap(console.warn),
       filter(([ user, viewDate ]) => !!user && !isSameMonth(this.lastDate, viewDate)),
       tap(([ user, viewDate ]) => {
         this._loading$.next(true);
