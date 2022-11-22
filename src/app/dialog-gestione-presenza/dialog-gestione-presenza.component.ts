@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { combineLatest, debounceTime, distinctUntilChanged, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { ConsuntivoEvent, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
+import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { Commessa, ConsuntivoEvent, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
 import { CalendarService } from '../calendar/calendar.service';
 import { RendicontazioneService } from '../services/rendicontazione.service';
 import { UserService } from '../services/user.service';
@@ -32,6 +32,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
   optionSetMap = {};
   controlMap = {};
   observableArrayMap = {};
+  arrayMap = {}; // Unwrapped values from observables set above
 
   form: FormGroup;
 
@@ -43,14 +44,14 @@ export class DialogGestionePresenzaComponent implements OnInit {
     private userService: UserService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
     const currDay = this.data.event.start.getDay();
     this.days[currDay][1] = true;
 
     this.createSelectorLogic(
       'commessa',
-      this.rendicontazioneService.commesse$,
+      this.rendicontazioneService.getCommesse$(this.data.event.start),
       'codiceCommessa',
       this.data.event.codiceCommessa,
       [ Validators.required ]
@@ -91,6 +92,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
   private createSelectorLogic(controlName, observableArray, filterKey, defaultValue = '', validators = []) {
 
     this.observableArrayMap[controlName] = observableArray;
+    this.arrayMap[controlName] = []; // Set default empty array
     this.optionSetMap[controlName] = new Set();
 
     observableArray
@@ -98,6 +100,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe(array => {
+        this.arrayMap[controlName] = array;
         this.optionSetMap[controlName].clear();
         array.map(item => this.optionSetMap[controlName].add(item[filterKey].toString()));
       });
@@ -115,14 +118,11 @@ export class DialogGestionePresenzaComponent implements OnInit {
         startWith(''),
         debounceTime(100),
         distinctUntilChanged(),
-        switchMap(value =>
-          combineLatest([
-            of(value),
-            this.observableArrayMap[controlName]
-          ])
-        ),
-        map(([value, array]) => 
-          array.filter(item => item[filterKey].toString().toLowerCase().includes(value))
+        map((value) => 
+          this.arrayMap[controlName]
+            .filter(item =>
+              new RegExp('^' + value, 'i').test(item[filterKey].toString())
+            )
         ),
     );
   }
@@ -141,13 +141,13 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     // Look for objects
     // TODO: fix codiceCommessa to idAttivita because of uniqueness
-    const commessaObj = this.rendicontazioneService.commesse
+    const commessaObj = this.arrayMap['commesse']
       .find(c => c.codiceCommessa === commessa);
 
-    const modalitaLavoroObj = this.userService.modalitaLavoro
-    .find(mL => mL.descrizione === modalitaLavoro);
+    const modalitaLavoroObj = this.arrayMap['diaria']
+      .find(mL => mL.descrizione === modalitaLavoro);
 
-    const diariaObj = this.userService.diarie
+    const diariaObj = this.arrayMap['modalitaLavoro']
       .find(d => d.tipoTrasferta === diaria);
 
     console.log('Commessa', commessaObj);
@@ -160,8 +160,6 @@ export class DialogGestionePresenzaComponent implements OnInit {
     const minuti = numeroOre * 60;
     const fine = new Date(_dataInizio.getTime() + minuti * 60 * 1000).toISOString();
 
-    console.log('Inizio', inizio, 'minuti', minuti, 'fine', fine);
-
     const consuntivo: SaveConsuntivoBody = {
       progressivo: 0, // Set below
       data: '', // Set below
@@ -173,12 +171,14 @@ export class DialogGestionePresenzaComponent implements OnInit {
       codiceAttivita: commessaObj.descrizioneAttivita,
       idCommessa: commessaObj.idCommessa,
       codiceCommessa: commessaObj.codiceCommessa,
-      modalita: modalitaLavoro.id,
+      modalita: modalitaLavoroObj.id,
       idTipoTrasferta: diaria?.idTipoTrasferta,
       reperibilita: false,
       turni: false,
       note: descrizione
     };
+
+    console.log('SaveConsuntivoBody', consuntivo);
 
     // Create new
     if (this.data.event.isLocal) {

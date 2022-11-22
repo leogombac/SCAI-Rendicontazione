@@ -46,14 +46,6 @@ export class UserService {
     this.createPipelineModalitaLavoro();
   }
 
-  get modalitaLavoro() {
-    return this._modalitaLavoro$.getValue();
-  }
-
-  get diarie() {
-    return this._diarie$.getValue();
-  }
-
   get idReferente() {
     const user = this._user$.getValue();
     if (!user) return;
@@ -169,7 +161,7 @@ export class UserService {
       switchMap(([ user, azienda ]) =>
         this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet({
           idUtente: user.idUtente,
-         idAzienda: azienda.idAzienda
+          idAzienda: azienda.idAzienda
         })
       ),
       map((d: any) => JSON.parse(d)),

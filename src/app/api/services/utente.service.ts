@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 
 import { EnumTipiBollatura } from '../models/enum-tipi-bollatura';
-import { InserimentoPresenza } from '../models/inserimento-presenza';
 
 @Injectable({
   providedIn: 'root',
@@ -132,6 +131,69 @@ export class UtenteService extends BaseService {
   }
 
   /**
+   * Path part for operation consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet
+   */
+  static readonly ConsuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGetPath = '/consuntivazione/utente/{idUtente}/presenze/{idAzienda}/{anno}-{mese}-{giorno}/mese';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet$Response(params: {
+    idUtente: number;
+    idAzienda: number;
+    anno: number;
+    mese: number;
+    giorno: number;
+    context?: HttpContext
+  }
+): Observable<StrictHttpResponse<void>> {
+
+    const rb = new RequestBuilder(this.rootUrl, UtenteService.ConsuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGetPath, 'get');
+    if (params) {
+      rb.path('idUtente', params.idUtente, {});
+      rb.path('idAzienda', params.idAzienda, {});
+      rb.path('anno', params.anno, {});
+      rb.path('mese', params.mese, {});
+      rb.path('giorno', params.giorno, {});
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'text',
+      accept: '*/*',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      })
+    );
+  }
+
+  /**
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet(params: {
+    idUtente: number;
+    idAzienda: number;
+    anno: number;
+    mese: number;
+    giorno: number;
+    context?: HttpContext
+  }
+): Observable<void> {
+
+    return this.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet$Response(params).pipe(
+      map((r: StrictHttpResponse<void>) => r.body as void)
+    );
+  }
+
+  /**
    * Path part for operation consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGet
    */
   static readonly ConsuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGetPath = '/consuntivazione/utente/{idUtente}/presenze/{idAzienda}/{anno}-{mese}-{giorno}';
@@ -190,69 +252,6 @@ export class UtenteService extends BaseService {
 ): Observable<void> {
 
     return this.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGet$Response(params).pipe(
-      map((r: StrictHttpResponse<void>) => r.body as void)
-    );
-  }
-
-  /**
-   * Path part for operation consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost
-   */
-  static readonly ConsuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPostPath = '/consuntivazione/utente/{idUtente}/presenze/{anno}-{mese}-{giorno}';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost()` instead.
-   *
-   * This method sends `application/*+json` and handles request body of type `application/*+json`.
-   */
-  consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost$Response(params: {
-    idUtente: number;
-    anno: number;
-    mese: number;
-    giorno: number;
-    context?: HttpContext
-    body?: InserimentoPresenza
-  }
-): Observable<StrictHttpResponse<void>> {
-
-    const rb = new RequestBuilder(this.rootUrl, UtenteService.ConsuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPostPath, 'post');
-    if (params) {
-      rb.path('idUtente', params.idUtente, {});
-      rb.path('anno', params.anno, {});
-      rb.path('mese', params.mese, {});
-      rb.path('giorno', params.giorno, {});
-      rb.body(params.body, 'application/*+json');
-    }
-
-    return this.http.request(rb.build({
-      responseType: 'text',
-      accept: '*/*',
-      context: params?.context
-    })).pipe(
-      filter((r: any) => r instanceof HttpResponse),
-      map((r: HttpResponse<any>) => {
-        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
-      })
-    );
-  }
-
-  /**
-   * This method provides access to only to the response body.
-   * To access the full response (for headers, for example), `consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost$Response()` instead.
-   *
-   * This method sends `application/*+json` and handles request body of type `application/*+json`.
-   */
-  consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost(params: {
-    idUtente: number;
-    anno: number;
-    mese: number;
-    giorno: number;
-    context?: HttpContext
-    body?: InserimentoPresenza
-  }
-): Observable<void> {
-
-    return this.consuntivazioneUtenteIdUtentePresenzeAnnoMeseGiornoPost$Response(params).pipe(
       map((r: StrictHttpResponse<void>) => r.body as void)
     );
   }

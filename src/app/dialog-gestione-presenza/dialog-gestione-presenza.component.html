@@ -14,7 +14,7 @@
           >
           <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
             <mat-option *ngFor="let option of (filteredArrayMap['commessa'] | async)" [value]="option.codiceCommessa">
-              {{ option.codiceCommessa }}
+              <b>{{ option.codiceCommessa }}</b> ({{ option.descrizioneCommessa }})
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>

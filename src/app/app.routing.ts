@@ -18,6 +18,22 @@ export const AppRoutes: Routes = [
     },
     {
         path: '',
+        component: AdminLayoutComponent,
+        children: [{
+            path: 'chiusura-mensile',
+            loadChildren: () => import('./chiusura-mensile/chiusura-mensile.module').then(m => m.ChiusuraMensileModule)
+        }],
+    },
+    {
+        path: '',
+        component: AdminLayoutComponent,
+        children: [{
+            path: 'chiusure-referente',
+            loadChildren: () => import('./chiusure-referente/chiusure-referente.module').then(m => m.ChiusureReferenteModule)
+        }],
+    },
+    {
+        path: '',
         component: AuthLayoutComponent,
         children: [
             {

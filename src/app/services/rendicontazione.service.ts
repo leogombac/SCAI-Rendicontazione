@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { isMonday, previousMonday } from 'date-fns';
+import { isMonday, isSameMonth, previousMonday } from 'date-fns';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
-import { Commessa, ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
+import { ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { getTZOffsettedDate } from '../utils/time.utils';
@@ -14,10 +14,9 @@ import { UserService } from './user.service';
 })
 export class RendicontazioneService {
 
-  _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
+  private lastDate = new Date('2000/01/01');
 
-  private _commesse$ = new BehaviorSubject<Commessa[]>([]);
-  commesse$ = this._commesse$.asObservable();
+  _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
 
   private _viewDate$ = new BehaviorSubject<Date>(new Date());
   viewDate$ = this._viewDate$.asObservable();
@@ -36,11 +35,6 @@ export class RendicontazioneService {
     private toasterService: ToasterService
   ) {
     this.createPipelineConsultivi();
-    this.createPipelineCommesse();
-  }
-
-  get commesse() {
-    return this._commesse$.getValue();
   }
 
   get viewDate() {
@@ -184,10 +178,14 @@ export class RendicontazioneService {
       this.viewDate$,
       this._update$,
     ]).pipe(
-      filter(([ user ]) => !!user),
-      tap(() => this._loading$.next(true)),
+      tap(console.warn),
+      filter(([ user, viewDate ]) => !!user && !isSameMonth(this.lastDate, viewDate)),
+      tap(([ user, viewDate ]) => {
+        this._loading$.next(true);
+        this.lastDate = viewDate;
+      }),
       switchMap(([ { idUtente } ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGet({
+        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
           idUtente,
           idAzienda: this.userService.azienda.idAzienda,
           anno: this.viewDate.getFullYear(),
@@ -195,7 +193,6 @@ export class RendicontazioneService {
           giorno: this.viewDate.getDate(),
         })
       ),
-      share(),
       map((d: any) => JSON.parse(d)),
       map(_consuntivi => {
 
@@ -205,7 +202,7 @@ export class RendicontazioneService {
           giorno.presenze.map((presenza: Presenza) =>
             consuntivi.push(new ConsuntivoEvent({ dataPresenza: giorno.dataPresenza, presenza }))
           )
-        )
+        );
         return consuntivi;
 
       }),
@@ -213,38 +210,25 @@ export class RendicontazioneService {
       tap(consuntivi => {
         this._loading$.next(false);
         this._initialized$.next(true);
-        console.log('Consuntivi', consuntivi)
+        console.log('Consuntivi', consuntivi);
       }),
     )
     .subscribe();
   }
 
-  private createPipelineCommesse() {
-    
-    combineLatest([
-      this.userService.user$,
-      this.viewDate$,
-      this._update$, // TODO: if not necessary, then remove it
-    ]).pipe(
-      filter(([ user ]) => !!user),
-      tap(() => this._loading$.next(true)),
-      switchMap(([ { idUtente } ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtenteCommesseIdAziendaAnnoMeseGiornoGet({
-          idUtente,
-          idAzienda: this.userService.azienda.idAzienda,
-          anno: this.viewDate.getFullYear(),
-          mese: this.viewDate.getMonth() + 1,
-          giorno: this.viewDate.getDate(),
-        })
-      ),
+  getCommesse$(date: Date) {
+    return this.utenteService.consuntivazioneUtenteIdUtenteCommesseIdAziendaAnnoMeseGiornoGet({
+      idUtente: this.userService.idUtente,
+      idAzienda: this.userService.azienda.idAzienda,
+      anno: date.getFullYear(),
+      mese: date.getMonth() + 1,
+      giorno: date.getDate(),
+    })
+    .pipe(
       share(),
       map((d: any) => JSON.parse(d)),
       map(_commesse => ([..._commesse.utente, ..._commesse.obbligatorie])),
-      tap(commesse => this._commesse$.next(commesse)),
-      tap(commesse => {
-        console.log('Commesse', commesse)
-      }),
-    )
-    .subscribe();
+      tap(commesse => console.log('Commesse', commesse)),
+    );
   }
 }

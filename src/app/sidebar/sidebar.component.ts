@@ -28,13 +28,25 @@ export const ROUTES: RouteInfo[] = [
         path: '/consuntivi',
         title: 'Consuntivi',
         type: 'link',
-        icontype: 'calendar_month'
+        icontype: 'edit_calendar'
+    },
+    {
+        path: '/chiusura-mensile',
+        title: 'Chiusura Mensile',
+        type: 'link',
+        icontype: 'free_cancellation'
+    },
+    {
+        path: '/chiusure-referente',
+        title: 'Chiusure Referente',
+        type: 'link',
+        icontype: 'view_list'
     },
     {
         path: 'pages/login',
         title: 'Login',
         type: 'link',
-        icontype: 'image',
+        icontype: 'login',
     }
 ];
 @Component({

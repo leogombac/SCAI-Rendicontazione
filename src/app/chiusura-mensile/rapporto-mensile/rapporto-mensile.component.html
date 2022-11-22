@@ -1,0 +1,123 @@
+<div class="card">
+    <div class="card-header card-header-primary card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">event_busy</i>
+        </div>
+        <h4 class="card-title">Rapporto Mensile</h4>
+    </div>
+    <div class="card-body pb-0">
+
+        <div class="line-up">
+            <div class="card element-center m-0">
+                <div class="card-header p-0">
+                    <form novalidate>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Cerca Mese</mat-label>
+                            <input
+                                matInput
+                                [matDatepicker]="picker"
+                                placeholder="Scegli un mese"
+                                readonly
+                            >
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker startView="year" (monthSelected)="closeDatePicker($event, picker)">
+                            </mat-datepicker>
+                        </mat-form-field>
+                    </form>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="h4">
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex justify-content-between mb-3">
+                                <b>Stato Chiusura</b>
+                                <span>Aperto</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-4">
+                                <b>Ore Mensili</b>
+                                <span>42h</span>
+                            </div>
+                            <button class="btn btn-primary" style="align-self: center;">Chiudi Mese</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="line-up">
+            <div class="card m-0">
+                <div class="card-header pb-0">
+                    <div class="card-title">Totali Ore</div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <b>Totale Ore</b>
+                        <span class="text-muted">12h e 30m</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Totale Ore Ordinarie</b>
+                        <span class="text-muted">12h e 30m</span>
+                    </div>
+                    <div class="d-flex justify-content-between pl-2">
+                        <b>di cui Totale Ore di Assenza</b>
+                        <span class="text-muted">9h</span>
+                    </div>
+                    <div class="d-flex justify-content-between pl-2 mb-1">
+                        <b>di cui Totale Ore Turni</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Totale Ore Reperibilità</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Totale Ore Altro</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card m-0">
+                <div class="card-header pb-0">
+                    <div class="card-title">Differenza</div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <b>Straordinario Feriale</b>
+                        <span class="text-muted">2h e 10m</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Straordinario Notturno</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Straordinario Festivo</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Ore Recuperi</b>
+                        <span class="text-muted">29h e 30m</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card m-0">
+                <div class="card-header">
+                    <div class="card-title">Modalità</div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <b>Modalità Casa</b>
+                        <span class="text-muted">12h e 30m</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Modalità Ufficio</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <b>Modalità Cliente</b>
+                        <span class="text-muted">0h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

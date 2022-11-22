@@ -153,7 +153,6 @@ export class CalendarComponent {
       .pipe(
         finalize(() => {
           this.dragToCreateActive = false;
-          // this.openDialog(dragToSelectEvent);
           this.refresh();
         }),
         takeUntil(fromEvent(document, 'mouseup'))
@@ -181,6 +180,7 @@ export class CalendarComponent {
         this.activeDayIsOpen = true;
       this.viewDate = date;
     }
+    this.rendicontazioneService.viewDate = date;
   }
 
   eventTimesChanged({ event, newStart, newEnd, }): void {
@@ -188,7 +188,6 @@ export class CalendarComponent {
     event.end = newEnd;
     event.meta.tmpEvent = true;
     event.setTitle();
-    // this.openDialog(event);
     this.refresh();
   }
 

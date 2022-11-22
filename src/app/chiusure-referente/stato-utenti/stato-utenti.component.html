@@ -1,0 +1,132 @@
+<div class="card">
+    <div class="card-header card-header-primary card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">list</i>
+        </div>
+        <h4 class="card-title">Dati Presenza</h4>
+    </div>
+    <div class="card-body">
+
+        <div class="card">
+            <div class="card-body">
+                <form novalidate>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Nome</mat-label>
+                                <input placeholder="Inserici nome" matInput>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Cognome</mat-label>
+                                <input placeholder="Inserici cognome" matInput>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Cerca Mese</mat-label>
+                                <input
+                                    matInput
+                                    [matDatepicker]="picker"
+                                    placeholder="Scegli un mese"
+                                    readonly
+                                >
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker startView="year" (monthSelected)="closeDatePicker($event, picker)">
+                                </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Stato</mat-label>
+                                <input
+                                    type="text" 
+                                    placeholder="Scegli stato"
+                                    matInput
+                                    [matAutocomplete]="auto"
+                                >
+                                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                                    <mat-option *ngFor="let option of ['a', 'b', 'c']">
+                                        {{ option }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-4">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Contratto</mat-label>
+                                <input
+                                    type="text" 
+                                    placeholder="Scegli contratto"
+                                    matInput
+                                    [matAutocomplete]="auto2"
+                                >
+                                <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
+                                    <mat-option *ngFor="let option of [1, 2, 3]">
+                                        {{ option }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row flex-wrap justify-content-center">
+                        <div class="col-12 col-md-auto">
+                            <mat-checkbox disabled>Straordinari</mat-checkbox>
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <mat-checkbox disabled>Trasferte</mat-checkbox>
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <mat-checkbox disabled>Turni</mat-checkbox>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-inner">
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Seleziona</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Cognome</th>
+                            <th scope="col">Sede</th>
+                            <th scope="col" class="text-right">Ore</th>
+                            <th scope="col" class="text-center">Stato</th>
+                            <th scope="col" class="text-right">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-checkbox></mat-checkbox>
+                            </td>
+                            <td>2383</td>
+                            <td>Angelica</td>
+                            <td>Zenere</td>
+                            <td>Padova</td>
+                            <td class="text-right">1000</td>
+                            <td class="text-center"><span class="badge badge-pill badge-primary">Chiuso</span></td>
+                            <td class="text-right">
+                                <button class="btn btn-link p-3">
+                                    <i class="material-icons">edit</i>
+                                </button>
+                                <button class="btn btn-link p-3">
+                                    <i class="material-icons">close</i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
