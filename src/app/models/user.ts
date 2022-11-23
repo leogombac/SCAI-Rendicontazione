@@ -80,7 +80,6 @@ export class User {
     turni: boolean;
 
     // Application level
-    idReferente: number;
     isReferente: boolean;
 
     constructor(datoOperativo: DatoOperativo) {
@@ -90,8 +89,7 @@ export class User {
         this.cognome = datoOperativo.cognome;
         this.turni = datoOperativo.turni;
 
-        // If user is referente, then he/she can change idUtente at will
-        this.idReferente = this.idUtente;
+        // If user is referente, then he/she can change viewIdUtente of AppState at will
         this.isReferente = datoOperativo.profili && datoOperativo.profili.length > 1;
     }
 }

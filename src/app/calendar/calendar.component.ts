@@ -14,15 +14,16 @@ import { WeekViewHourSegment } from 'calendar-utils';
 import { fromEvent, Subject } from 'rxjs';
 import { finalize, take, takeUntil, tap } from 'rxjs/operators';
 import { addDays, addMinutes, endOfWeek, isSameDay, isSameMonth } from 'date-fns';
-import { RendicontazioneService } from './../services/rendicontazione.service';
+import { ConsuntivoService } from '../services/consuntivo.service';
 import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
 import { isMobile } from '../utils/mobile.utils';
-import { ConsuntivoEvent } from '../models/rendicontazione';
+import { ConsuntivoEvent } from '../models/consuntivo';
 import { DialogGestionePresenzaComponent } from '../dialog-gestione-presenza/dialog-gestione-presenza.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CalendarService } from './calendar.service';
 import { UUID } from '../utils/uuid.utils';
+import { AppStateService } from '../services/app-state.service';
 
 @Component({
   selector: 'app-calendar',
@@ -58,7 +59,8 @@ export class CalendarComponent {
   dragToCreateActive = false;
 
   constructor(
-    public rendicontazioneService: RendicontazioneService,
+    public appState: AppStateService,
+    public consuntivoService: ConsuntivoService,
     private calendarService: CalendarService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
@@ -68,7 +70,7 @@ export class CalendarComponent {
 
   ngOnInit() {
 
-    this.rendicontazioneService.viewDate$
+    this.appState.viewDate$
       .pipe(
         takeUntil(this.destroy$),
         tap(viewDate => {
@@ -78,7 +80,7 @@ export class CalendarComponent {
       )
       .subscribe();
 
-    this.rendicontazioneService._consuntiviRemote$
+    this.consuntivoService._consuntiviRemote$
       .pipe(
         takeUntil(this.destroy$),
         tap(consuntivi => {
@@ -95,7 +97,7 @@ export class CalendarComponent {
       )
       .subscribe();
 
-    this.rendicontazioneService.loading$
+    this.consuntivoService.loading$
       .pipe(
         takeUntil(this.destroy$),
         tap(loading => {
@@ -105,7 +107,7 @@ export class CalendarComponent {
       )
       .subscribe();
 
-    this.rendicontazioneService.initialized$
+    this.consuntivoService.initialized$
       .pipe(
         takeUntil(this.destroy$),
         tap(initialized => {
@@ -116,7 +118,7 @@ export class CalendarComponent {
       .subscribe();
 
     // Scroll once after init
-    this.rendicontazioneService.initialized$
+    this.consuntivoService.initialized$
       .pipe(
         tap(() => this.scrollContainer.nativeElement.scroll(0, 540)),
         take(1),
@@ -180,7 +182,7 @@ export class CalendarComponent {
         this.activeDayIsOpen = true;
       this.viewDate = date;
     }
-    this.rendicontazioneService.viewDate = date;
+    this.appState.viewDate = date;
   }
 
   eventTimesChanged({ event, newStart, newEnd, }): void {
@@ -212,7 +214,7 @@ export class CalendarComponent {
   refresh() {
     this.events = [
       ...this.calendarService._consuntiviLocal$.getValue(),
-      ...this.rendicontazioneService._consuntiviRemote$.getValue()
+      ...this.consuntivoService._consuntiviRemote$.getValue()
     ];
     this.cdr.detectChanges();
   }

@@ -1,38 +1,33 @@
-<ng-container
-    *ngIf="{
-        user: userService.user$ | async,
-        users: userService.utentiAzienda$ | async
-    } as data"
->
-    <div *ngIf="data.users && data.user && data.user.isReferente" class="card user-panel-card">
-        <div class="card-header card-header-primary card-header-icon">
-            <div class="card-icon">
-                <i class="material-icons">supervisor_account</i>
-            </div>
-            <h4 class="card-title">Ciao {{ data.user.nome }} {{ data.user.cognome }}</h4>
+<div class="card user-panel-card">
+    <div class="card-header card-header-primary card-header-icon">
+        <div class="card-icon">
+            <i class="material-icons">supervisor_account</i>
         </div>
-        <div class="card-body">
-            <!-- <p class="text-muted">Hai il ruolo di referente: ti è data la possibilità di gestire i consuntivi di altri utenti.</p> -->
-            <p class="h4 text-center">Stai consuntivando<br><b>{{ getNomeCognome(data.users, data.user.idUtente) }}</b></p>
-            <form novalidate>
-                <mat-form-field appearance="fill">
-                    <mat-label>Utente Consuntivi</mat-label>
-                    <input
-                        type="text" 
-                        placeholder="Scegli un utente"
-                        matInput 
-                        [formControl]="myControl"
-                        [matAutocomplete]="auto"
-                    >
-                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.idUtente">
-                            {{ option.nome }} {{ option.cognome }}
-                        </mat-option>
-                    </mat-autocomplete>
-                    <mat-hint>Usa questo campo per cambiare utente</mat-hint>
-                    <mat-icon matPrefix>search</mat-icon>
-                </mat-form-field>
-            </form>
-        </div>
+        <h4 class="card-title">Ciao {{ userService.user.nome }} {{ userService.user.cognome }}</h4>
     </div>
-</ng-container>
+    <div class="card-body">
+        <p class="h4 text-center">Stai consuntivando<br><b>{{ getNomeCognome() }}</b></p>
+        <form novalidate>
+            <mat-form-field appearance="fill">
+                <mat-label>Utente Consuntivi</mat-label>
+                <input
+                    type="text" 
+                    placeholder="Scegli un utente"
+                    matInput 
+                    [formControl]="utenteAziendaAutocomplete.control"
+                    [matAutocomplete]="auto"
+                >
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    <mat-option
+                        *ngFor="let utenteAzienda of (utenteAziendaAutocomplete.filteredArray$ | async)"
+                        [value]="utenteAzienda.idUtente"
+                    >
+                        {{ utenteAzienda.nome }} {{ utenteAzienda.cognome }}
+                    </mat-option>
+                </mat-autocomplete>
+                <mat-hint>Usa questo campo per cambiare utente</mat-hint>
+                <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+        </form>
+    </div>
+</div>

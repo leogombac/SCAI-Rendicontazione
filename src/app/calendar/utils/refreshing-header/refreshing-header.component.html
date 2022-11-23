@@ -6,13 +6,13 @@
             placeholder="Cerca data"
             readonly
             [matDatepicker]="picker"
-            [value]="rendicontazioneService.viewDate"
-            (dateChange)="rendicontazioneService.viewDate = $event.value"
+            [value]="appState.viewDate"
+            (dateChange)="appState.viewDate = $event.value"
         >
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
-    <button class="btn btn-link" (click)="rendicontazioneService.refresh()">
+    <button class="btn btn-link" (click)="consuntivoService.refresh()">
         Aggiorna 
         <i class="material-icons">refresh</i>
     </button>

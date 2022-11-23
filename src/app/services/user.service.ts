@@ -1,30 +1,25 @@
 import { HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, map, ReplaySubject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, of, switchMap, tap } from 'rxjs';
 import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
-import { ModalitaLavoro } from '../models/rendicontazione';
-import { Azienda, DatoOperativo, Diaria, User, UtenteAzienda } from '../models/user';
+import { ModalitaLavoro } from '../models/consuntivo';
+import { Azienda, Diaria, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
+import { AppStateService } from './app-state.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
-  utentiAzienda$ = this._utentiAzienda$.asObservable();
-
-  private _diarie$ = new BehaviorSubject<Diaria[]>([]);
-  diarie$ = this._diarie$.asObservable();
+  private _user$ = new BehaviorSubject<User>(null);
+  user$ = this._user$.asObservable();
 
   private _modalitaLavoro$ = new BehaviorSubject<ModalitaLavoro[]>([]);
   modalitaLavoro$ = this._modalitaLavoro$.asObservable();
 
-  private _datoOperativo$ = new ReplaySubject<DatoOperativo>(1);
-  datoOperativo$ = this._datoOperativo$.asObservable();
-
-  private _user$ = new BehaviorSubject<User>(null);
-  user$ = this._user$.asObservable();
+  private _diarie$ = new BehaviorSubject<Diaria[]>([]);
+  diarie$ = this._diarie$.asObservable();
 
   private _aziende$ = new BehaviorSubject<Azienda[]>([]);
   aziende$ = this._aziende$.asObservable();
@@ -32,158 +27,152 @@ export class UserService {
   private _azienda$ = new BehaviorSubject<Azienda>(null);
   azienda$ = this._azienda$.asObservable();
 
+  private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
+  utentiAzienda$ = this._utentiAzienda$.asObservable();
+
+  get user() {
+    const user = this._user$.getValue();
+    return user;
+  }
+
   constructor(
     private utenteService: UtenteService,
     private aziendeService: AziendeService,
     private commesseService: CommesseService,
     private referenteService: ReferenteService,
-    private authService: AuthService
+    private authService: AuthService,
+    private appState: AppStateService
   ) {
+
+    // These pipelines only need loginData
     this.createPipelineAziende();
-    this.createPipelineDatiOperativi();
-    this.createPipelineUtentiAzienda();
-    this.createPipelineTrasferte();
     this.createPipelineModalitaLavoro();
-  }
 
-  get idReferente() {
-    const user = this._user$.getValue();
-    if (!user) return;
-    return user.idReferente;
-  }
+    this.createPipelineUser();
 
-  get idUtente() {
-    const user = this._user$.getValue();
-    if (!user) return;
-    return user.idUtente;
-  }
+    this.createPipelineDiarie();
 
-  set idUtente(idUtente: number) {
-    const user = this._user$.getValue();
-    if (!user) return;
-
-    // Check to see if given idUtente exists in utentiAzienda
-    const utentiAzienda = this._utentiAzienda$.getValue();
-    if (idUtente !== this.idReferente && !utentiAzienda.some(utenteAzienda => utenteAzienda.idUtente === idUtente))
-      return;
-
-    user.idUtente = idUtente;
-    this._user$.next(user);
-  }
-
-  // Trying next style of coding with these getters and setters
-  get aziende() {
-    return this._aziende$.getValue();
-  }
-
-  set aziende(aziende: Azienda[]) {
-    this._aziende$.next(aziende);
-  }
-
-  get azienda() {
-    return this._azienda$.getValue();
-  }
-
-  set azienda(azienda: Azienda) {
-    this._azienda$.next(azienda);
+    // This pipeline only ever emits if user is referente
+    this.createPipelineUtentiAzienda();
   }
 
   private createPipelineAziende() {
-
     this.authService.loginData$
       .pipe(
         filter(loginData => !!loginData),
         switchMap(loginData => 
-          this.utenteService.consuntivazioneUtenteIdUtenteAziendeGet({ idUtente: +loginData.username.slice(-4) })
+          this.utenteService.consuntivazioneUtenteIdUtenteAziendeGet({
+            idUtente: +loginData.username.slice(-4)
+          }).pipe(
+            map((d: any) => JSON.parse(d))
+          )
         ),
-        map((d: any) => JSON.parse(d)),
-        tap(aziende => this.aziende = aziende),
-        tap(() => console.log("Aziende", this.aziende)),
-        tap(() => {
+        tap(aziende => {
+          this._aziende$.next(aziende);
+          console.log("Aziende", aziende);
 
-          // If azienda is not yet select, then select it
-          if (!this.azienda)
-            this.azienda = this.aziende.find(azienda => !!azienda.idAziendaGruppoPreferita);
-        }),
-        tap(() => console.log("Selected azienda", this.azienda)),
+          // Select default viewIdAzienda
+          const defaultAzienda = aziende.find(azienda => !!azienda.idAziendaGruppoPreferita)
+          this.appState.viewIdAzienda$.next(defaultAzienda.idAzienda);
+          console.log("Default viewIdAzienda", defaultAzienda.idAzienda);
+        })
       )
       .subscribe();
   }
 
-  private createPipelineDatiOperativi() {
+  private createPipelineModalitaLavoro() {
+    this.authService.loginData$
+      .pipe(
+        filter(loginData => !!loginData),
+        switchMap(() =>
+          this.commesseService.consuntivazioneCommessePresenzeTipiModalitaLavoroGet({
+            context: new HttpContext()
+          }).pipe(
+            map((d: any) => JSON.parse(d))
+          )
+        ),
+        tap(modalitaLavoro => {
+          this._modalitaLavoro$.next(modalitaLavoro);
+          console.log("Modalita Lavoro", modalitaLavoro);
+        })
+      )
+      .subscribe();
+  }
 
+  private createPipelineUser() {
     combineLatest([
       this.authService.loginData$,
-      this.azienda$
+      this.appState.viewIdAzienda$
     ])
     .pipe(
-      filter(([ loginData, azienda ]) => !!loginData && !!azienda),
-      switchMap(([ loginData ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtenteDatiOperativiGet({ idUtente: +loginData.username.slice(-5) })
+      filter(([ loginData, idAzienda ]) => !!loginData && !!idAzienda),
+      switchMap(([ loginData, idAzienda ]) =>
+        combineLatest([
+          this.utenteService.consuntivazioneUtenteIdUtenteDatiOperativiGet({
+            idUtente: +loginData.username.slice(-5)
+          }).pipe(
+            map((d: any) => JSON.parse(d))
+          ),
+          of(idAzienda)
+        ])
       ),
-      map((d: any) => JSON.parse(d)),
-      map(datiOperativi => datiOperativi.find(datoOperativo => datoOperativo.idAziendaAssunzione === this.azienda.idAzienda)),
-      tap(datoOperativo => this._datoOperativo$.next(datoOperativo)),
-      tap(datoOperativo => console.log("Dato Operativo", datoOperativo)),
+      map(([ datiOperativi, idAzienda ]) =>
+        datiOperativi.find(datoOperativo => datoOperativo.idAziendaAssunzione === idAzienda)
+      ),
       tap(datoOperativo => {
-        const newUser = new User(datoOperativo);
-        this._user$.next(newUser);
-        console.log("User", newUser);
-      }),
+        const user = new User(datoOperativo);
+        this._user$.next(user);
+        console.log("User", user);
+
+        // Select default viewIdUtente
+        this.appState.viewIdUtente$.next(datoOperativo.idUtente);
+        console.log("Default viewIdUtente", datoOperativo.idUtente);
+      })
+    )
+    .subscribe();
+  }
+
+  private createPipelineDiarie() {
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$,
+    ]).pipe(
+      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      switchMap(([ idUtente, idAzienda ]) =>
+        this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet({
+          idUtente,
+          idAzienda
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
+      ),
+      tap(diarie => {
+        this._diarie$.next(diarie);
+        console.log("Diarie", diarie);
+      })
     )
     .subscribe();
   }
 
   private createPipelineUtentiAzienda() {
-
     combineLatest([
       this.user$,
-      this.azienda$,
+      this.appState.viewIdAzienda$,
     ]).pipe(
-      filter(([ user ]) => !!user && user.isReferente),
-      switchMap(([ user, azienda ]) =>
-        this.referenteService.consuntivazioneReferenteIdReferenteAziendaIdAziendaUtentiGet({ idReferente: user.idReferente, idAzienda: azienda.idAzienda })
+      filter(([ user, idAzienda ]) => !!user && user.isReferente && !!idAzienda),
+      switchMap(([ user, idAzienda ]) =>
+        this.referenteService.consuntivazioneReferenteIdReferenteAziendaIdAziendaUtentiGet({
+          idReferente: user.idUtente,
+          idAzienda
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
       ),
-      map((d: any) => JSON.parse(d)),
-      tap(utentiAzienda => this._utentiAzienda$.next(utentiAzienda)),
-      tap(utentiAzienda => console.log("Utenti Azienda", utentiAzienda)),
+      tap(utentiAzienda => {
+        this._utentiAzienda$.next(utentiAzienda);
+        console.log("Utenti Azienda", utentiAzienda);
+      })
     )
     .subscribe();
   }
-
-  private createPipelineTrasferte() {
-
-    combineLatest([
-      this.user$,
-      this.azienda$,
-    ]).pipe(
-      filter(([ user ]) => !!user),
-      switchMap(([ user, azienda ]) =>
-        this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet({
-          idUtente: user.idUtente,
-          idAzienda: azienda.idAzienda
-        })
-      ),
-      map((d: any) => JSON.parse(d)),
-      tap(diarie => this._diarie$.next(diarie)),
-      tap(diarie => console.log("Diarie", diarie)),
-    )
-    .subscribe();
-  }
-
-  private createPipelineModalitaLavoro() {
-
-    this.authService.loginData$
-      .pipe(
-        filter(loginData => !!loginData),
-        switchMap(() =>
-          this.commesseService.consuntivazioneCommessePresenzeTipiModalitaLavoroGet({ context: new HttpContext() })
-        ),
-        map((d: any) => JSON.parse(d)),
-        tap(modalitaLavoro => this._modalitaLavoro$.next(modalitaLavoro)),
-        tap(modalitaLavoro => console.log("Modalita Lavoro", modalitaLavoro)),
-      )
-      .subscribe();
-  }
-
 }

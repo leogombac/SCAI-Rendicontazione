@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Commessa, ConsuntivoEvent, ModalitaLavoro, SaveConsuntivoBody } from 'src/app/models/rendicontazione';
+import { Commessa, ConsuntivoEvent, ModalitaLavoro, SaveConsuntivoBody } from 'src/app/models/consuntivo';
 import { CalendarService } from '../calendar/calendar.service';
 import { Diaria } from '../models/user';
-import { RendicontazioneService } from '../services/rendicontazione.service';
+import { ConsuntivoService } from '../services/consuntivo.service';
 import { UserService } from '../services/user.service';
 import { createAutocompleteLogic, AutocompleteLogic } from '../utils/form.utils';
 import { getTZOffsettedDate } from '../utils/time.utils';
@@ -37,19 +37,20 @@ export class DialogGestionePresenzaComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { event: ConsuntivoEvent, events?: ConsuntivoEvent[] },
     private dialog: MatDialogRef<DialogGestionePresenzaComponent>,
     private calendarService: CalendarService,
-    private rendicontazioneService: RendicontazioneService,
+    private consuntivoService: ConsuntivoService,
     private userService: UserService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
 
     const currDay = this.data.event.start.getDay();
     this.days[currDay][1] = true;
 
     this.commessaAutocomplete = createAutocompleteLogic(
       'commessa',
-      this.rendicontazioneService.getCommesse$(this.data.event.start),
+      this.consuntivoService.getCommesse$(this.data.event.start),
       'codiceCommessa',
+      (item, value) => new RegExp(value, 'i').test(item.codiceCommessa.toString()),
       this.data.event.codiceCommessa,
       [ Validators.required ]
     );
@@ -58,12 +59,14 @@ export class DialogGestionePresenzaComponent implements OnInit {
       'diaria',
       this.userService.diarie$,
       'tipoTrasferta',
+      (item, value) => new RegExp(value, 'i').test(item.tipoTrasferta.toString()),
     );
 
     this.modalitaLavoroAutocomplete = createAutocompleteLogic(
       'modalitaLavoro',
       this.userService.modalitaLavoro$,
       'descrizione',
+      (item, value) => new RegExp(value, 'i').test(item.descrizione.toString()),
       this.data.event.modalitaLavoro?.descrizione,
       [ Validators.required ]
     );
@@ -149,7 +152,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
       consuntivo.data = inizio;
       this.data.event.idCommessa = commessaObj.idCommessa;
       try {
-        await this.rendicontazioneService.saveConsuntivoRecursive(
+        await this.consuntivoService.saveConsuntivoRecursive(
           this.days.map((x: any) => x[1]),
           this.data.event,
           consuntivo
@@ -164,7 +167,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
     // Update old
     consuntivo.progressivo = this.data.event.progressivo;
     consuntivo.data = this.data.event.originalStart;
-    this.rendicontazioneService.saveConsuntivo(this.data.event, consuntivo);
+    this.consuntivoService.saveConsuntivo(this.data.event, consuntivo);
     this.dialog.close();
   }
 
@@ -176,7 +179,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
     }
 
     // Delete remote event
-    this.rendicontazioneService.deleteConsuntivo(this.data.event);
+    this.consuntivoService.deleteConsuntivo(this.data.event);
   }
 
   private removeLocalEvent() {

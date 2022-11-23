@@ -14,18 +14,18 @@
                         mwlCalendarPreviousView
                         [view]="view"
                         [(viewDate)]="viewDate"
-                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                        (viewDateChange)="appState.viewDate = viewDate"
                     ><i class="fa fa-caret-left" aria-hidden="true"></i></div>
                     <div class="btn btn-primary"
                         mwlCalendarToday
                         [(viewDate)]="viewDate"
-                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                        (viewDateChange)="appState.viewDate = viewDate"
                     >Today</div>
                     <div class="btn btn-primary"
                         mwlCalendarNextView
                         [view]="view"
                         [(viewDate)]="viewDate"
-                        (viewDateChange)="rendicontazioneService.viewDate = viewDate"
+                        (viewDateChange)="appState.viewDate = viewDate"
                     ><i class="fa fa-caret-right" aria-hidden="true"></i></div>
                 </div>
             </div>

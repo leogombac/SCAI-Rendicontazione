@@ -1,5 +1,9 @@
 import { FormControl } from "@angular/forms";
-import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, of, startWith, switchMap } from "rxjs";
+import { combineLatest, debounceTime, distinctUntilChanged, filter, isObservable, map, Observable, of, startWith, switchMap, take } from "rxjs";
+
+export interface AutocompleteFilterFn<T> {
+    (item: T, value: string): boolean;
+};    
 
 export interface AutocompleteLogic<T> {
     control: FormControl;
@@ -12,18 +16,28 @@ export interface AutocompleteLogic<T> {
 export const createAutocompleteLogic = <T>(
     controlName: string,
     array$: Observable<T[]>,
-    filterKey: string,
-    defaultValue = '',
+    trackByKey,
+    filterFunction,
+    defaultValue: Observable<string | number> | string | number = '',
     validators = []
 ): AutocompleteLogic<T> => {
 
     // Return object to be populated
     const r = {
-        control: new FormControl(defaultValue),
+        control: new FormControl(''),
         optionSet: new Set<string>(),
         array: [],
         filteredArray$: of([]) // Dummy observable so that TS doesn't complain
     };
+
+    // Set defaultValue in control
+    const _defaultValue = !isObservable(defaultValue)
+        ? of(defaultValue)
+        : defaultValue;
+    _defaultValue.pipe(
+        filter(value => !!value),
+        take(1)
+    ).subscribe(value => r.control.setValue(value+''));
 
     r.filteredArray$ = array$.pipe(
         map(array => {
@@ -32,7 +46,7 @@ export const createAutocompleteLogic = <T>(
             r.optionSet.clear();
             array.map(item =>
                 r.optionSet.add(
-                    item[filterKey].toString()
+                    item[trackByKey]
                 )
             );
 
@@ -68,12 +82,7 @@ export const createAutocompleteLogic = <T>(
             ])
         ),
         map(([ array, value ]) =>
-
-            // Filter array with a regular expression
-            array.filter(item =>
-                new RegExp(value, 'i')
-                    .test(item[filterKey].toString())
-            )
+            array.filter(item => filterFunction(item, value))
         )
     );
 

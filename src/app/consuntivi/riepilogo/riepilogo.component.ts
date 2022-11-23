@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, map, Observable } from 'rxjs';
 import { CalendarService } from 'src/app/calendar/calendar.service';
-import { ConsuntivoEvent } from 'src/app/models/rendicontazione';
-import { RendicontazioneService } from 'src/app/services/rendicontazione.service';
+import { ConsuntivoEvent } from 'src/app/models/consuntivo';
+import { ConsuntivoService } from 'src/app/services/consuntivo.service';
 import { DialogGestionePresenzaComponent } from '../../dialog-gestione-presenza/dialog-gestione-presenza.component';
 
 @Component({
@@ -16,12 +16,12 @@ export class RiepilogoComponent implements OnInit {
   consuntivi$: Observable<ConsuntivoEvent[]>;
 
   constructor(
-    public rendicontazioneService: RendicontazioneService,
+    public consuntivoService: ConsuntivoService,
     private calendarService: CalendarService,
     private dialog: MatDialog
   ) {
     this.consuntivi$ = combineLatest([
-      this.rendicontazioneService._consuntiviRemote$,
+      this.consuntivoService._consuntiviRemote$,
       this.calendarService._consuntiviLocal$
     ])
     .pipe(

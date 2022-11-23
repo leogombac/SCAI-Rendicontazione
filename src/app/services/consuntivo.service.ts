@@ -1,60 +1,128 @@
 import { Injectable } from '@angular/core';
 import { isMonday, isSameMonth, previousMonday } from 'date-fns';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
+import { ReferenteAziendaService } from '../api/referente/services';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
-import { ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/rendicontazione';
+import { ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/consuntivo';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { getTZOffsettedDate } from '../utils/time.utils';
+import { AppStateService } from './app-state.service';
 import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class RendicontazioneService {
+export class ConsuntivoService {
 
   private lastDate = new Date(0);
 
   _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
 
-  private _viewDate$ = new BehaviorSubject<Date>(new Date());
-  viewDate$ = this._viewDate$.asObservable();
-
   private _initialized$ = new BehaviorSubject<boolean>(false);
   initialized$ = this._initialized$.asObservable();
+
   private _loading$ = new BehaviorSubject<boolean>(false);
   loading$ = this._loading$.asObservable();
-  private _update$ = new BehaviorSubject<boolean>(true);
+
+  private _refresh$ = new BehaviorSubject<boolean>(true);
+  refresh$ = this._refresh$.asObservable();
 
   constructor(
     private utenteService: UtenteService,
     private commesseService: CommesseService,
+    private referenteAziendaService: ReferenteAziendaService,
+    private appState: AppStateService,
     private userService: UserService,
     private calendarService: CalendarService,
     private toasterService: ToasterService
   ) {
-    this.createPipelineUpdate();
-    this.createPipelineConsultivi();
+    this.createPipelineRefresh();
+    this.createPipelineConsuntivi();
   }
 
-  get viewDate() {
-    return this._viewDate$.getValue();
+  // Pipeline to force refresh of consuntivi when lastDate and viewDate are of the same month
+  private createPipelineRefresh() {
+    combineLatest([
+      this.userService.user$,
+      this.appState.viewIdUtente$,
+      this.refresh$
+    ])
+    .pipe(
+      tap(() => this.lastDate = new Date(0))
+    )
+    .subscribe();
   }
 
-  set viewDate(value: Date) {
-    this._viewDate$.next(value);
+  private createPipelineConsuntivi() {
+
+    // Pipelline to clear consuntiviLocal$ on idUtente or idAzienda change
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$
+    ]).pipe(
+        filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+        distinctUntilChanged(
+          (x, y) => x[0] !== y[0] && x[1] !== y[1]
+        ),
+        tap(() =>
+          this.calendarService._consuntiviLocal$.next([])
+        )
+      )
+      .subscribe();
+
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewDate$,
+      this.refresh$,
+    ]).pipe(
+      filter(([ idUtente, viewDate ]) => !!idUtente && !isSameMonth(this.lastDate, viewDate)),
+      tap(([ idUtente, viewDate ]) => {
+        this._loading$.next(true);
+        this.lastDate = viewDate;
+      }),
+      switchMap(([ idUtente ]) =>
+        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
+          idUtente,
+          idAzienda: this.appState.viewIdAzienda,
+          anno: this.appState.viewDate.getFullYear(),
+          mese: this.appState.viewDate.getMonth() + 1,
+          giorno: this.appState.viewDate.getDate(),
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
+      ),
+      map(_consuntivi => {
+
+        // Extract consuntivi from presenze response
+        const consuntivi = [];
+        _consuntivi.giorni.map(giorno =>
+          giorno.presenze.map((presenza: Presenza) =>
+            consuntivi.push(new ConsuntivoEvent({ dataPresenza: giorno.dataPresenza, presenza }))
+          )
+        );
+        return consuntivi;
+      }),
+      tap(consuntivi => {
+        this._consuntiviRemote$.next(consuntivi);
+        console.log('Consuntivi', consuntivi);
+        this._loading$.next(false);
+        this._initialized$.next(true);
+      })
+    )
+    .subscribe();
   }
 
   refresh() {
-    this._update$.next(true);
+    this._refresh$.next(true);
   }
 
   async saveConsuntivo(event: ConsuntivoEvent, saveConsuntivoBody: SaveConsuntivoBody) {
 
     const saveRequest = lastValueFrom(
       this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
-        idUtente: this.userService.idUtente,
+        idUtente: this.appState.viewIdUtente,
         body: saveConsuntivoBody,
         idCommessa: event.idCommessa
       })
@@ -103,7 +171,7 @@ export class RendicontazioneService {
 
         return lastValueFrom(
           this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtentePost({
-            idUtente: this.userService.idUtente,
+            idUtente: this.appState.viewIdUtente,
             body: saveConsuntivoBody,
             idCommessa: event.idCommessa
           })
@@ -141,7 +209,7 @@ export class RendicontazioneService {
         idCommessa: event.idCommessa,
         idAttivita: event.idAttivita,
         progressivo: event.progressivo,
-        idUtente: this.userService.idUtente,
+        idUtente: this.appState.viewIdUtente,
         anno: event.start.getFullYear(),
         mese: event.start.getMonth() + 1,
         giorno: event.start.getDate()
@@ -158,92 +226,23 @@ export class RendicontazioneService {
     }
   }
 
-  private createPipelineUpdate() {
-
-    // This pipeline is used to force refresh of consuntivi when lastDate and viewDate are of the same month
-    combineLatest([
-      this.userService.user$,
-      this._update$
-    ])
-    .pipe(
-      tap(() =>
-        this.lastDate = new Date(0)
-      )
-    )
-    .subscribe();
-  }
-
-  private createPipelineConsultivi() {
-
-    // Clear consuntiviLocal$ on idUtente or idAzienda change
-    combineLatest([
-      this.userService.user$,
-      this.userService.azienda$
-    ]).pipe(
-        filter(([ user, azienda ]) => !!user && !!azienda),
-        distinctUntilChanged(
-          (x, y) => x[0].idUtente !== y[0].idUtente
-                && x[1].idAzienda !== y[1].idAzienda
-        ),
-        tap(() => this.calendarService._consuntiviLocal$.next([]))
-      )
-      .subscribe();
-
-    combineLatest([
-      this.userService.user$,
-      this.viewDate$,
-      this._update$,
-    ]).pipe(
-      filter(([ user, viewDate ]) => !!user && !isSameMonth(this.lastDate, viewDate)),
-      tap(([ user, viewDate ]) => {
-        this._loading$.next(true);
-        this.lastDate = viewDate;
-      }),
-      switchMap(([ { idUtente } ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
-          idUtente,
-          idAzienda: this.userService.azienda.idAzienda,
-          anno: this.viewDate.getFullYear(),
-          mese: this.viewDate.getMonth() + 1,
-          giorno: this.viewDate.getDate(),
-        })
-      ),
-      map((d: any) => JSON.parse(d)),
-      map(_consuntivi => {
-
-        // Extract consuntivi from presenze response
-        const consuntivi = [];
-        _consuntivi.giorni.map(giorno =>
-          giorno.presenze.map((presenza: Presenza) =>
-            consuntivi.push(new ConsuntivoEvent({ dataPresenza: giorno.dataPresenza, presenza }))
-          )
-        );
-        return consuntivi;
-
-      }),
-      tap(consuntivi => this._consuntiviRemote$.next(consuntivi)),
-      tap(consuntivi => {
-        this._loading$.next(false);
-        this._initialized$.next(true);
-        console.log('Consuntivi', consuntivi);
-      }),
-    )
-    .subscribe();
-  }
-
   getCommesse$(date: Date) {
     return this.utenteService.consuntivazioneUtenteIdUtenteCommesseIdAziendaAnnoMeseGiornoGet({
-      idUtente: this.userService.idUtente,
-      idAzienda: this.userService.azienda.idAzienda,
+      idUtente: this.appState.viewIdUtente,
+      idAzienda: this.appState.viewIdAzienda,
       anno: date.getFullYear(),
       mese: date.getMonth() + 1,
-      giorno: date.getDate(),
+      giorno: date.getDate()
     })
     .pipe(
       share(),
       map((d: any) => JSON.parse(d)),
-      map(_commesse => ([..._commesse.utente, ..._commesse.obbligatorie])),
-      tap(commesse => console.log('Commesse', commesse)),
+      map(_commesse => {
+        const r = [..._commesse.utente, ..._commesse.obbligatorie];
+        console.log('Commesse', r);
+        return r;
+      })
     );
   }
+ 
 }

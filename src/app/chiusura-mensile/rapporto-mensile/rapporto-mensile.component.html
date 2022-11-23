@@ -11,16 +11,29 @@
             <div class="card element-center m-0">
                 <div class="card-header p-0">
                     <form novalidate>
+                        
                         <mat-form-field appearance="fill">
-                            <mat-label>Cerca Mese</mat-label>
                             <input
+                                class="no-style"
+                                type="text"
+                                readonly
+                                [value]="formatDate(appState.viewDate)"
+                                (click)="picker.open()"
+                            >
+                            <input
+                                class="my-hide"
                                 matInput
                                 [matDatepicker]="picker"
                                 placeholder="Scegli un mese"
+                                [value]="formatDate(appState.viewDate)"
                                 readonly
                             >
                             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                            <mat-datepicker #picker startView="year" (monthSelected)="closeDatePicker($event, picker)">
+                            <mat-datepicker
+                                #picker
+                                startView="year"
+                                (monthSelected)="closeDatePicker($event, picker)"
+                            >
                             </mat-datepicker>
                         </mat-form-field>
                     </form>

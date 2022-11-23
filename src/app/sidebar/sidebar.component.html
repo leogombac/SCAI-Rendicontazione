@@ -19,12 +19,12 @@
       </a>
       <div id="collapse-user" class="collapse">
         <ul class="nav">
-          <li *ngFor="let azienda of userService.aziende" class="nav-item">
+          <li *ngFor="let azienda of (userService.aziende$ | async)" class="nav-item">
             <a
               href="javascript:void(0)"
               class="nav-link"
-              [class.active]="userService.azienda?.idAzienda === azienda.idAzienda"
-              (click)="userService.azienda = azienda"
+              [class.active]="appState.viewIdAzienda === azienda.idAzienda"
+              (click)="appState.viewIdAzienda = azienda.idAzienda"
             >
               <span class="sidebar-mini">{{ azienda.acronimo }}</span>
               <span class="sidebar-normal">{{ azienda.descrizione }}</span>

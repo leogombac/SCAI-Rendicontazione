@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import PerfectScrollbar from 'perfect-scrollbar';
+import { AppStateService } from '../services/app-state.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 
@@ -61,6 +62,7 @@ export class SidebarComponent implements OnInit {
 
     constructor(
         private authService: AuthService,
+        public appState: AppStateService,
         public userService: UserService
     ) { }
 

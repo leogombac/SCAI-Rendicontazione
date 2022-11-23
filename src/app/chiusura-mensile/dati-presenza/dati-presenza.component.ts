@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ChiusureService } from 'src/app/services/chiusure.service';
 
 @Component({
   selector: 'app-dati-presenza',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DatiPresenzaComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private chiusureService: ChiusureService
+  ) { }
 
   ngOnInit(): void {
+    this.chiusureService.getChiusuraMese$()
+      .subscribe(console.warn);
   }
 
 }

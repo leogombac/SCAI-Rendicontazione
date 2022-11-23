@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RendicontazioneService } from 'src/app/services/rendicontazione.service';
+import { AppStateService } from 'src/app/services/app-state.service';
+import { ConsuntivoService } from 'src/app/services/consuntivo.service';
 
 @Component({
   selector: 'app-refreshing-header',
@@ -8,7 +9,8 @@ import { RendicontazioneService } from 'src/app/services/rendicontazione.service
 export class RefreshingHeaderComponent implements OnInit {
 
   constructor(
-    public rendicontazioneService: RendicontazioneService
+    public appState: AppStateService,
+    public consuntivoService: ConsuntivoService
   ) { }
 
   ngOnInit(): void {
