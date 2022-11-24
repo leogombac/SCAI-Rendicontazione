@@ -1,7 +1,7 @@
 <div class="main-content">
     <div class="container">
         <app-user-panel *ngIf="userService.user?.isReferente"></app-user-panel>
-        <app-rapporto-mensile></app-rapporto-mensile>
-        <app-dati-presenza></app-dati-presenza>
+        <app-rapporto-mensile [chiusuraMese$]="chiusuraMese$"></app-rapporto-mensile>
+        <app-dati-presenza [chiusuraMese$]="chiusuraMese$"></app-dati-presenza>
     </div>
 </div>

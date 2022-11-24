@@ -6,112 +6,67 @@
         <h4 class="card-title">Dati Presenza</h4>
     </div>
     <div class="card-body">
-
-        <div class="table-wrap">
-            <div class="table-inner">
-
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Codice Attività</th>
-                            <th scope="col">Data Presenza</th>
-                            <th scope="col">Modalità Lavoro</th>
-                            <th scope="col">Minuti</th>
-                            <th scope="col">Turni</th>
-                            <th scope="col">Reperibilità</th>
-                            <th scope="col">Note</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>29_15-ITEC-XXX</td>
-                            <td>3 nov 2022</td>
-                            <td>Casa</td>
-                            <td>120</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>
-                                <button
-                                    class="btn btn-link"
-                                    mat-raised-button
-                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                >
-                                    <i class="material-icons">info</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>4 nov 2022</td>
-                            <td>Casa</td>
-                            <td>120</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>
-                                <button
-                                    class="btn btn-link"
-                                    mat-raised-button
-                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                >
-                                    <i class="material-icons">info</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>5 nov 2022</td>
-                            <td>Ufficio</td>
-                            <td>120</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>
-                                <button
-                                    class="btn btn-link"
-                                    mat-raised-button
-                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                >
-                                    <i class="material-icons">info</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ferie</td>
-                            <td>6 nov 2022</td>
-                            <td>Casa</td>
-                            <td>120</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>
-                                <button
-                                    class="btn btn-link"
-                                    mat-raised-button
-                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                >
-                                    <i class="material-icons">info</i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>7 nov 2022</td>
-                            <td>Casa</td>
-                            <td>120</td>
-                            <td>No</td>
-                            <td>No</td>
-                            <td>
-                                <button
-                                    class="btn btn-link"
-                                    mat-raised-button
-                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                >
-                                    <i class="material-icons">info</i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="custom-table-wrap">
+            <div class="custom-table-inner">
+                <p style="color: #666; font-size: 12px;">
+                    La barra gialla indica la percentuale di tempo speso in una attività rispetto al totale ore.<br>
+                    Ogni riga e collassata e sintetizzata sulla base delle attività al suo interno.
+                </p>
+                <div class="custom-table">
+                    <div class="custom-table-header">
+                        <span scope="col">Espandi</span>
+                        <span scope="col">Codice Attività</span>
+                        <span scope="col">Data Presenza</span>
+                        <span scope="col">Modalità</span>
+                        <span scope="col">Minuti</span>
+                        <span scope="col">Turni</span>
+                        <span scope="col">Reperibilità</span>
+                        <span scope="col">Note</span>
+                    </div>
+                    <div class="custom-table-body">
+                        <div class="row-wrap" *ngFor="let dr of (this.chiusureMeseForTable$ | async)">
+                            <input type="checkbox" class="my-collapse-trigger" hidden [id]="dr.row.idAttivita">
+                            <div class="custom-table-row" style="position: relative;">
+                                <div class="progress" style="position: absolute; top: 0; height: 4px; width: 100%;">
+                                    <div class="progress-bar bg-warning" [style.width]="dr.row._percent"></div>
+                                </div>
+                                <span>
+                                    <label class="btn btn-link" [for]="dr.row.idAttivita">
+                                        <i class="material-icons">expand_more</i>
+                                    </label>
+                                </span>
+                                <span>{{ dr.row.codiceAttivita }}</span>
+                                <span></span>
+                                <span></span>
+                                <span>{{ dr.row.numeroMinuti }}</span>
+                                <span>{{ dr.row.turni }}</span>
+                                <span>{{ dr.row.reperibilita }}</span>
+                                <span></span>
+                            </div>
+                            <div class="my-collapse" id="custom-table-subrows">
+                                <div class="custom-table-subrow" *ngFor="let dsr of dr.subrows">
+                                    <span></span>
+                                    <span></span>
+                                    <span>{{ dsr.dataPresenza }}</span>
+                                    <span>{{ dsr.modalitaLavoro }}</span>
+                                    <span>{{ dsr.numeroMinuti }}</span>
+                                    <span>{{ dsr.turni }}</span>
+                                    <span>{{ dsr.reperibilita }}</span>
+                                    <span>
+                                        <button
+                                            class="btn btn-link"
+                                            mat-raised-button
+                                            matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
+                                        >
+                                            <i class="material-icons">info</i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </div>

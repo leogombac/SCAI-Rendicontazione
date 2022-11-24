@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { AppStateService } from 'src/app/services/app-state.service';
-import { ConsuntivoService } from 'src/app/services/consuntivo.service';
+import { ChiusureService } from 'src/app/services/chiusure.service';
 
 @Component({
   selector: 'app-rapporto-mensile',
@@ -10,10 +10,13 @@ import { ConsuntivoService } from 'src/app/services/consuntivo.service';
 })
 export class RapportoMensileComponent implements OnInit {
 
+  @Input('chiusuraMese$') chiusuraMese$;
+
   selectedMonth$: Observable<number>;
 
   constructor(
-    public appState: AppStateService
+    public appState: AppStateService,
+    public chiusureService: ChiusureService
   ) { }
 
   ngOnInit(): void {

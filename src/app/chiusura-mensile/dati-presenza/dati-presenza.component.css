@@ -1,1 +1,32 @@
-/* TODO: wanna bring table styles from consuntivi riepilogo? */
+.custom-table {
+    overflow: hidden;
+    overflow-x: auto;
+}
+
+.custom-table-header, .custom-table-row, .custom-table-subrow {
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(100px, 1fr));
+    justify-items: center;
+}
+
+.custom-table-header {
+    border-bottom: 2px solid #eee;
+    font-weight: bolder;
+}
+
+.custom-table .row-wrap:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.my-collapse {
+    max-height: 0;
+    opacity: 0;
+    transition: all 250ms ease-out;
+}
+
+input.my-collapse-trigger:checked ~ .my-collapse {
+    max-height: 100vh;
+    opacity: 1;
+    overflow-y: auto;
+}

@@ -31,8 +31,11 @@ export class UserService {
   utentiAzienda$ = this._utentiAzienda$.asObservable();
 
   get user() {
-    const user = this._user$.getValue();
-    return user;
+    return this._user$.getValue();
+  }
+
+  get modalitaLavoro() {
+    return this._modalitaLavoro$.getValue();
   }
 
   constructor(

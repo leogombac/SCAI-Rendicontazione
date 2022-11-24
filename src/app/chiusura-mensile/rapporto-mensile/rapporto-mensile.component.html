@@ -41,15 +41,31 @@
                 <div class="card-body pt-0">
                     <div class="h4">
                         <div class="d-flex flex-column gap-2">
-                            <div class="d-flex justify-content-between mb-3">
+                            <div
+                                *ngIf="(chiusuraMese$ | async)?.idStatoChiusura as idStatoChiusura"
+                                class="d-flex justify-content-between mb-3"
+                            >
                                 <b>Stato Chiusura</b>
-                                <span>Aperto</span>
+                                <span>{{ idStatoChiusura === 1 ? 'Aperto' : idStatoChiusura === 2 ? 'Chiuso' : 'Vistato' }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-4">
                                 <b>Ore Mensili</b>
-                                <span>42h</span>
+                                <span>{{ (chiusuraMese$ | async)?.totaleOre }}</span>
                             </div>
-                            <button class="btn btn-primary" style="align-self: center;">Chiudi Mese</button>
+                            <ng-container *ngIf="(chiusuraMese$ | async)?.idStatoChiusura as idStatoChiusura">
+                                <button
+                                    class="btn btn-primary"
+                                    style="align-self: center;"
+                                    [disabled]="idStatoChiusura === 3"
+                                    (click)="idStatoChiusura === 1
+                                        ? chiusureService.chiudiMese()
+                                        : idStatoChiusura === 2
+                                            ? chiusureService.apriMese()
+                                            : null"
+                                >
+                                    {{ idStatoChiusura === 1 ? 'Chiudi Mese' : idStatoChiusura === 2 ? 'Apri Mese' : 'Vistato' }}
+                                </button>
+                            </ng-container>
                         </div>
                     </div>
                 </div>
@@ -64,27 +80,27 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <b>Totale Ore</b>
-                        <span class="text-muted">12h e 30m</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOre }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Totale Ore Ordinarie</b>
-                        <span class="text-muted">12h e 30m</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOreOrdinarie }}</span>
                     </div>
                     <div class="d-flex justify-content-between pl-2">
                         <b>di cui Totale Ore di Assenza</b>
-                        <span class="text-muted">9h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOreAssenza }}</span>
                     </div>
                     <div class="d-flex justify-content-between pl-2 mb-1">
                         <b>di cui Totale Ore Turni</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOreTurni }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Totale Ore Reperibilità</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOreReperibilita }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Totale Ore Altro</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.totaleOreAltro }}</span>
                     </div>
                 </div>
             </div>
@@ -95,19 +111,19 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <b>Straordinario Feriale</b>
-                        <span class="text-muted">2h e 10m</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.straordinarioFeriale }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Straordinario Notturno</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.straordinarioNotturno }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Straordinario Festivo</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.straordinarioFestivo }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Ore Recuperi</b>
-                        <span class="text-muted">29h e 30m</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.oreRecuperi }}</span>
                     </div>
                 </div>
             </div>
@@ -118,15 +134,15 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <b>Modalità Casa</b>
-                        <span class="text-muted">12h e 30m</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.modalitaCasa }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Modalità Ufficio</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.modalitaUfficio }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <b>Modalità Cliente</b>
-                        <span class="text-muted">0h</span>
+                        <span class="text-muted">{{ (chiusuraMese$ | async)?.modalitaCliente }}</span>
                     </div>
                 </div>
             </div>
