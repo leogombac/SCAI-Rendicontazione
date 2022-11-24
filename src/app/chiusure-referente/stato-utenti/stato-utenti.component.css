@@ -15,6 +15,7 @@
 }
 .custom-table-row {
     padding-top: 4px;
+    min-height: 64px;
 }
 
 .custom-table .row-wrap:not(:last-child) {

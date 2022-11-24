@@ -70,7 +70,15 @@ export class StatoUtentiComponent implements OnInit {
       this.form.valueChanges
         .pipe(
           startWith({ }),
-          debounceTime(450)
+          debounceTime(450),
+          tap(_ =>
+
+            // Force page to zero when the user fiddles with the search card
+            this.paginator$.next({
+              ...this.paginator$.getValue(),
+              pageIndex: 0
+            })
+          )
         ),
       this.paginator$
     ])
