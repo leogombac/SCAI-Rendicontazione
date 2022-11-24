@@ -15,8 +15,8 @@
     font-weight: bolder;
 }
 
-.custom-table .row-wrap:not(:last-child) {
-    border-bottom: 1px solid #eee;
+.custom-table-subrow {
+    border-top: 1px solid #eee;
 }
 
 .my-collapse {
