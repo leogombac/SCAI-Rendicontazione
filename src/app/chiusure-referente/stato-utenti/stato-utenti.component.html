@@ -9,12 +9,16 @@
 
         <div class="card">
             <div class="card-body">
-                <form novalidate>
+                <form [formGroup]="form" novalidate>
                     <div class="row">
                         <div class="col-12">
                             <mat-form-field appearance="fill">
                                 <mat-label>Nome e/o Cognome</mat-label>
-                                <input placeholder="Inserici nome e/o cognome" matInput>
+                                <input 
+                                    placeholder="Inserici nome e/o cognome" 
+                                    matInput
+                                    formControlName="nome"
+                                >
                             </mat-form-field>
                         </div>
                     </div>
@@ -26,7 +30,7 @@
                                     class="no-style"
                                     type="text"
                                     readonly
-                                    [value]="formatDate(appState.viewDate)"
+                                    [value]="formatDate()"
                                     (click)="picker.open()"
                                 >
                                 <input
@@ -34,7 +38,7 @@
                                     matInput
                                     [matDatepicker]="picker"
                                     placeholder="Scegli un mese"
-                                    [value]="formatDate(appState.viewDate)"
+                                    [value]="formatDate()"
                                     readonly
                                 >
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -53,11 +57,12 @@
                                     type="text" 
                                     placeholder="Scegli stato"
                                     matInput
+                                    formControlName="stato"
                                     [matAutocomplete]="auto"
                                 >
                                 <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                                    <mat-option *ngFor="let option of ['a', 'b', 'c']">
-                                        {{ option }}
+                                    <mat-option *ngFor="let stato of (statoAutocomplete.filteredArray$ | async)" [value]="stato.descr">
+                                        {{ stato.descr }}
                                     </mat-option>
                                 </mat-autocomplete>
                             </mat-form-field>
@@ -69,11 +74,12 @@
                                     type="text" 
                                     placeholder="Scegli contratto"
                                     matInput
+                                    formControlName="contratto"
                                     [matAutocomplete]="auto2"
                                 >
                                 <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
-                                    <mat-option *ngFor="let option of [1, 2, 3]">
-                                        {{ option }}
+                                    <mat-option *ngFor="let contratto of (contrattoAutocomplete.filteredArray$ | async)" [value]="contratto.descr">
+                                        {{ contratto.descr }}
                                     </mat-option>
                                 </mat-autocomplete>
                             </mat-form-field>
@@ -81,58 +87,84 @@
                     </div>
                     <div class="row flex-wrap justify-content-center">
                         <div class="col-12 col-md-auto">
-                            <mat-checkbox disabled>Straordinari</mat-checkbox>
+                            <mat-checkbox formControlName="straordinari">Straordinari</mat-checkbox>
                         </div>
                         <div class="col-12 col-md-auto">
-                            <mat-checkbox disabled>Trasferte</mat-checkbox>
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <mat-checkbox disabled>Turni</mat-checkbox>
+                            <mat-checkbox formControlName="trasferte">Trasferte</mat-checkbox>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="table-wrap">
-            <div class="table-inner">
+        <ng-container *ngIf="(searchResults$ | async) as searchResults">
+            {{ searchResults.items | json }}
+        </ng-container>
 
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Seleziona</th>
-                            <th scope="col">ID</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Cognome</th>
-                            <th scope="col">Sede</th>
-                            <th scope="col" class="text-right">Ore</th>
-                            <th scope="col" class="text-center">Stato</th>
-                            <th scope="col" class="text-right">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <mat-checkbox></mat-checkbox>
-                            </td>
-                            <td>2383</td>
-                            <td>Angelica</td>
-                            <td>Zenere</td>
-                            <td>Padova</td>
-                            <td class="text-right">1000</td>
-                            <td class="text-center"><span class="badge badge-pill badge-primary">Chiuso</span></td>
-                            <td class="text-right">
-                                <button class="btn btn-link p-3">
-                                    <i class="material-icons">edit</i>
-                                </button>
-                                <button class="btn btn-link p-3">
-                                    <i class="material-icons">close</i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="custom-table-wrap">
+            <div class="custom-table-inner">
+                <p class="text-right text-muted" style="font-size: 12px;">
+                    La barra indica la percentuale di tempo consuntivato rispetto il totale.
+                </p>
+                <div class="custom-table">
+                    <div class="custom-table-header">
+                        <th scope="col">Seleziona</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Cognome</th>
+                        <th scope="col">Sede</th>
+                        <th scope="col" class="text-right">Ore Consuntiv.</th>
+                        <th scope="col" class="text-right">Ore Mensili</th>
+                        <th scope="col" class="text-center">Stato</th>
+                        <th scope="col" class="text-right">Azioni</th>
+                    </div>
+                    <div class="custom-table-body">
+                        <div class="row-wrap" *ngFor="let statoUtente of (searchResults$ | async)">
+                            <div class="custom-table-row" style="position: relative;">
+                                <div class="progress" style="position: absolute; top: 0; height: 4px; width: 100%;">
+                                    <div
+                                        class="progress-bar"
+                                        [style.width]="statoUtente._progress"
+                                        [style.backgroundColor]="statoUtente._color"
+                                    ></div>
+                                </div>
+                                <span>
+                                    <mat-checkbox></mat-checkbox>
+                                </span>
+                                <span>{{ statoUtente.idUtente }}</span>
+                                <span>{{ statoUtente.nome }}</span>
+                                <span>{{ statoUtente.cognome }}</span>
+                                <span>{{ statoUtente.sedeLavoro }}</span>
+                                <span class="text-right">{{ statoUtente.oreConsuntivate }}</span>
+                                <span class="text-right">{{ statoUtente.oreMensili }}</span>
+                                <span class="text-center">
+                                    <span
+                                        class="badge"
+                                        [class.badge-primary]="statoUtente.stato === 'Aperto'"
+                                        [class.badge-secondary]="statoUtente.stato === 'Chiuso' || statoUtente.stato === 'Vistato'"
+                                    >{{ statoUtente.stato }}</span>
+                                </span>
+                                <span class="text-right">
+                                    <button class="btn btn-link p-3" *ngIf="statoUtente.stato !== 'Vistato'">
+                                        <i class="material-icons">edit</i>
+                                    </button>
+                                    <button class="btn btn-link p-3" *ngIf="statoUtente.stato !== 'Vistato' && statoUtente.stato !== 'Chiuso'">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <mat-paginator
+                *ngIf="paginator$ | async as paginator"
+                [length]="length"
+                [pageSize]="paginator.pageSize"
+                [pageSizeOptions]="[10, 15, 25, 50]"
+                (page)="onPageChange($event)"
+            >
+            </mat-paginator>
         </div>
 
     </div>

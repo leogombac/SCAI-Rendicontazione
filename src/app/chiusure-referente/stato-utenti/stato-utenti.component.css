@@ -1,1 +1,22 @@
-/* TODO: wanna bring table styles from consuntivi riepilogo? */
+.custom-table {
+    overflow: hidden;
+    overflow-x: auto;
+}
+
+.custom-table-header, .custom-table-row {
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(9, minmax(100px, 1fr));
+}
+
+.custom-table-header {
+    border-bottom: 2px solid #eee;
+    font-weight: bolder;
+}
+.custom-table-row {
+    padding-top: 4px;
+}
+
+.custom-table .row-wrap:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}

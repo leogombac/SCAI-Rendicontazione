@@ -12,19 +12,12 @@ export class RapportoMensileComponent implements OnInit {
 
   @Input('chiusuraMese$') chiusuraMese$;
 
-  selectedMonth$: Observable<number>;
-
   constructor(
     public appState: AppStateService,
     public chiusureService: ChiusureService
   ) { }
 
-  ngOnInit(): void {
-    this.selectedMonth$ = this.appState.viewDate$
-      .pipe(
-        map(date => date.getMonth())
-      );
-  }
+  ngOnInit(): void { }
 
   closeDatePicker(eventDate: any, dp?: any) {
     this.appState.viewDate = eventDate;

@@ -15,7 +15,7 @@ export interface AutocompleteLogic<T> {
 // This function creates the logic for an autocomplete
 export const createAutocompleteLogic = <T>(
     controlName: string,
-    array$: Observable<T[]>,
+    array: Observable<T[]> | T[],
     trackByKey,
     filterFunction,
     defaultValue: Observable<string | number> | string | number = '',
@@ -39,7 +39,11 @@ export const createAutocompleteLogic = <T>(
         take(1)
     ).subscribe(value => r.control.setValue(value+''));
 
-    r.filteredArray$ = array$.pipe(
+    const _array = !isObservable(array)
+        ? of(array)
+        : array;
+
+    r.filteredArray$ = _array.pipe(
         map(array => {
 
             // Clear and populate optionSet

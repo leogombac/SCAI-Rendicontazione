@@ -24,7 +24,7 @@
                         <span scope="col">Note</span>
                     </div>
                     <div class="custom-table-body">
-                        <div class="row-wrap" *ngFor="let dr of (this.chiusureMeseForTable$ | async)">
+                        <div class="row-wrap" *ngFor="let dr of (chiusureMeseForTable$ | async)">
                             <input type="checkbox" class="my-collapse-trigger" hidden [id]="dr.row.idAttivita">
                             <div class="custom-table-row" style="position: relative;">
                                 <div class="progress" style="position: absolute; top: 0; height: 4px; width: 100%;">
