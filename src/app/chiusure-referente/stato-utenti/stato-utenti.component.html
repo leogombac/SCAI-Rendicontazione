@@ -1,9 +1,9 @@
 <div class="card">
     <div class="card-header card-header-primary card-header-icon">
         <div class="card-icon">
-            <i class="material-icons">list</i>
+            <i class="material-icons">people</i>
         </div>
-        <h4 class="card-title">Dati Presenza</h4>
+        <h4 class="card-title">Stati Utente</h4>
     </div>
     <div class="card-body">
 
@@ -11,31 +11,38 @@
             <div class="card-body">
                 <form novalidate>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <mat-form-field appearance="fill">
-                                <mat-label>Nome</mat-label>
-                                <input placeholder="Inserici nome" matInput>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-md-6">
-                            <mat-form-field appearance="fill">
-                                <mat-label>Cognome</mat-label>
-                                <input placeholder="Inserici cognome" matInput>
+                                <mat-label>Nome e/o Cognome</mat-label>
+                                <input placeholder="Inserici nome e/o cognome" matInput>
                             </mat-form-field>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
-                            <mat-form-field appearance="fill">
-                                <mat-label>Cerca Mese</mat-label>
+                            <mat-form-field class="mat-form-field-should-float" appearance="fill">
+                                <mat-label>Scegli mese</mat-label>
                                 <input
+                                    class="no-style"
+                                    type="text"
+                                    readonly
+                                    [value]="formatDate(appState.viewDate)"
+                                    (click)="picker.open()"
+                                >
+                                <input
+                                    class="my-hide"
                                     matInput
                                     [matDatepicker]="picker"
                                     placeholder="Scegli un mese"
+                                    [value]="formatDate(appState.viewDate)"
                                     readonly
                                 >
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker startView="year" (monthSelected)="closeDatePicker($event, picker)">
+                                <mat-datepicker
+                                    #picker
+                                    startView="year"
+                                    (monthSelected)="closeDatePicker($event, picker)"
+                                >
                                 </mat-datepicker>
                             </mat-form-field>
                         </div>
