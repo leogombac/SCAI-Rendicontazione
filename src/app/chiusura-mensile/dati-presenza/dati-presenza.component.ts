@@ -18,10 +18,11 @@ export class DatiPresenzaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    let totMinuti = 0;
+    let totMinuti;
     this.chiusureMeseForTable$ = this.chiusuraMese$
       .pipe(
         tap((chiusuraMese: any) => {
+          totMinuti = 0;
           const [hh, mm] = chiusuraMese.totaleOre.split(':');
           totMinuti += hh * 60 + mm * 1;
         }),
