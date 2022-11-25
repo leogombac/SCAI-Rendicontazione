@@ -4,6 +4,7 @@ import { ReferenteAziendaService } from '../api/referente/services';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { AppStateService } from './app-state.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class ChiusureService {
   constructor(
     private referenteAziendaService: ReferenteAziendaService,
     private appState: AppStateService,
+    private userService: UserService,
     private toasterService: ToasterService
   ) { }
 
@@ -142,15 +144,15 @@ export class ChiusureService {
     trasferte?
   ) {
     return combineLatest([
-      this.appState.viewIdUtente$,
+      this.userService.user$,
       this.appState.viewIdAzienda$
     ])
     .pipe(
-      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      filter(([ user, idAzienda ]) => !!user && !!idAzienda),
       tap(_ => this._statoUtentiLoading$.next(true)),
-      switchMap(([ idUtente, idAzienda ]) =>
+      switchMap(([ user, idAzienda ]) =>
         this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaAnnoMeseStatoUtentiGet({
-          idUtente: idUtente,
+          idUtente: user.idUtente,
           idAzienda: idAzienda,
           anno: date.getFullYear(),
           mese: date.getMonth() + 1,

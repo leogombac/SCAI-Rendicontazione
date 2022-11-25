@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, debounceTime, map, Observable, share, startWith, switchMap, tap } from 'rxjs';
 import { StatoUtente } from 'src/app/models/chiusure';
 import { AppStateService } from 'src/app/services/app-state.service';
@@ -29,6 +30,7 @@ export class StatoUtentiComponent implements OnInit {
   });
 
   constructor(
+    private router: Router,
     public appState: AppStateService,
     public chiusureService: ChiusureService
   ) { }
@@ -137,6 +139,11 @@ export class StatoUtentiComponent implements OnInit {
   closeDatePicker(eventDate: any, dp?: any) {
     this.appState.viewDate = eventDate;
     dp.close();
+  }
+
+  goToChiusuraMensile(idUtente) {
+    this.appState.viewIdUtente = idUtente;
+    this.router.navigate(['/chiusura-mensile']);
   }
 
 }
