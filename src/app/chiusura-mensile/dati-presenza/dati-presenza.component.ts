@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { map, tap } from 'rxjs';
+import { ChiusureService } from 'src/app/services/chiusure.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -14,7 +15,8 @@ export class DatiPresenzaComponent implements OnInit {
   @Input('chiusuraMese$') chiusuraMese$;
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    public chiusureService: ChiusureService
   ) { }
 
   ngOnInit(): void {

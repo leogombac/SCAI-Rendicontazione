@@ -30,7 +30,7 @@
                                     class="no-style"
                                     type="text"
                                     readonly
-                                    [value]="formatDate()"
+                                    [value]="formatDate(appState.viewDate)"
                                     (click)="picker.open()"
                                 >
                                 <input
@@ -38,7 +38,7 @@
                                     matInput
                                     [matDatepicker]="picker"
                                     placeholder="Scegli un mese"
-                                    [value]="formatDate()"
+                                    [value]="formatDate(appState.viewDate)"
                                     readonly
                                 >
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -92,14 +92,13 @@
                         <div class="col-12 col-md-auto">
                             <mat-checkbox formControlName="trasferte">Trasferte</mat-checkbox>
                         </div>
+                        <div class="col-12 col-md-auto">
+                            <mat-checkbox formControlName="turni">Turni</mat-checkbox>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
-
-        <ng-container *ngIf="(searchResults$ | async) as searchResults">
-            {{ searchResults.items | json }}
-        </ng-container>
 
         <div class="custom-table-wrap">
             <div class="custom-table-inner">
@@ -109,51 +108,83 @@
                 <div class="custom-table">
                     <div class="custom-table-header">
                         <th scope="col">Seleziona</th>
-                        <th scope="col">ID</th>
                         <th scope="col">Nome</th>
                         <th scope="col">Cognome</th>
-                        <th scope="col">Sede</th>
-                        <th scope="col" class="text-right">Ore Consuntiv.</th>
-                        <th scope="col" class="text-right">Ore Mensili</th>
-                        <th scope="col" class="text-center">Stato</th>
-                        <th scope="col" class="text-right">Azioni</th>
+                        <th scope="col">Ore Consuntiv.</th>
+                        <th scope="col">Ore Mensili</th>
+                        <th scope="col">Straodinari</th>
+                        <th scope="col">Trasferte</th>
+                        <th scope="col">Turni</th>
+                        <th scope="col">Stato</th>
+                        <th scope="col">Azioni</th>
                     </div>
                     <div class="custom-table-body">
-                        <div class="row-wrap" *ngFor="let statoUtente of (searchResults$ | async)">
-                            <div class="custom-table-row" style="position: relative;">
-                                <div class="progress" style="position: absolute; top: 0; height: 4px; width: 100%;">
-                                    <div
-                                        class="progress-bar"
-                                        [style.width]="statoUtente._progress"
-                                        [style.backgroundColor]="statoUtente._color"
-                                    ></div>
-                                </div>
-                                <span>
-                                    <mat-checkbox></mat-checkbox>
-                                </span>
-                                <span>{{ statoUtente.idUtente }}</span>
-                                <span>{{ statoUtente.nome }}</span>
-                                <span>{{ statoUtente.cognome }}</span>
-                                <span>{{ statoUtente.sedeLavoro }}</span>
-                                <span class="text-right">{{ statoUtente.oreConsuntivate }}</span>
-                                <span class="text-right">{{ statoUtente.oreMensili }}</span>
-                                <span class="text-center">
-                                    <span
-                                        class="badge"
-                                        [class.badge-primary]="statoUtente.stato === 'Aperto'"
-                                        [class.badge-secondary]="statoUtente.stato === 'Chiuso' || statoUtente.stato === 'Vistato'"
-                                    >{{ statoUtente.stato }}</span>
-                                </span>
-                                <span class="text-right">
-                                    <button class="btn btn-link p-3" *ngIf="statoUtente.stato !== 'Vistato'">
-                                        <i class="material-icons">edit</i>
-                                    </button>
-                                    <button class="btn btn-link p-3" *ngIf="statoUtente.stato !== 'Vistato' && statoUtente.stato !== 'Chiuso'">
-                                        <i class="material-icons">close</i>
-                                    </button>
-                                </span>
-                            </div>
+
+                    <ng-container *ngIf="{
+                        loading: chiusureService.statoUtentiLoading$ | async,
+                        statoUtenti: searchResults$ | async
+                    } as data">
+                        <div *ngIf="data.loading" class="text-center py-5">
+                            <div class="spinner-border" role="status"></div>
+                            <br>
+                            Caricando...
                         </div>
+
+                        <ng-container *ngIf="!data.loading">
+                            <div class="row-wrap" *ngFor="let statoUtente of data.statoUtenti">
+                                <div class="custom-table-row" style="position: relative;">
+                                    <div class="progress" style="position: absolute; top: 0; height: 2px; width: 100%;">
+                                        <div
+                                            class="progress-bar"
+                                            [style.width]="statoUtente._progress"
+                                            [style.backgroundColor]="statoUtente._color"
+                                        ></div>
+                                    </div>
+                                    <span>
+                                        <mat-checkbox></mat-checkbox>
+                                    </span>
+                                    <span>{{ statoUtente.nome }}</span>
+                                    <span>{{ statoUtente.cognome }}</span>
+                                    <span>{{ statoUtente.oreConsuntivate }}</span>
+                                    <span>{{ statoUtente.oreMensili }}</span>
+                                    <span>
+                                        <mat-checkbox disabled></mat-checkbox>
+                                    </span>
+                                    <span>
+                                        <mat-checkbox disabled></mat-checkbox>
+                                    </span>
+                                    <span>
+                                        <mat-checkbox disabled></mat-checkbox>
+                                    </span>
+                                    <span>
+                                        <span
+                                            class="badge"
+                                            [class.badge-outline-warning]="statoUtente.stato === 'Aperto'"
+                                            [class.badge-outline-primary]="statoUtente.stato === 'Chiuso'"
+                                            [class.badge-outline-secondary]="statoUtente.stato === 'Vistato'"
+                                        >{{ statoUtente.stato }}</span>
+                                    </span>
+                                    <span style="justify-self: end;">
+                                        <button
+                                            *ngIf="statoUtente.stato !== 'Vistato'"
+                                            matTooltip="Apri dettaglio mese"
+                                            class="btn btn-link p-3"
+                                        >
+                                            <i class="material-icons">open_in_browser</i>
+                                        </button>
+                                        <button
+                                            *ngIf="statoUtente.stato === 'Chiuso'"
+                                            matTooltip="Vista selezionato"
+                                            class="btn btn-link p-3"
+                                        >
+                                            <i class="material-icons">visibility</i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    
                     </div>
                 </div>
             </div>

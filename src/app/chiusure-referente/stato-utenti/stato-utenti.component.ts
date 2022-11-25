@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { BehaviorSubject, combineLatest, debounceTime, map, Observable, share, startWith, switchMap, tap } from 'rxjs';
 import { StatoUtente } from 'src/app/models/chiusure';
+import { AppStateService } from 'src/app/services/app-state.service';
 import { ChiusureService } from 'src/app/services/chiusure.service';
 import { createAutocompleteLogic } from 'src/app/utils/form.utils';
+import { formatDate } from 'src/app/utils/time.utils';
 
 @Component({
   selector: 'app-stato-utenti',
@@ -12,7 +14,7 @@ import { createAutocompleteLogic } from 'src/app/utils/form.utils';
 })
 export class StatoUtentiComponent implements OnInit {
 
-  selectedDate = new Date();
+  formatDate = formatDate;
 
   form: FormGroup;
   statoAutocomplete;
@@ -27,7 +29,8 @@ export class StatoUtentiComponent implements OnInit {
   });
 
   constructor(
-    private chiusureService: ChiusureService
+    public appState: AppStateService,
+    public chiusureService: ChiusureService
   ) { }
 
   ngOnInit(): void {
@@ -63,10 +66,13 @@ export class StatoUtentiComponent implements OnInit {
       'stato': this.statoAutocomplete.control,
       'contratto': this.contrattoAutocomplete.control,
       'straordinari': new FormControl(''),
-      'trasferte': new FormControl('')
+      'trasferte': new FormControl(''),
+      'turni': new FormControl('')
     });
 
     this.searchResults$ = combineLatest([
+      this.appState.viewDate$,
+      this.paginator$,
       this.form.valueChanges
         .pipe(
           startWith({ }),
@@ -79,17 +85,16 @@ export class StatoUtentiComponent implements OnInit {
               pageIndex: 0
             })
           )
-        ),
-      this.paginator$
+        )
     ])
     .pipe(
-      switchMap(([ { nome, stato, contratto, straordinari, trasferte }, paginator ]) => {
+      switchMap(([ date, paginator, { nome, stato, contratto, straordinari, trasferte } ]) => {
 
         const idStato = stati.find(_stato => _stato.descr === stato)?.id;
         const idContratto = contratti.find(_contratto => _contratto.descr === contratto)?.id;
 
         return this.chiusureService.getStatoUtenti$(
-          this.selectedDate,
+          date,
           paginator.pageIndex,
           paginator.pageSize,
           nome,
@@ -130,13 +135,8 @@ export class StatoUtentiComponent implements OnInit {
   }
 
   closeDatePicker(eventDate: any, dp?: any) {
-    this.selectedDate = eventDate;
+    this.appState.viewDate = eventDate;
     dp.close();
-  }
-
-  formatDate() {
-    if (!this.selectedDate) return;
-    return this.selectedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
   }
 
 }

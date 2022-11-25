@@ -11,8 +11,13 @@
 }
 
 .custom-table-header {
-    border-bottom: 2px solid #eee;
+    border-bottom: 1px solid #eee;
     font-weight: bolder;
+}
+
+.custom-table-row {
+    padding-top: 2px;
+    min-height: 64px;
 }
 
 .custom-table-subrow {

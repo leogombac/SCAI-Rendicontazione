@@ -41,31 +41,46 @@
                 <div class="card-body pt-0">
                     <div class="h4">
                         <div class="d-flex flex-column gap-2">
-                            <div
-                                *ngIf="(chiusuraMese$ | async)?.idStatoChiusura as idStatoChiusura"
-                                class="d-flex justify-content-between mb-3"
-                            >
-                                <b>Stato Chiusura</b>
-                                <span>{{ idStatoChiusura === 1 ? 'Aperto' : idStatoChiusura === 2 ? 'Chiuso' : 'Vistato' }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-4">
-                                <b>Ore Mensili</b>
-                                <span>{{ (chiusuraMese$ | async)?.totaleOre }}</span>
-                            </div>
-                            <ng-container *ngIf="(chiusuraMese$ | async)?.idStatoChiusura as idStatoChiusura">
-                                <button
-                                    class="btn btn-primary"
-                                    style="align-self: center;"
-                                    [disabled]="idStatoChiusura === 3"
-                                    (click)="idStatoChiusura === 1
-                                        ? chiusureService.chiudiMese()
-                                        : idStatoChiusura === 2
-                                            ? chiusureService.apriMese()
-                                            : null"
-                                >
-                                    {{ idStatoChiusura === 1 ? 'Chiudi Mese' : idStatoChiusura === 2 ? 'Apri Mese' : 'Vistato' }}
-                                </button>
+
+                            <ng-container *ngIf="{
+                                loading: chiusureService.chiusuraMeseLoading$| async,
+                                chiusuraMese: chiusuraMese$ | async
+                            } as data">
+                                <div *ngIf="data.loading" class="text-center py-5">
+                                    <div class="spinner-border" role="status"></div>
+                                    <br>
+                                    Caricando...
+                                </div>
+    
+                                <ng-container *ngIf="!data.loading">
+                                    <div
+                                        *ngIf="data.chiusuraMese?.idStatoChiusura as idStatoChiusura"
+                                        class="d-flex justify-content-between mb-3"
+                                    >
+                                        <b>Stato Chiusura</b>
+                                        <span>{{ idStatoChiusura === 1 ? 'Aperto' : idStatoChiusura === 2 ? 'Chiuso' : 'Vistato' }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-4">
+                                        <b>Ore Mensili</b>
+                                        <span>{{ data.chiusuraMese?.totaleOre }}</span>
+                                    </div>
+                                    <ng-container *ngIf="data.chiusuraMese?.idStatoChiusura as idStatoChiusura">
+                                        <button
+                                            class="btn btn-primary"
+                                            style="align-self: center;"
+                                            [disabled]="idStatoChiusura === 3"
+                                            (click)="idStatoChiusura === 1
+                                                ? chiusureService.chiudiMese()
+                                                : idStatoChiusura === 2
+                                                    ? chiusureService.apriMese()
+                                                    : null"
+                                        >
+                                            {{ idStatoChiusura === 1 ? 'Chiudi Mese' : idStatoChiusura === 2 ? 'Apri Mese' : 'Vistato' }}
+                                        </button>
+                                    </ng-container>
+                                </ng-container>
                             </ng-container>
+
                         </div>
                     </div>
                 </div>
@@ -74,7 +89,7 @@
 
         <div class="line-up">
             <div class="card m-0">
-                <div class="card-header pb-0">
+                <div class="card-header pb-0 d-flex">
                     <div class="card-title">Totali Ore</div>
                 </div>
                 <div class="card-body">

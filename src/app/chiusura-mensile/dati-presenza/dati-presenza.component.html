@@ -24,46 +24,61 @@
                         <span scope="col">Note</span>
                     </div>
                     <div class="custom-table-body">
-                        <div class="row-wrap" *ngFor="let dr of (chiusureMeseForTable$ | async)">
-                            <input type="checkbox" class="my-collapse-trigger" hidden [id]="dr.row.idAttivita">
-                            <div class="custom-table-row" style="position: relative;">
-                                <div class="progress" style="position: absolute; top: 0; height: 4px; width: 100%;">
-                                    <div class="progress-bar bg-warning" [style.width]="dr.row._percent"></div>
-                                </div>
-                                <span>
-                                    <label class="btn btn-link" [for]="dr.row.idAttivita">
-                                        <i class="material-icons">expand_more</i>
-                                    </label>
-                                </span>
-                                <span>{{ dr.row.codiceAttivita }}</span>
-                                <span></span>
-                                <span></span>
-                                <span>{{ dr.row.numeroMinuti }}</span>
-                                <span>{{ dr.row.turni }}</span>
-                                <span>{{ dr.row.reperibilita }}</span>
-                                <span></span>
+
+                        <ng-container *ngIf="{
+                            loading: chiusureService.chiusuraMeseLoading$| async,
+                            drs: chiusureMeseForTable$ | async
+                        } as data">
+                            <div *ngIf="data.loading" class="text-center py-5">
+                                <div class="spinner-border" role="status"></div>
+                                <br>
+                                Caricando...
                             </div>
-                            <div class="my-collapse" id="custom-table-subrows">
-                                <div class="custom-table-subrow" *ngFor="let dsr of dr.subrows">
-                                    <span></span>
-                                    <span></span>
-                                    <span>{{ dsr.dataPresenza }}</span>
-                                    <span>{{ dsr.modalitaLavoro }}</span>
-                                    <span>{{ dsr.numeroMinuti }}</span>
-                                    <span>{{ dsr.turni }}</span>
-                                    <span>{{ dsr.reperibilita }}</span>
-                                    <span>
-                                        <button
-                                            class="btn btn-link"
-                                            mat-raised-button
-                                            matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum totam aspernatur vel mollitia neque veritatis asperiores perspiciatis ab blanditiis itaque explicabo cum laudantium corporis incidunt excepturi impedit, magnam atque exercitationem?"
-                                        >
-                                            <i class="material-icons">info</i>
-                                        </button>
-                                    </span>
+
+                            <ng-container *ngIf="!data.loading">
+                                <div class="row-wrap" *ngFor="let dr of data.drs">
+                                    <input type="checkbox" class="my-collapse-trigger" hidden [id]="dr.row.idAttivita">
+                                    <div class="custom-table-row" style="position: relative;">
+                                        <div class="progress" style="position: absolute; top: 0; height: 2px; width: 100%;">
+                                            <div class="progress-bar bg-warning" [style.width]="dr.row._percent"></div>
+                                        </div>
+                                        <span>
+                                            <label class="btn btn-link" [for]="dr.row.idAttivita">
+                                                <i class="material-icons">expand_more</i>
+                                            </label>
+                                        </span>
+                                        <span>{{ dr.row.codiceAttivita }}</span>
+                                        <span></span>
+                                        <span></span>
+                                        <span>{{ dr.row.numeroMinuti }}</span>
+                                        <span>{{ dr.row.turni }}</span>
+                                        <span>{{ dr.row.reperibilita }}</span>
+                                        <span></span>
+                                    </div>
+                                    <div class="my-collapse" id="custom-table-subrows">
+                                        <div class="custom-table-subrow" *ngFor="let dsr of dr.subrows">
+                                            <span></span>
+                                            <span></span>
+                                            <span>{{ dsr.dataPresenza }}</span>
+                                            <span>{{ dsr.modalitaLavoro }}</span>
+                                            <span>{{ dsr.numeroMinuti }}</span>
+                                            <span>{{ dsr.turni }}</span>
+                                            <span>{{ dsr.reperibilita }}</span>
+                                            <span>
+                                                <button
+                                                    class="btn btn-link"
+                                                    mat-raised-button
+                                                    matTooltip="Lorem ipsum dolor sit amet consectetur adipisicing elit."
+                                                >
+                                                    <i class="material-icons">info</i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </ng-container>
+                        </ng-container>
+
                     </div>
                 </div>
             </div>

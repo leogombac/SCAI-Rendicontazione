@@ -6,15 +6,17 @@
 .custom-table-header, .custom-table-row {
     align-items: center;
     display: grid;
-    grid-template-columns: repeat(9, minmax(100px, 1fr));
+    grid-template-columns: repeat(10, minmax(12ch, 1fr));
+    justify-items: center;
 }
 
 .custom-table-header {
-    border-bottom: 2px solid #eee;
+    border-bottom: 1px solid #eee;
     font-weight: bolder;
 }
+
 .custom-table-row {
-    padding-top: 4px;
+    padding-top: 2px;
     min-height: 64px;
 }
 

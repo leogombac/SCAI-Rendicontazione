@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, lastValueFrom, map, share, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { ReferenteAziendaService } from '../api/referente/services';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { AppStateService } from './app-state.service';
-import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +13,14 @@ export class ChiusureService {
   private _refresh$ = new BehaviorSubject<boolean>(true);
   refresh$ = this._refresh$.asObservable();
 
+  private _chiusuraMeseLoading$ = new BehaviorSubject<boolean>(true);
+  chiusuraMeseLoading$ = this._chiusuraMeseLoading$.asObservable();
+  private _statoUtentiLoading$ = new BehaviorSubject<boolean>(true);
+  statoUtentiLoading$ = this._statoUtentiLoading$.asObservable();
+
   constructor(
     private referenteAziendaService: ReferenteAziendaService,
     private appState: AppStateService,
-    private userService: UserService,
     private toasterService: ToasterService
   ) { }
 
@@ -32,6 +35,7 @@ export class ChiusureService {
     ])
     .pipe(
       filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      tap(_ => this._chiusuraMeseLoading$.next(true)),
       switchMap(([ idUtente, idAzienda ]) =>
         this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseGet({
           idUtente,
@@ -78,7 +82,8 @@ export class ChiusureService {
             {}
           )
         })
-      )
+      ),
+      tap(_ => this._chiusuraMeseLoading$.next(false))
     );
   }
 
@@ -142,6 +147,7 @@ export class ChiusureService {
     ])
     .pipe(
       filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      tap(_ => this._statoUtentiLoading$.next(true)),
       switchMap(([ idUtente, idAzienda ]) =>
         this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaAnnoMeseStatoUtentiGet({
           idUtente: idUtente,
@@ -162,7 +168,8 @@ export class ChiusureService {
           map((d: any) => JSON.parse(d))
         )
       ),
-      share()
+      share(),
+      tap(_ => this._statoUtentiLoading$.next(false))
     );
   }
 
