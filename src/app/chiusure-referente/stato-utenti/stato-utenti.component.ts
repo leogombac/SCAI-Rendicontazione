@@ -21,6 +21,7 @@ export class StatoUtentiComponent implements OnInit {
   statoAutocomplete;
   contrattoAutocomplete;
 
+  searchResults: StatoUtente[];
   searchResults$: Observable<StatoUtente>;
   length = 0;
 
@@ -78,7 +79,7 @@ export class StatoUtentiComponent implements OnInit {
       this.form.valueChanges
         .pipe(
           startWith({ }),
-          debounceTime(450),
+          debounceTime(200),
           tap(_ =>
 
             // Force page to zero when the user fiddles with the search card
@@ -121,10 +122,12 @@ export class StatoUtentiComponent implements OnInit {
           return {
             ...statoUtente,
             _progress,
-            _color
+            _color,
+            _selected: false
           };
         })
       ),
+      tap(statiUtente => this.searchResults = statiUtente),
       share()
     );
   }
@@ -144,6 +147,24 @@ export class StatoUtentiComponent implements OnInit {
   goToChiusuraMensile(idUtente) {
     this.appState.viewIdUtente = idUtente;
     this.router.navigate(['/chiusura-mensile']);
+  }
+
+  selectAll() {
+    this.searchResults
+      .filter((x: any) => x.stato === 'Chiuso')
+      .map((x: any) => x._selected = true);
+  }
+
+  disableVistaSelected() {
+    if (!this.searchResults)
+      return true;
+    return !this.searchResults
+      .filter((x: any) => x._selected)
+      .length
+  }
+
+  vistaSelected() {
+    console.log(this.searchResults.filter((x: any) => x._selected));
   }
 
 }

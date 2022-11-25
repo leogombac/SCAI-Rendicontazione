@@ -71,6 +71,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     meta = { tmpEvent: false };
 
     // Presenza
+    idStato;
     progressivo;
     idCommessa;
     idAttivita;
@@ -99,6 +100,7 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.id = presenza.progressivo;
         this.isLocal = false;
 
+        // TODO: add idStato assignment
         this.progressivo = presenza.progressivo;
         this.idCommessa = presenza.idCommessa;
         this.idAttivita = presenza.idAttivita;

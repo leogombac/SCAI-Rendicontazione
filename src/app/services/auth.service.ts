@@ -6,6 +6,7 @@ import { LoginService } from '../api/services';
 import { LoginData } from '../models/auth';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
+import { AppStateService } from './app-state.service';
 
 const LOGIN_LS = 'LOGIN_DATA'
 
@@ -20,9 +21,17 @@ export class AuthService {
   constructor(
     private loginService: LoginService,
     private router: Router,
+    private appState: AppStateService,
     private toasterService: ToasterService
   ) {
     this.login(); // Auto-login
+  }
+
+  backdoorLogin(username, token, idAzienda) {
+    localStorage.setItem(LOGIN_LS, JSON.stringify({ username, token }));
+    this._loginData$.next(this.getLoginData());
+    this.appState.viewIdAzienda = idAzienda;
+    this.router.navigate(['/']);
   }
 
   login(username?) {
@@ -55,7 +64,8 @@ export class AuthService {
     // If it's auto-login but no login data is present, then launch a toast and route to login page
     if (!username) {
       this.toasterService.addToast(ToastLevel.Warning, `Effettua l'accesso per poter accedere all'applicativo.`);
-      this.router.navigate(['pages', 'login']);
+      if (this.router.url.split('?')[0] !== '/pages/login')
+        this.router.navigate(['pages', 'login']);
       return;
     }
 

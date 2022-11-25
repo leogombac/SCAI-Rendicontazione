@@ -1,13 +1,8 @@
-import { Location } from '@angular/common';
-import { HttpContext } from '@angular/common/http';
 import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
-import { first } from 'rxjs';
-import { addHours } from 'date-fns';
 import { AuthService } from 'src/app/services/auth.service';
-import { UserService } from 'src/app/services/user.service';
 import { ToasterService } from 'src/app/shared/toaster/toaster.service';
 import { ToastLevel } from 'src/app/models/toast';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 declare var $: any;
 
@@ -25,12 +20,24 @@ export class LoginComponent implements OnInit, OnDestroy {
     constructor(
         private element: ElementRef,
         private authService: AuthService,
-        private userService: UserService,
         private router: Router,
+        private route: ActivatedRoute,
         private toasterService: ToasterService
     ) {
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
+
+        // Use backdoor login if queryParams are provided
+        if (
+            this.route.snapshot.queryParams
+         && this.route.snapshot.queryParams.token
+         && this.route.snapshot.queryParams.username
+        )
+            this.authService.backdoorLogin(
+                this.route.snapshot.queryParams.username,
+                this.route.snapshot.queryParams.token,
+                this.route.snapshot.queryParams.idAzienda
+            );
     }
 
     ngOnInit() {
@@ -68,7 +75,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     async login(username) {
-        console.warn(username);
         try {
             await this.authService.login(username);
             this.toasterService.addToast(ToastLevel.Success, "Login effettuato con successo!");

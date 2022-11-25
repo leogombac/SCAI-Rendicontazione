@@ -175,4 +175,28 @@ export class ChiusureService {
     );
   }
 
+  async vistaUtenti() {
+    
+    // TODO: make it so that it accepts multiple user ids
+    // /referente/azienda/{idAzienda}/consuntivazione/{anno}-{mese}/stato-chiusura/{statoNuovo} body->[186,190,186] ???
+    // const apriReq = lastValueFrom(
+    //   this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseStatoChiusuraStatoNuovoPost({
+    //     idUtente: this.appState.viewIdUtente,
+    //     idAzienda: this.appState.viewIdAzienda,
+    //     anno: this.appState.viewDate.getFullYear(),
+    //     mese: this.appState.viewDate.getMonth() + 1,
+    //     statoNuovo: 3,
+    //   })
+    // );
+
+    // try {
+    //   await apriReq;
+    //   this.toasterService.addToast(ToastLevel.Success, "Utente vistato con successo!");
+    //   this.refresh();
+    // }
+    // catch (e) {
+    //   this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante la vistatura dell'utente.");
+    // }
+  }
+
 }

@@ -60,9 +60,13 @@
                                         <b>Stato Chiusura</b>
                                         <span>{{ idStatoChiusura === 1 ? 'Aperto' : idStatoChiusura === 2 ? 'Chiuso' : 'Vistato' }}</span>
                                     </div>
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <b>Ore Consuntivate</b>
+                                        <span>{{ data.chiusuraMese?.totaleOre }}</span>
+                                    </div>
                                     <div class="d-flex justify-content-between mb-4">
                                         <b>Ore Mensili</b>
-                                        <span>{{ data.chiusuraMese?.totaleOre }}</span>
+                                        <span>{{ data.chiusuraMese?.oreMensili }}</span>
                                     </div>
                                     <ng-container *ngIf="data.chiusuraMese?.idStatoChiusura as idStatoChiusura">
                                         <button

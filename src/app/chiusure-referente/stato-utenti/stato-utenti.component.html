@@ -100,11 +100,29 @@
             </div>
         </div>
 
+        <div class="d-flex flex-wrap" style="gap: 1rem;">
+            <button class="col-12 col-md-auto btn btn-large btn-outline-primary" (click)="selectAll()">
+                <i class="material-icons">check</i>
+                <br>
+                Seleziona tutti
+            </button>
+            <button
+                class="col-12 col-md-auto btn btn-large btn-primary"
+                [disabled]="disableVistaSelected()"
+                (click)="vistaSelected()"
+            >
+                <i class="material-icons">lock</i>
+                <br>
+                Vista selezionati
+            </button>
+        </div>
+
+        <p class="text-right text-muted" style="font-size: 12px;">
+            La barra indica la percentuale di tempo consuntivato rispetto il totale.
+        </p>
+
         <div class="custom-table-wrap">
             <div class="custom-table-inner">
-                <p class="text-right text-muted" style="font-size: 12px;">
-                    La barra indica la percentuale di tempo consuntivato rispetto il totale.
-                </p>
                 <div class="custom-table">
                     <div class="custom-table-header">
                         <th scope="col">Seleziona</th>
@@ -122,7 +140,7 @@
 
                     <ng-container *ngIf="{
                         loading: chiusureService.statoUtentiLoading$ | async,
-                        statoUtenti: searchResults$ | async
+                        searchResults: searchResults$ | async
                     } as data">
                         <div *ngIf="data.loading" class="text-center py-5">
                             <div class="spinner-border" role="status"></div>
@@ -131,7 +149,7 @@
                         </div>
 
                         <ng-container *ngIf="!data.loading">
-                            <div class="row-wrap" *ngFor="let statoUtente of data.statoUtenti">
+                            <div class="row-wrap" *ngFor="let statoUtente of data.searchResults">
                                 <div class="custom-table-row" style="position: relative;">
                                     <div class="progress" style="position: absolute; top: 0; height: 2px; width: 100%;">
                                         <div
@@ -141,7 +159,11 @@
                                         ></div>
                                     </div>
                                     <span>
-                                        <mat-checkbox></mat-checkbox>
+                                        <mat-checkbox 
+                                            [checked]="statoUtente._selected" 
+                                            [disabled]="statoUtente.stato !== 'Chiuso'"
+                                            (change)="statoUtente._selected = $event.checked"
+                                        ></mat-checkbox>
                                     </span>
                                     <span>{{ statoUtente.nome }}</span>
                                     <span>{{ statoUtente.cognome }}</span>
@@ -186,7 +208,7 @@
                                 </div>
                             </div>
 
-                            <div *ngIf="data.statoUtenti.length === 0" class="text-center py-5">
+                            <div *ngIf="data.searchResults?.length === 0" class="text-center py-5">
                                 Non ci sono record presenti per questa data
                             </div>
                         </ng-container>

@@ -71,6 +71,23 @@ export interface Azienda {
     descrizione: string
 }
 
+export interface AziendaDettaglio {
+    idAzienda: number;
+    descrizione: string;
+    acronimo: string;
+    modalitaLavoroAttivazione: string;
+    bloccaConsuntivazione: boolean;
+    straordinarioFestivoSabato: boolean;
+    straordinarioFestivo: boolean;
+    attivazioneMonteOre: boolean;
+    attivazioneBancaOre: boolean;
+    attivazioneDiaria: boolean;
+    attivazioneStraordinari: boolean;
+    attivazioneTurni: boolean;
+    attivazioneUsoBadge: boolean;
+    sovrapposizioneOrari: boolean;
+}
+
 export class User {
 
     // From DatoOperativo

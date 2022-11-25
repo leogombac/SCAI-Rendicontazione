@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, of, switchMap, tap } from 'rxjs';
 import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
 import { ModalitaLavoro } from '../models/consuntivo';
-import { Azienda, Diaria, User, UtenteAzienda } from '../models/user';
+import { Azienda, AziendaDettaglio, Diaria, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 import { AppStateService } from './app-state.service';
 
@@ -24,7 +24,7 @@ export class UserService {
   private _aziende$ = new BehaviorSubject<Azienda[]>([]);
   aziende$ = this._aziende$.asObservable();
 
-  private _azienda$ = new BehaviorSubject<Azienda>(null);
+  private _azienda$ = new BehaviorSubject<AziendaDettaglio>(null);
   azienda$ = this._azienda$.asObservable();
 
   private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
@@ -51,12 +51,26 @@ export class UserService {
     this.createPipelineAziende();
     this.createPipelineModalitaLavoro();
 
+    this.createPipelineAzienda();
+
     this.createPipelineUser();
 
     this.createPipelineDiarie();
 
     // This pipeline only ever emits if user is referente
     this.createPipelineUtentiAzienda();
+  }
+
+  private createPipelineAzienda() {
+    this.appState.viewIdAzienda$
+      .pipe(
+        filter(idAzienda => !!idAzienda),
+        switchMap(idAzienda =>
+          this.aziendeService.consuntivazioneAziendeIdAziendaGet({ idAzienda })
+        ),
+        tap(console.log)
+      )
+      .subscribe();
   }
 
   private createPipelineAziende() {
