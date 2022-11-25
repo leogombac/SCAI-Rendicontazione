@@ -16,6 +16,7 @@ export class ChiusureService {
 
   private _chiusuraMeseLoading$ = new BehaviorSubject<boolean>(true);
   chiusuraMeseLoading$ = this._chiusuraMeseLoading$.asObservable();
+  
   private _statoUtentiLoading$ = new BehaviorSubject<boolean>(true);
   statoUtentiLoading$ = this._statoUtentiLoading$.asObservable();
 
