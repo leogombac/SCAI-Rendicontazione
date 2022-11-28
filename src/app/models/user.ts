@@ -15,6 +15,13 @@ export interface UtenteAzienda {
     idUtente: number
 }
 
+export interface Festivita {
+    comune: string;
+    descrizione: string;
+    mese: number;
+    giorno: number;
+}
+
 export interface Diaria {
     idTipoTrasferta: number;
     tipoTrasferta: string;

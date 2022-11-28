@@ -1,9 +1,8 @@
 .toasts {
-    bottom: 5rem;
     display: grid;
     gap: 1rem;
-    left: 50%;
     position: fixed;
-    transform: translateX(-50%);
+    right: 1rem;
+    top: calc(74px + 1rem);
     z-index: 10000;
 }

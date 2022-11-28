@@ -128,6 +128,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     const consuntivo: SaveConsuntivoBody = {
       progressivo: 0, // Set below
+      dataPrecedente: '', // Set below
       data: '', // Set below
       inizio,
       minuti,
@@ -166,7 +167,8 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     // Update old
     consuntivo.progressivo = this.data.event.progressivo;
-    consuntivo.data = this.data.event.originalStart;
+    consuntivo.dataPrecedente = this.data.event.start;
+    consuntivo.data = inizio;
     this.consuntivoService.saveConsuntivo(this.data.event, consuntivo);
     this.dialog.close();
   }

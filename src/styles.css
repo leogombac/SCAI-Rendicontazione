@@ -80,16 +80,74 @@ input.no-style:focus {
 }
 
 /* Angular calendar fixes */
-.cal-event-title {
-    display: grid;
-    gap: 0.25rem;
-    justify-content: start;
-    justify-items: start;
-    padding: 0.25rem 0;
+.cal-day-headers .is-holiday {
+    background-color: #f4433636 !important;
+}
+
+.cal-day-columns .is-holiday {
+    background-color: #f4433614 !important;
+}
+
+.cal-day-headers .is-holiday::after {
+    color: #f44336dc;
+    content: 'Festivo';
+    display: block;
+    font-size: 0.75rem;
+}
+
+.cal-day-headers .is-holiday.festa-della-liberazione::after {
+    content: 'Festa della liberazione';
+}
+
+.cal-day-headers .is-holiday.festa-del-lavoro::after {
+    content: 'Festa del lavoro';
+}
+
+.cal-day-headers .is-holiday.natale::after {
+    content: 'Natale';
+}
+
+.cal-day-headers .is-holiday.santo-stefano::after {
+    content: 'Santo Stefano';
+}
+
+.cal-day-headers .is-holiday.festa-della-repubblica::after {
+    content: 'Festa della Repubblica';
+}
+
+.cal-day-headers .is-holiday.ferragosto::after {
+    content: 'Ferragosto';
+}
+
+.cal-day-headers .is-holiday.capodanno::after {
+    content: 'Capodanno';
+}
+
+.cal-day-headers .is-holiday.ognissanti::after {
+    content: 'Ognissanti';
+}
+
+.cal-day-headers .is-holiday.befana::after {
+    content: 'Befana';
+}
+
+.cal-day-headers .is-holiday.immacolata-concezione::after {
+    content: 'Immacolata Concezione';
 }
 
 .cal-event {
     user-select: none;
+}
+
+.cal-event-title, .cal-tooltip-inner {
+    display: grid;
+    gap: 0.25rem;
+    justify-content: start;
+    justify-items: start;
+}
+
+.cal-tooltip-inner {
+    padding: 0.5rem;
 }
 
 .cal-bg-yellow {
@@ -98,6 +156,10 @@ input.no-style:focus {
 
 .cal-bg-blue {
     background-color: rgb(209, 232, 255);
+}
+
+.cal-bg-grey {
+    background-color: rgb(204, 204, 204);
 }
 
 /* Generic styles */

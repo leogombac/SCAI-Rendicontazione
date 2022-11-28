@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { isMonday, isSameMonth, previousMonday } from 'date-fns';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
-import { ReferenteAziendaService } from '../api/referente/services';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
-import { ConsuntivoEvent, Presenza, SaveConsuntivoBody } from '../models/consuntivo';
+import { ConsuntivoEvent, SaveConsuntivoBody } from '../models/consuntivo';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { getTZOffsettedDate } from '../utils/time.utils';
@@ -32,7 +31,6 @@ export class ConsuntivoService {
   constructor(
     private utenteService: UtenteService,
     private commesseService: CommesseService,
-    private referenteAziendaService: ReferenteAziendaService,
     private appState: AppStateService,
     private userService: UserService,
     private calendarService: CalendarService,
@@ -93,16 +91,20 @@ export class ConsuntivoService {
           map((d: any) => JSON.parse(d))
         )
       ),
-      map(_consuntivi => {
+      map((response: any) => {
 
-        // Extract consuntivi from presenze response
-        const consuntivi = [];
-        _consuntivi.giorni.map(giorno =>
-          giorno.presenze.map((presenza: Presenza) =>
-            consuntivi.push(new ConsuntivoEvent({ dataPresenza: giorno.dataPresenza, presenza }))
-          )
-        );
-        return consuntivi;
+        this.appState.viewIdStato$.next(response.statoChiusura);
+
+        return response.giorni.map(giorno =>
+          new ConsuntivoEvent({
+            presenza: {
+              inizioMese: response.inizio,
+              fineMese: response.fine,
+              statoChiusura: response.statoChiusura,
+              ...giorno
+            }
+          })
+        )
       }),
       tap(consuntivi => {
         this._consuntiviRemote$.next(consuntivi);

@@ -93,7 +93,8 @@
                         [hourSegmentTemplate]="weekViewHourSegmentTemplate"
                         [weekStartsOn]="weekStartsOn"
                         (eventTimesChanged)="eventTimesChanged($event)"
-                        (eventClicked)="onEventClicked($event)">
+                        (eventClicked)="onEventClicked($event)"
+                        (beforeViewRender)="beforeWeekViewRender($event)">
                     </mwl-calendar-week-view>
                     <mwl-calendar-day-view
                         *ngSwitchCase="CalendarView.Day"

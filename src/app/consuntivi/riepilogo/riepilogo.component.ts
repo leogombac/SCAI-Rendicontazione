@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, map, Observable } from 'rxjs';
 import { CalendarService } from 'src/app/calendar/calendar.service';
 import { ConsuntivoEvent } from 'src/app/models/consuntivo';
+import { AppStateService } from 'src/app/services/app-state.service';
 import { ConsuntivoService } from 'src/app/services/consuntivo.service';
 import { DialogGestionePresenzaComponent } from '../../dialog-gestione-presenza/dialog-gestione-presenza.component';
 
@@ -16,6 +17,7 @@ export class RiepilogoComponent implements OnInit {
   consuntivi$: Observable<ConsuntivoEvent[]>;
 
   constructor(
+    public appState: AppStateService,
     public consuntivoService: ConsuntivoService,
     private calendarService: CalendarService,
     private dialog: MatDialog
@@ -33,6 +35,11 @@ export class RiepilogoComponent implements OnInit {
   }
 
   openDialog(event: ConsuntivoEvent) {
+
+    // Do nothing if stato is Chiuso or Vistato
+    if (this.appState.viewIdStato === 2 || this.appState.viewIdStato === 3)
+      return;
+    
     this.dialog.open(
       DialogGestionePresenzaComponent,
       {

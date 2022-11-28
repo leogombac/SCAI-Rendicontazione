@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
-import { ReferenteAziendaService } from '../api/referente/services';
+import { ReferenteAziendaController2Service, ReferenteAziendaService } from '../api/referente/services';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { AppStateService } from './app-state.service';
@@ -22,6 +22,7 @@ export class ChiusureService {
 
   constructor(
     private referenteAziendaService: ReferenteAziendaService,
+    private referenteAziendaService2: ReferenteAziendaController2Service,
     private appState: AppStateService,
     private userService: UserService,
     private toasterService: ToasterService
@@ -176,28 +177,26 @@ export class ChiusureService {
     );
   }
 
-  async vistaUtenti() {
-    
-    // TODO: make it so that it accepts multiple user ids
-    // /referente/azienda/{idAzienda}/consuntivazione/{anno}-{mese}/stato-chiusura/{statoNuovo} body->[186,190,186] ???
-    // const apriReq = lastValueFrom(
-    //   this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseStatoChiusuraStatoNuovoPost({
-    //     idUtente: this.appState.viewIdUtente,
-    //     idAzienda: this.appState.viewIdAzienda,
-    //     anno: this.appState.viewDate.getFullYear(),
-    //     mese: this.appState.viewDate.getMonth() + 1,
-    //     statoNuovo: 3,
-    //   })
-    // );
+  async vistaUtenti(idUtenti: number[]) {
 
-    // try {
-    //   await apriReq;
-    //   this.toasterService.addToast(ToastLevel.Success, "Utente vistato con successo!");
-    //   this.refresh();
-    // }
-    // catch (e) {
-    //   this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante la vistatura dell'utente.");
-    // }
+    const apriReq = lastValueFrom(
+      this.referenteAziendaService2.referenteAziendaIdAziendaConsuntivazioneAnnoMeseStatoChiusuraStatoNuovoPost({
+        idAzienda: this.appState.viewIdAzienda,
+        anno: this.appState.viewDate.getFullYear(),
+        mese: this.appState.viewDate.getMonth() + 1,
+        body: idUtenti,
+        statoNuovo: 3,
+      })
+    );
+
+    try {
+      await apriReq;
+      this.toasterService.addToast(ToastLevel.Success, "Utenti vistati con successo!");
+      this.refresh();
+    }
+    catch (e) {
+      this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante la vistatura degli utenti.");
+    }
   }
 
 }

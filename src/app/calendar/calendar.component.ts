@@ -15,7 +15,7 @@ import { fromEvent, Subject } from 'rxjs';
 import { finalize, take, takeUntil, tap } from 'rxjs/operators';
 import { addDays, addMinutes, endOfWeek, isSameDay, isSameMonth } from 'date-fns';
 import { ConsuntivoService } from '../services/consuntivo.service';
-import { CustomEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
+import { NoTooltipEventTitleFormatter } from './utils/custom-event-title-formatter.provider';
 import { ceilToNearest, floorToNearest } from './utils/date.util';
 import { isMobile } from '../utils/mobile.utils';
 import { ConsuntivoEvent } from '../models/consuntivo';
@@ -24,6 +24,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { CalendarService } from './calendar.service';
 import { UUID } from '../utils/uuid.utils';
 import { AppStateService } from '../services/app-state.service';
+import { UserService } from '../services/user.service';
+import { toHyphenCase } from '../utils/string.utils';
 
 @Component({
   selector: 'app-calendar',
@@ -33,7 +35,7 @@ import { AppStateService } from '../services/app-state.service';
   providers: [
     {
       provide: CalendarEventTitleFormatter,
-      useClass: CustomEventTitleFormatter,
+      useClass: NoTooltipEventTitleFormatter,
     },
   ],
 })
@@ -60,6 +62,7 @@ export class CalendarComponent {
 
   constructor(
     public appState: AppStateService,
+    private userService: UserService,
     public consuntivoService: ConsuntivoService,
     private calendarService: CalendarService,
     private dialog: MatDialog,
@@ -198,6 +201,11 @@ export class CalendarComponent {
   }
 
   private openDialog(event: ConsuntivoEvent, events?: ConsuntivoEvent[]) {
+
+    // Do nothing if stato is Chiuso or Vistato
+    if (this.appState.viewIdStato === 2 || this.appState.viewIdStato === 3)
+      return;
+
     this.dialog.open(
       DialogGestionePresenzaComponent,
       {
@@ -217,5 +225,30 @@ export class CalendarComponent {
       ...this.consuntivoService._consuntiviRemote$.getValue()
     ];
     this.cdr.detectChanges();
+  }
+
+  beforeWeekViewRender(renderEvent: any): void {
+
+    if (!this.userService.festivita) return;
+
+    const festivo = this.userService.festivita.reduce((acc, val) => (acc[val.mese + '-' + val.giorno] = val, acc), {});
+
+    renderEvent.header.forEach(day => {
+      const _festivo = festivo[(day.date.getMonth() + 1) + '-' + day.date.getDate()];
+      (_festivo || [0, 6].includes(day.date.getDay()))
+        ? day.cssClass = 'is-holiday ' + toHyphenCase(_festivo?.festivita)
+        : null
+    });
+
+    renderEvent.hourColumns.forEach((hourColumn) =>
+      hourColumn.hours.forEach((hour) =>
+        hour.segments.forEach((segment) => {
+          const _festivo = festivo[(segment.date.getMonth() + 1) + '-' + segment.date.getDate()];
+          (_festivo || [0, 6].includes(segment.date.getDay()))
+            ? segment.cssClass = 'is-holiday ' + toHyphenCase(_festivo?.festivita)
+            : null
+          })
+      )
+    );
   }
 }

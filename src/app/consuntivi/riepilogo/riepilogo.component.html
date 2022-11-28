@@ -36,6 +36,7 @@
                             *ngFor="let consuntivo of (consuntivi$ | async)"
                             [class.cal-bg-yellow]="consuntivo.meta.tmpEvent"
                             [class.cal-bg-blue]="!consuntivo.meta.tmpEvent"
+                            [class.cal-bg-grey]="appState.viewIdStato === 2 || appState.viewIdStato === 3"
                         >
                             <td>{{ consuntivo.giorno }}</td>
                             <td>{{ consuntivo.start | date: 'hh:mm' }}</td>
@@ -43,6 +44,7 @@
                             <td class="text-right">
                                 <button
                                     class="btn btn-link p-3"
+                                    [disabled]="appState.viewIdStato === 2 || appState.viewIdStato === 3"
                                     (click)="openDialog(consuntivo)"
                                 >Modifica <i class="material-icons">edit_note</i></button>
                             </td>

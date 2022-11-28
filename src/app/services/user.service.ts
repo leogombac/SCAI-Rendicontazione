@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, map, of, switchMap, tap } from 'rxjs';
 import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
 import { ModalitaLavoro } from '../models/consuntivo';
-import { Azienda, AziendaDettaglio, Diaria, User, UtenteAzienda } from '../models/user';
+import { Azienda, AziendaDettaglio, Diaria, Festivita, User, UtenteAzienda } from '../models/user';
 import { AuthService } from './auth.service';
 import { AppStateService } from './app-state.service';
 
@@ -27,6 +27,9 @@ export class UserService {
   private _azienda$ = new BehaviorSubject<AziendaDettaglio>(null);
   azienda$ = this._azienda$.asObservable();
 
+  private _festivita$ = new BehaviorSubject<Festivita[]>([]);
+  festivita$ = this._festivita$.asObservable();
+
   private _utentiAzienda$ = new BehaviorSubject<UtenteAzienda[]>([]);
   utentiAzienda$ = this._utentiAzienda$.asObservable();
 
@@ -36,6 +39,10 @@ export class UserService {
 
   get modalitaLavoro() {
     return this._modalitaLavoro$.getValue();
+  }
+
+  get festivita() {
+    return this._festivita$.getValue();
   }
 
   constructor(
@@ -54,8 +61,11 @@ export class UserService {
     this.createPipelineAzienda();
 
     this.createPipelineUser();
+    this.createPipelineViewUser();
 
     this.createPipelineDiarie();
+
+    this.createPipelineFestivita();
 
     // This pipeline only ever emits if user is referente
     this.createPipelineUtentiAzienda();
@@ -149,6 +159,35 @@ export class UserService {
     .subscribe();
   }
 
+  private createPipelineViewUser() {
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$
+    ])
+    .pipe(
+      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      switchMap(([ idUtente, idAzienda ]) =>
+        combineLatest([
+          this.utenteService.consuntivazioneUtenteIdUtenteDatiOperativiGet({
+            idUtente
+          }).pipe(
+            map((d: any) => JSON.parse(d))
+          ),
+          of(idAzienda)
+        ])
+      ),
+      map(([ datiOperativi, idAzienda ]) =>
+        datiOperativi.find(datoOperativo => datoOperativo.idAziendaAssunzione === idAzienda)
+      ),
+      tap(datoOperativo => {
+        const user = new User(datoOperativo);
+        this.appState.viewUser$.next(user);
+        console.log("View user", user);
+      })
+    )
+    .subscribe();
+  }
+
   private createPipelineDiarie() {
     combineLatest([
       this.appState.viewIdUtente$,
@@ -166,6 +205,28 @@ export class UserService {
       tap(diarie => {
         this._diarie$.next(diarie);
         console.log("Diarie", diarie);
+      })
+    )
+    .subscribe();
+  }
+
+  private createPipelineFestivita() {
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$,
+    ]).pipe(
+      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      switchMap(([ idUtente, idAzienda ]) =>
+        this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteFestivitaGet({
+          idUtente,
+          idAzienda
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
+      ),
+      tap(festivita => {
+        this._festivita$.next(festivita);
+        console.log("Festività", festivita);
       })
     )
     .subscribe();

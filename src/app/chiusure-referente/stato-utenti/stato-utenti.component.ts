@@ -164,7 +164,13 @@ export class StatoUtentiComponent implements OnInit {
   }
 
   vistaSelected() {
-    console.log(this.searchResults.filter((x: any) => x._selected));
+    const idUtenti = this.searchResults
+      .filter((x: any) => x._selected)
+      .map(x => x.idUtente);
+    this.chiusureService.vistaUtenti(idUtenti);
+
+    // Force refresh by resetting the viewDate to itself
+    this.appState.viewDate = this.appState.viewDate;
   }
 
 }
