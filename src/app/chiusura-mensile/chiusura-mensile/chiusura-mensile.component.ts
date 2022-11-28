@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, share, switchMap } from 'rxjs';
-import { AppStateService } from 'src/app/services/app-state.service';
 import { ChiusureService } from 'src/app/services/chiusure.service';
+import { ConsuntivoService } from 'src/app/services/consuntivo.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -11,26 +10,12 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class ChiusuraMensileComponent implements OnInit {
 
-  chiusuraMese$;
-
   constructor(
-    private appState: AppStateService,
     public userService: UserService,
-    public chiusureService: ChiusureService
+    public chiusureService: ChiusureService,
+    private consuntivoService: ConsuntivoService
   ) { }
 
-  ngOnInit(): void {
-    this.chiusuraMese$ = 
-      combineLatest([
-        this.appState.viewDate$,
-        this.chiusureService.refresh$
-      ])
-      .pipe(
-        switchMap(_ =>
-          this.chiusureService.getChiusuraMese$()
-        ),
-        share()
-      )
-  }
+  ngOnInit(): void {}
 
 }

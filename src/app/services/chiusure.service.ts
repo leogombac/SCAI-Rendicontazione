@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { ReferenteAziendaController2Service, ReferenteAziendaService } from '../api/referente/services';
+import { ChiusuraMese } from '../models/chiusure';
 import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { AppStateService } from './app-state.service';
+import { ConsuntivoService } from './consuntivo.service';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -13,6 +15,9 @@ export class ChiusureService {
 
   private _refresh$ = new BehaviorSubject<boolean>(true);
   refresh$ = this._refresh$.asObservable();
+
+  private _chiusuraMese$ = new BehaviorSubject<ChiusuraMese>(null);
+  chiusuraMese$ = this._chiusuraMese$.asObservable();
 
   private _chiusuraMeseLoading$ = new BehaviorSubject<boolean>(true);
   chiusuraMeseLoading$ = this._chiusuraMeseLoading$.asObservable();
@@ -25,27 +30,32 @@ export class ChiusureService {
     private referenteAziendaService2: ReferenteAziendaController2Service,
     private appState: AppStateService,
     private userService: UserService,
+    private consuntivoService: ConsuntivoService,
     private toasterService: ToasterService
-  ) { }
+  ) {
+    this.createPipelineChiusuraMese();
+  }
 
   refresh() {
     this._refresh$.next(true);
   }
 
-  getChiusuraMese$() {
-    return combineLatest([
+  private createPipelineChiusuraMese() {
+    combineLatest([
       this.appState.viewIdUtente$,
-      this.appState.viewIdAzienda$
+      this.appState.viewIdAzienda$,
+      this.appState.viewDate$,
+      this.refresh$
     ])
     .pipe(
-      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+      filter(([ idUtente, idAzienda, viewDate ]) => !!idUtente && !!idAzienda && !!viewDate),
       tap(_ => this._chiusuraMeseLoading$.next(true)),
-      switchMap(([ idUtente, idAzienda ]) =>
+      switchMap(([ idUtente, idAzienda, viewDate ]) =>
         this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseGet({
           idUtente,
           idAzienda: idAzienda,
-          anno: this.appState.viewDate.getFullYear(),
-          mese: this.appState.viewDate.getMonth() + 1
+          anno: viewDate.getFullYear(),
+          mese: viewDate.getMonth() + 1
         }).pipe(
           map((d: any) => JSON.parse(d))
         )
@@ -87,8 +97,13 @@ export class ChiusureService {
           )
         })
       ),
-      tap(_ => this._chiusuraMeseLoading$.next(false))
-    );
+      tap(chiusuraMese => {
+        this._chiusuraMese$.next(chiusuraMese);
+        console.log('Chiusura Mese', chiusuraMese);
+        this._chiusuraMeseLoading$.next(false);
+      })
+    )
+    .subscribe();
   }
 
   async chiudiMese() {
@@ -107,6 +122,7 @@ export class ChiusureService {
       await chiudiReq;
       this.toasterService.addToast(ToastLevel.Success, "Mese chiuso con successo!");
       this.refresh();
+      this.consuntivoService.refresh();
     }
     catch (e) {
       this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante la chiusura del mese.");
@@ -129,6 +145,7 @@ export class ChiusureService {
       await apriReq;
       this.toasterService.addToast(ToastLevel.Success, "Mese aperto con successo!");
       this.refresh();
+      this.consuntivoService.refresh();
     }
     catch (e) {
       this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante l'apertura del mese.");

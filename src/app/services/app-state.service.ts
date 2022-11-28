@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { User } from '../models/user';
+import { AziendaDetail, User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +11,10 @@ export class AppStateService {
   viewIdStato$ = new BehaviorSubject<number>(1);
 
   viewIdUtente$ = new BehaviorSubject<number>(null);
-  viewIdAzienda$ = new BehaviorSubject<number>(null);
   viewUser$ = new BehaviorSubject<User>(null);
+
+  viewIdAzienda$ = new BehaviorSubject<number>(null);
+  viewAzienda$ = new BehaviorSubject<AziendaDetail>(null);
 
   get viewDate() {
     return this.viewDate$.getValue();

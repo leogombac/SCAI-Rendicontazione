@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ChiusureService } from 'src/app/services/chiusure.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -9,7 +10,8 @@ import { UserService } from 'src/app/services/user.service';
 export class ConsuntiviComponent implements OnInit {
 
   constructor(
-    public userService: UserService
+    public userService: UserService,
+    private chiusureService: ChiusureService
   ) { }
 
   ngOnInit(): void {

@@ -78,21 +78,21 @@ export interface Azienda {
     descrizione: string
 }
 
-export interface AziendaDettaglio {
-    idAzienda: number;
-    descrizione: string;
+export interface AziendaDetail {
     acronimo: string;
-    modalitaLavoroAttivazione: string;
-    bloccaConsuntivazione: boolean;
-    straordinarioFestivoSabato: boolean;
-    straordinarioFestivo: boolean;
-    attivazioneMonteOre: boolean;
     attivazioneBancaOre: boolean;
     attivazioneDiaria: boolean;
+    attivazioneMonteOre: boolean;
     attivazioneStraordinari: boolean;
     attivazioneTurni: boolean;
     attivazioneUsoBadge: boolean;
+    bloccaConsuntivazione: boolean;
+    descrizione: string;
+    idAzienda: number;
+    modalitaLavoroAttivazione: string;
     sovrapposizioneOrari: boolean;
+    straordinarioFestivo: boolean;
+    straordinarioFestivoSabato: boolean;
 }
 
 export class User {

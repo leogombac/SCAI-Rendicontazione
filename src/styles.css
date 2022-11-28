@@ -80,58 +80,71 @@ input.no-style:focus {
 }
 
 /* Angular calendar fixes */
-.cal-day-headers .is-holiday {
-    background-color: #f4433636 !important;
+.cal-day-headers .is-holiday,
+.cal-month-view .is-holiday {
+    background-color: #f4433636;
+    text-align: center;
 }
 
 .cal-day-columns .is-holiday {
-    background-color: #f4433614 !important;
+    background-color: #f4433614;
 }
 
-.cal-day-headers .is-holiday::after {
+.cal-day-headers .is-holiday::after,
+.cal-month-view .is-holiday::after {
     color: #f44336dc;
     content: 'Festivo';
     display: block;
     font-size: 0.75rem;
 }
 
-.cal-day-headers .is-holiday.festa-della-liberazione::after {
+.cal-day-headers .is-holiday.festa-della-liberazione::after,
+.cal-month-view .is-holiday.festa-della-liberazione::after {
     content: 'Festa della liberazione';
 }
 
-.cal-day-headers .is-holiday.festa-del-lavoro::after {
+.cal-day-headers .is-holiday.festa-del-lavoro::after,
+.cal-month-view .is-holiday.festa-del-lavoro::after {
     content: 'Festa del lavoro';
 }
 
-.cal-day-headers .is-holiday.natale::after {
+.cal-day-headers .is-holiday.natale::after,
+.cal-month-view .is-holiday.natale::after {
     content: 'Natale';
 }
 
-.cal-day-headers .is-holiday.santo-stefano::after {
+.cal-day-headers .is-holiday.santo-stefano::after,
+.cal-month-view .is-holiday.santo-stefano::after {
     content: 'Santo Stefano';
 }
 
-.cal-day-headers .is-holiday.festa-della-repubblica::after {
+.cal-day-headers .is-holiday.festa-della-repubblica::after,
+.cal-month-view .is-holiday.festa-della-repubblica::after {
     content: 'Festa della Repubblica';
 }
 
-.cal-day-headers .is-holiday.ferragosto::after {
+.cal-day-headers .is-holiday.ferragosto::after,
+.cal-month-view .is-holiday.ferragosto::after {
     content: 'Ferragosto';
 }
 
-.cal-day-headers .is-holiday.capodanno::after {
+.cal-day-headers .is-holiday.capodanno::after,
+.cal-month-view .is-holiday.capodanno::after {
     content: 'Capodanno';
 }
 
-.cal-day-headers .is-holiday.ognissanti::after {
+.cal-day-headers .is-holiday.ognissanti::after,
+.cal-month-view .is-holiday.ognissanti::after {
     content: 'Ognissanti';
 }
 
-.cal-day-headers .is-holiday.befana::after {
+.cal-day-headers .is-holiday.befana::after,
+.cal-month-view .is-holiday.befana::after {
     content: 'Befana';
 }
 
-.cal-day-headers .is-holiday.immacolata-concezione::after {
+.cal-day-headers .is-holiday.immacolata-concezione::after,
+.cal-month-view .is-holiday.immacolata-concezione::after {
     content: 'Immacolata Concezione';
 }
 

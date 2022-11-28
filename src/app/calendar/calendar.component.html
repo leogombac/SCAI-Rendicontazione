@@ -84,7 +84,8 @@
                         [activeDayIsOpen]="true"
                         (dayClicked)="dayClicked($event.day)"
                         (eventTimesChanged)="eventTimesChanged($event)"
-                        (eventClicked)="onEventClicked($event)">
+                        (eventClicked)="onEventClicked($event)"
+                        (beforeViewRender)="beforeMonthViewRender($event)">
                     </mwl-calendar-month-view>
                     <mwl-calendar-week-view
                         *ngSwitchCase="CalendarView.Week"
@@ -102,7 +103,8 @@
                         [events]="events"
                         [hourSegmentTemplate]="weekViewHourSegmentTemplate"
                         (eventTimesChanged)="eventTimesChanged($event)"
-                        (eventClicked)="onEventClicked($event)">
+                        (eventClicked)="onEventClicked($event)"
+                        (beforeViewRender)="beforeDayViewRender($event)">
                     </mwl-calendar-day-view>
                 </ng-container>
             </div>

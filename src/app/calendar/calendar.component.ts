@@ -6,8 +6,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
+  CalendarDayViewBeforeRenderEvent,
   CalendarEventTitleFormatter,
+  CalendarMonthViewBeforeRenderEvent,
   CalendarView,
+  CalendarWeekViewBeforeRenderEvent,
   DAYS_OF_WEEK,
 } from 'angular-calendar';
 import { WeekViewHourSegment } from 'calendar-utils';
@@ -227,7 +230,7 @@ export class CalendarComponent {
     this.cdr.detectChanges();
   }
 
-  beforeWeekViewRender(renderEvent: any): void {
+  beforeWeekViewRender(renderEvent: CalendarWeekViewBeforeRenderEvent): void {
 
     if (!this.userService.festivita) return;
 
@@ -239,6 +242,29 @@ export class CalendarComponent {
         ? day.cssClass = 'is-holiday ' + toHyphenCase(_festivo?.festivita)
         : null
     });
+
+    this.beforeDayViewRender(renderEvent);
+  }
+
+  beforeMonthViewRender(renderEvent: CalendarMonthViewBeforeRenderEvent): void {
+
+    if (!this.userService.festivita) return;
+
+    const festivo = this.userService.festivita.reduce((acc, val) => (acc[val.mese + '-' + val.giorno] = val, acc), {});
+
+    renderEvent.body.forEach((day) => {
+      const _festivo = festivo[(day.date.getMonth() + 1) + '-' + day.date.getDate()];
+      (_festivo || [0, 6].includes(day.date.getDay()))
+        ? day.cssClass = 'is-holiday ' + toHyphenCase(_festivo?.festivita)
+        : null
+    });
+  }
+
+  beforeDayViewRender(renderEvent: CalendarDayViewBeforeRenderEvent) {
+
+    if (!this.userService.festivita) return;
+
+    const festivo = this.userService.festivita.reduce((acc, val) => (acc[val.mese + '-' + val.giorno] = val, acc), {});
 
     renderEvent.hourColumns.forEach((hourColumn) =>
       hourColumn.hours.forEach((hour) =>

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { map, tap } from 'rxjs';
+import { filter, map, Observable, tap } from 'rxjs';
+import { ChiusuraMese } from 'src/app/models/chiusure';
 import { ChiusureService } from 'src/app/services/chiusure.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -12,7 +13,7 @@ export class DatiPresenzaComponent implements OnInit {
 
   chiusureMeseForTable$;
 
-  @Input('chiusuraMese$') chiusuraMese$;
+  @Input('chiusuraMese$') chiusuraMese$: Observable<ChiusuraMese>;
 
   constructor(
     private userService: UserService,
@@ -23,15 +24,16 @@ export class DatiPresenzaComponent implements OnInit {
     let totMinuti;
     this.chiusureMeseForTable$ = this.chiusuraMese$
       .pipe(
-        tap((chiusuraMese: any) => {
+        filter(chiusuraMese => !!chiusuraMese),
+        tap(chiusuraMese => {
           totMinuti = 0;
-          const [hh, mm] = chiusuraMese.totaleOre.split(':');
+          const [hh, mm] = chiusuraMese.totaleOre.split(':').map(s => +s);
           totMinuti += hh * 60 + mm * 1;
         }),
-        map((chiusuraMese: any) => chiusuraMese.presenzeGroupedByAttivita),
+        map(chiusuraMese => chiusuraMese.presenzeGroupedByAttivita),
         map(presenzeGroupedByAttivita =>
           Object.values(presenzeGroupedByAttivita)
-            .map(presenzeGroup => {
+            .map((presenzeGroup: any) => { // Used any here because for some reason TS doens't get the correct Presenza type
               const r = {
                 row: null,
                 subrows: null

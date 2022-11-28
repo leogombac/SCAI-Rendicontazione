@@ -179,9 +179,9 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     setTitle() {
         let html = '';
         if (this.meta.tmpEvent)
-            html += 'Consuntivo Locale<br>';
+            html += 'Consuntivo Temporaneo<br>';
         else
-            html += 'Consuntivo Remoto<br>';
+            html += 'Consuntivo Salvato<br>';
         if (this.codiceCommessa)
             html += '<span class="badge badge-primary mr-1">' + this.codiceCommessa + '</span>';
         if (this.statoChiusura)
