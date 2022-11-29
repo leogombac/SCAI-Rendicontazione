@@ -5,6 +5,7 @@ import { map, of, share, switchMap, tap } from 'rxjs';
 import { Commessa, ConsuntivoEvent, ModalitaLavoro, SaveConsuntivoBody } from 'src/app/models/consuntivo';
 import { CalendarService } from '../calendar/calendar.service';
 import { Diaria } from '../models/user';
+import { AppStateService } from '../services/app-state.service';
 import { ConsuntivoService } from '../services/consuntivo.service';
 import { UserService } from '../services/user.service';
 import { createAutocompleteLogic, AutocompleteLogic } from '../utils/form.utils';
@@ -38,6 +39,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { event: ConsuntivoEvent, events?: ConsuntivoEvent[] },
     private dialog: MatDialogRef<DialogGestionePresenzaComponent>,
+    public appState: AppStateService,
     private calendarService: CalendarService,
     private consuntivoService: ConsuntivoService,
     private userService: UserService
@@ -121,8 +123,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
       numeroOre: new FormControl(
         this.data.event.durataOre, [
           Validators.required,
-          Validators.min(0.5),
-          Validators.max(14)
+          Validators.min(0.5)
         ]
       ),
       descrizione: new FormControl(this.data.event.note),
@@ -205,7 +206,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     // Update old
     consuntivo.progressivo = this.data.event.progressivo;
-    consuntivo.dataPrecedente = this.data.event.start;
+    consuntivo.dataPrecedente = this.data.event.originalStart;
     consuntivo.data = inizio;
     this.consuntivoService.saveConsuntivo(this.data.event, consuntivo);
     this.dialog.close();

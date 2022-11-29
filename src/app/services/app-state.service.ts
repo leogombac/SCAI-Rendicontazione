@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CalendarView } from 'angular-calendar';
 import { BehaviorSubject } from 'rxjs';
 import { AziendaDetail, User } from '../models/user';
 
@@ -8,6 +9,7 @@ import { AziendaDetail, User } from '../models/user';
 export class AppStateService {
 
   viewDate$ = new BehaviorSubject<Date>(new Date);
+  viewMode$ = new BehaviorSubject<CalendarView.Month | CalendarView.Week | CalendarView.Day>(CalendarView.Month);
   viewIdStato$ = new BehaviorSubject<number>(1);
 
   viewIdUtente$ = new BehaviorSubject<number>(null);
@@ -22,6 +24,14 @@ export class AppStateService {
 
   set viewDate(date: Date) {
     this.viewDate$.next(date);
+  }
+
+  get viewMode() {
+    return this.viewMode$.getValue();
+  }
+
+  set viewMode(mode) {
+    this.viewMode$.next(mode);
   }
 
   get viewIdUtente() {
@@ -42,6 +52,10 @@ export class AppStateService {
 
   set viewIdAzienda(id: number) {
     this.viewIdAzienda$.next(id);
+  }
+
+  get viewAzienda() {
+    return this.viewAzienda$.getValue();
   }
 
   get viewIdStato() {

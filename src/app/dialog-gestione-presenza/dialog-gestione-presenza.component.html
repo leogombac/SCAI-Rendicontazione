@@ -21,7 +21,10 @@
       </div>
     </div>
     <div class="row mb-3">
-      <div class="col-md-6">
+      <div
+        [class.col-md-6]="appState.viewAzienda.modalitaLavoroAttivazione === 'S'"
+        [class.col-md-12]="appState.viewAzienda.modalitaLavoroAttivazione !== 'S'"
+      >
         <mat-form-field appearance="fill">
           <mat-label>Diaria</mat-label>
           <input
@@ -39,7 +42,7 @@
           <mat-hint>Seleziona una commessa per vedere le diarie</mat-hint>
         </mat-form-field>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6" *ngIf="appState.viewAzienda.modalitaLavoroAttivazione === 'S'">
         <mat-form-field appearance="fill">
           <mat-label>Modalità Lavoro</mat-label>
           <input
@@ -78,6 +81,45 @@
             placeholder="Numero ore"
             formControlName="numeroOre"
             step="0.5"
+          >
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row justify-content-end mb-3" *ngIf="appState.viewAzienda.attivazioneBancaOre">
+      <div class="col-md-6">
+        <mat-form-field appearance="fill">
+          <mat-label>Banca Ore</mat-label>
+          <input
+            type="number"
+            matInput
+            placeholder="Banca ore"
+            step="0.5"
+          >
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <mat-form-field appearance="fill">
+          <mat-label>Straordinari Diurni</mat-label>
+          <input
+            type="number"
+            matInput
+            placeholder="Numero ore straord. diurni"
+            step="0.5"
+            disabled
+          >
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="fill">
+          <mat-label>Straordinari Notturni</mat-label>
+          <input
+            type="number"
+            matInput
+            placeholder="Numero ore straord. notturni"
+            step="0.5"
+            disabled
           >
         </mat-form-field>
       </div>

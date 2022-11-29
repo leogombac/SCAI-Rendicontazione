@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { isMonday, isSameMonth, previousMonday } from 'date-fns';
+import { CalendarView } from 'angular-calendar';
+import { isMonday, previousMonday } from 'date-fns';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, lastValueFrom, map, share, switchMap, tap } from 'rxjs';
 import { CommesseService, UtenteService } from '../api/services';
 import { CalendarService } from '../calendar/calendar.service';
@@ -8,14 +9,11 @@ import { ToastLevel } from '../models/toast';
 import { ToasterService } from '../shared/toaster/toaster.service';
 import { getTZOffsettedDate } from '../utils/time.utils';
 import { AppStateService } from './app-state.service';
-import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConsuntivoService {
-
-  private lastDate = new Date(0);
 
   _consuntiviRemote$ = new BehaviorSubject<ConsuntivoEvent[]>([]);
 
@@ -32,11 +30,9 @@ export class ConsuntivoService {
     private utenteService: UtenteService,
     private commesseService: CommesseService,
     private appState: AppStateService,
-    private userService: UserService,
     private calendarService: CalendarService,
     private toasterService: ToasterService
   ) {
-    this.createPipelineRefresh();
     this.createPipelineConsuntivi();
   }
 
@@ -173,19 +169,6 @@ export class ConsuntivoService {
     );
   }
 
-  // Pipeline to force refresh of consuntivi when lastDate and viewDate are of the same month
-  private createPipelineRefresh() {
-    combineLatest([
-      this.userService.user$,
-      this.appState.viewIdUtente$,
-      this.refresh$
-    ])
-    .pipe(
-      tap(() => this.lastDate = new Date(0))
-    )
-    .subscribe();
-  }
-
   private createPipelineConsuntivi() {
 
     // Pipelline to clear consuntiviLocal$ on idUtente or idAzienda change
@@ -206,25 +189,31 @@ export class ConsuntivoService {
     combineLatest([
       this.appState.viewIdUtente$,
       this.appState.viewDate$,
+      this.appState.viewMode$,
       this.refresh$,
     ]).pipe(
-      filter(([ idUtente, viewDate ]) => !!idUtente && !isSameMonth(this.lastDate, viewDate)),
-      tap(([ idUtente, viewDate ]) => {
-        this._loading$.next(true);
-        this.lastDate = viewDate;
+      filter(([ idUtente ]) => !!idUtente),
+      tap(() => this._loading$.next(true)),
+      switchMap(([ idUtente, viewDate, viewMode ]) => {
+        if (viewMode === CalendarView.Month)
+          return this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
+            idUtente,
+            idAzienda: this.appState.viewIdAzienda,
+            anno: viewDate.getFullYear(),
+            mese: viewDate.getMonth() + 1,
+            giorno: viewDate.getDate(),
+          });
+        return this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoGet({
+            idUtente,
+            idAzienda: this.appState.viewIdAzienda,
+            anno: viewDate.getFullYear(),
+            mese: viewDate.getMonth() + 1,
+            giorno: viewDate.getDate(),
+          });
       }),
-      switchMap(([ idUtente ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
-          idUtente,
-          idAzienda: this.appState.viewIdAzienda,
-          anno: this.appState.viewDate.getFullYear(),
-          mese: this.appState.viewDate.getMonth() + 1,
-          giorno: this.appState.viewDate.getDate(),
-        }).pipe(
-          map((d: any) => JSON.parse(d))
-        )
-      ),
-      map((response: any) => {
+      map((responseText: any) => {
+
+        const response = JSON.parse(responseText);
 
         this.appState.viewIdStato$.next(response.statoChiusura);
 

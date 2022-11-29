@@ -12,10 +12,10 @@
                 <div class="btn-group">
                     <div class="btn btn-primary"
                         mwlCalendarPreviousView
-                        [view]="view"
+                        [view]="appState.viewMode"
                         [(viewDate)]="viewDate"
                         (viewDateChange)="appState.viewDate = viewDate"
-                    ><i class="fa fa-caret-left" aria-hidden="true"></i></div>
+                    ><i class="fa fa-caret-left"></i></div>
                     <div class="btn btn-primary"
                         mwlCalendarToday
                         [(viewDate)]="viewDate"
@@ -23,31 +23,31 @@
                     >Today</div>
                     <div class="btn btn-primary"
                         mwlCalendarNextView
-                        [view]="view"
+                        [view]="appState.viewMode"
                         [(viewDate)]="viewDate"
                         (viewDateChange)="appState.viewDate = viewDate"
-                    ><i class="fa fa-caret-right" aria-hidden="true"></i></div>
+                    ><i class="fa fa-caret-right"></i></div>
                 </div>
             </div>
             <div class="col-xl-4">
-                <h3>{{ viewDate | calendarDate: view + 'ViewTitle':locale }}</h3>
+                <h3>{{ viewDate | calendarDate: appState.viewMode + 'ViewTitle':locale }}</h3>
             </div>
             <div class="col-xl-4">
                 <div class="btn-group">
                     <div
                         class="btn btn-primary"
-                        [class.active]="view === CalendarView.Month"
-                        (click)="view = CalendarView.Month"
+                        [class.active]="appState.viewMode === CalendarView.Month"
+                        (click)="appState.viewMode = CalendarView.Month"
                     ><i class="material-icons">calendar_view_month</i></div>
                     <div
                         class="btn btn-primary"
-                        [class.active]="view === CalendarView.Week"
-                        (click)="view = CalendarView.Week"
+                        [class.active]="appState.viewMode === CalendarView.Week"
+                        (click)="appState.viewMode = CalendarView.Week"
                     ><i class="material-icons">calendar_view_week</i></div>
                     <div
                         class="btn btn-primary"
-                        [class.active]="view === CalendarView.Day"
-                        (click)="view = CalendarView.Day"
+                        [class.active]="appState.viewMode === CalendarView.Day"
+                        (click)="appState.viewMode = CalendarView.Day"
                     ><i class="material-icons">calendar_view_day</i></div>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                     </div>
                 </ng-template>
 
-                <ng-container [ngSwitch]="view">
+                <ng-container [ngSwitch]="appState.viewMode">
                     <mwl-calendar-month-view
                         *ngSwitchCase="CalendarView.Month"
                         [viewDate]="viewDate"

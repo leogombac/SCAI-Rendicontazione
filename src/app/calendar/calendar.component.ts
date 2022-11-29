@@ -48,7 +48,6 @@ export class CalendarComponent {
 
   CalendarView = CalendarView;
 
-  view: CalendarView = CalendarView.Week;
   locale = 'it-IT';
   weekStartsOn = DAYS_OF_WEEK.MONDAY;
 
@@ -71,7 +70,7 @@ export class CalendarComponent {
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
-    this.view = isMobile() ? CalendarView.Day : CalendarView.Week;
+    appState.viewMode = isMobile() ? CalendarView.Day : CalendarView.Week;
   }
 
   ngOnInit() {
