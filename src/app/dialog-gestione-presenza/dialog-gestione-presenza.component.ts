@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { map, of, share, switchMap, tap } from 'rxjs';
 import { Commessa, ConsuntivoEvent, ModalitaLavoro, SaveConsuntivoBody } from 'src/app/models/consuntivo';
 import { CalendarService } from '../calendar/calendar.service';
 import { Diaria } from '../models/user';
 import { ConsuntivoService } from '../services/consuntivo.service';
 import { UserService } from '../services/user.service';
 import { createAutocompleteLogic, AutocompleteLogic } from '../utils/form.utils';
+import { escapeRegExp } from '../utils/string.utils';
 import { getTZOffsettedDate } from '../utils/time.utils';
 
 @Component({
@@ -46,29 +48,63 @@ export class DialogGestionePresenzaComponent implements OnInit {
     const currDay = this.data.event.start.getDay();
     this.days[currDay][1] = true;
 
+    const commesse$ = this.consuntivoService.getCommesse$(this.data.event.start);
+
     this.commessaAutocomplete = createAutocompleteLogic(
       'commessa',
-      this.consuntivoService.getCommesse$(this.data.event.start),
-      'codiceCommessa',
-      (item, value) => new RegExp(value, 'i').test(item.codiceCommessa.toString()),
-      this.data.event.codiceCommessa,
+      commesse$,
+      'idAttivita',
+      (item, value) => {
+        if (typeof value === 'string')
+          return new RegExp(escapeRegExp(value), 'i').test(item.descrizioneAttivita + ' ' + item.descrizioneCommessa);
+        return item.idAttivita === value.idAttivita;
+      },
+      commesse$.pipe(
+        map(commesse =>
+          commesse.find(commessa => commessa.idAttivita === this.data.event.idAttivita)
+        )
+      ),
       [ Validators.required ]
     );
 
+    const diarie$ = this.commessaAutocomplete.control.valueChanges
+      .pipe(
+        switchMap(commessa => {
+          if (!commessa) return of([]);
+          return this.userService.getDiarie(commessa.idAttivita);
+        }),
+        share()
+      );
+
+    // Diaria is bound to commessa valueChanges because of "se azienda.attivazioneDiaria==true  inserire nel get diaria l’id attività"
     this.diariaAutocomplete = createAutocompleteLogic(
       'diaria',
-      this.userService.diarie$,
-      'tipoTrasferta',
-      (item, value) => new RegExp(value, 'i').test(item.tipoTrasferta.toString()),
+      diarie$,
+      'idTipoTrasferta',
+      (item, value) => {
+        if (typeof value === 'string')
+          return new RegExp(escapeRegExp(value), 'i').test(item.tipoTrasferta);
+        return item.idTipoTrasferta === value.idTipoTrasferta;
+      },
+      diarie$.pipe(
+        map(diarie => diarie.find(diaria => diaria.idTipoTrasferta === this.data.event.idTipoTrasferta))
+      )
     );
 
     this.modalitaLavoroAutocomplete = createAutocompleteLogic(
       'modalitaLavoro',
       this.userService.modalitaLavoro$,
-      'descrizione',
-      (item, value) => new RegExp(value, 'i').test(item.descrizione.toString()),
-      this.data.event.modalitaLavoro?.descrizione,
-      [ Validators.required ]
+      'id',
+      (item, value) => {
+        if (typeof value === 'string')
+          return new RegExp(escapeRegExp(value), 'i').test(item.descrizione);
+        return item.id === value.id;
+      },
+      this.userService.modalitaLavoro$.pipe(
+        map(modalitaLavoro =>
+          modalitaLavoro.find(modalitaLavoro => modalitaLavoro.id === this.data.event.idModalitaLavoro)
+        )
+      )
     );
 
     // Map controls to form
@@ -93,6 +129,22 @@ export class DialogGestionePresenzaComponent implements OnInit {
     });
   }
 
+  displayFnCommessa(commessa: Commessa): string {
+    if (!commessa) return '';
+    return commessa.descrizioneCommessa
+        && `${commessa.descrizioneAttivita} (${commessa.descrizioneCommessa})`;
+  }
+
+  displayFnDiaria(diaria: Diaria): string {
+    if (!diaria) return '';
+    return diaria.tipoTrasferta;
+  }
+
+  displayFnModalitaLavoro(modalitaLavoro: ModalitaLavoro): string {
+    if (!modalitaLavoro) return '';
+    return modalitaLavoro.descrizione;
+  }
+
   async save() {
 
     // Extract field values
@@ -105,20 +157,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
       numeroOre
     } = this.form.value;
 
-    // Look for objects
-    // TODO: fix codiceCommessa to idAttivita because of uniqueness
-    const commessaObj = this.commessaAutocomplete.array
-      .find(c => c.codiceCommessa === commessa);
-
-    const diariaObj = this.diariaAutocomplete.array
-      .find(d => d.tipoTrasferta === diaria);
-
-    const modalitaLavoroObj = this.modalitaLavoroAutocomplete.array
-      .find(mL => mL.descrizione === modalitaLavoro);
-
-    console.log('Commessa', commessaObj);
-    console.log('Diaria', diariaObj);
-    console.log('Modalita Lavoro', modalitaLavoroObj);
+    console.log('Form value', this.form.value);
 
     // Calculate minuti and fine
     const _dataInizio = getTZOffsettedDate(new Date(dataInizio));
@@ -128,18 +167,17 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
     const consuntivo: SaveConsuntivoBody = {
       progressivo: 0, // Set below
-      dataPrecedente: '', // Set below
       data: '', // Set below
       inizio,
       minuti,
       fine,
       inserimentoAutomatico: false,
-      idAttivita: commessaObj.idAttivita,
-      codiceAttivita: commessaObj.descrizioneAttivita,
-      idCommessa: commessaObj.idCommessa,
-      codiceCommessa: commessaObj.codiceCommessa,
-      modalita: modalitaLavoroObj.id,
-      idTipoTrasferta: diariaObj?.idTipoTrasferta,
+      idAttivita: commessa.idAttivita,
+      codiceAttivita: commessa.descrizioneAttivita,
+      idCommessa: commessa.idCommessa,
+      codiceCommessa: commessa.codiceCommessa,
+      modalita: modalitaLavoro?.id,
+      idTipoTrasferta: diaria?.idTipoTrasferta,
       reperibilita: false,
       turni: false,
       note: descrizione
@@ -151,7 +189,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
     if (this.data.event.isLocal) {
       consuntivo.progressivo = 0;
       consuntivo.data = inizio;
-      this.data.event.idCommessa = commessaObj.idCommessa;
+      this.data.event.idCommessa = commessa.idCommessa;
       try {
         await this.consuntivoService.saveConsuntivoRecursive(
           this.days.map((x: any) => x[1]),

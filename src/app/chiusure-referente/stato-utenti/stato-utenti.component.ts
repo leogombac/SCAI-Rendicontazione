@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, debounceTime, map, Observable, share, startWith, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, map, Observable, of, share, startWith, switchMap, tap } from 'rxjs';
 import { StatoUtente } from 'src/app/models/chiusure';
 import { AppStateService } from 'src/app/services/app-state.service';
 import { ChiusureService } from 'src/app/services/chiusure.service';
 import { createAutocompleteLogic } from 'src/app/utils/form.utils';
+import { escapeRegExp } from 'src/app/utils/string.utils';
 import { formatDate } from 'src/app/utils/time.utils';
 
 @Component({
@@ -45,9 +46,13 @@ export class StatoUtentiComponent implements OnInit {
     ];
     this.statoAutocomplete = createAutocompleteLogic(
       'stato',
-      stati,
-      'descr',
-      (item, value) => new RegExp(value, 'i').test(item.descr.toString())
+      of(stati),
+      'id',
+      (item, value) => {
+        if (typeof value === 'string')
+          return new RegExp(escapeRegExp(value), 'i').test(item.id);
+        return item.id === value.id;
+      }
     );
 
     const contratti = [
@@ -58,9 +63,13 @@ export class StatoUtentiComponent implements OnInit {
     ];
     this.contrattoAutocomplete = createAutocompleteLogic(
       'contratto',
-      contratti,
-      'descr',
-      (item, value) => new RegExp(value, 'i').test(item.descr.toString())
+      of(contratti),
+      'id',
+      (item, value) => {
+        if (typeof value === 'string')
+          return new RegExp(escapeRegExp(value), 'i').test(item.id);
+        return item.id === value.id;
+      }
     );
 
     // Map controls to form
@@ -91,22 +100,19 @@ export class StatoUtentiComponent implements OnInit {
         )
     ])
     .pipe(
-      switchMap(([ date, paginator, { nome, stato, contratto, straordinari, trasferte } ]) => {
-
-        const idStato = stati.find(_stato => _stato.descr === stato)?.id;
-        const idContratto = contratti.find(_contratto => _contratto.descr === contratto)?.id;
-
-        return this.chiusureService.getStatoUtenti$(
+      switchMap(([ date, paginator, { nome, stato, contratto, straordinari, trasferte } ]) =>
+        this.chiusureService.getStatoUtenti$(
           date,
           paginator.pageIndex,
           paginator.pageSize,
           nome,
-          idStato,
-          idContratto,
+          stato?.id,
+          contratto?.id,
           straordinari,
           trasferte
         )
-      }),
+      ),
+      share(),
       tap(response => this.length = response.totalItems),
       map(response => response.items),
       map(statiUtente => 
@@ -127,9 +133,13 @@ export class StatoUtentiComponent implements OnInit {
           };
         })
       ),
-      tap(statiUtente => this.searchResults = statiUtente),
-      share()
+      tap(statiUtente => this.searchResults = statiUtente)
     );
+  }
+
+  displayFn(data: any): string {
+    if (!data) return '';
+    return data.descr;
   }
 
   onPageChange({ pageIndex, pageSize}) {

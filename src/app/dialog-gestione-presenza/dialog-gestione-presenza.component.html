@@ -12,9 +12,9 @@
             formControlName="commessa"
             [matAutocomplete]="auto"
           >
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option *ngFor="let commessa of (commessaAutocomplete.filteredArray$ | async)" [value]="commessa.codiceCommessa">
-              <b>{{ commessa.codiceCommessa }}</b> ({{ commessa.descrizioneCommessa }})
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFnCommessa">
+            <mat-option *ngFor="let commessa of (commessaAutocomplete.filteredArray$ | async)" [value]="commessa">
+              <b>{{ commessa.descrizioneAttivita }}</b> ({{ commessa.descrizioneCommessa }})
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
@@ -31,11 +31,12 @@
             formControlName="diaria"
             [matAutocomplete]="auto2"
           >
-          <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
-            <mat-option *ngFor="let diaria of (diariaAutocomplete.filteredArray$ | async)" [value]="diaria.tipoTrasferta">
+          <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete" [displayWith]="displayFnDiaria">
+            <mat-option *ngFor="let diaria of (diariaAutocomplete.filteredArray$ | async)" [value]="diaria">
               {{ diaria.tipoTrasferta }}
             </mat-option>
           </mat-autocomplete>
+          <mat-hint>Seleziona una commessa per vedere le diarie</mat-hint>
         </mat-form-field>
       </div>
       <div class="col-md-6">
@@ -48,8 +49,8 @@
             formControlName="modalitaLavoro"
             [matAutocomplete]="auto3"
           >
-          <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete">
-            <mat-option *ngFor="let modalitaLavoro of (modalitaLavoroAutocomplete.filteredArray$ | async)" [value]="modalitaLavoro.descrizione">
+          <mat-autocomplete autoActiveFirstOption #auto3="matAutocomplete" [displayWith]="displayFnModalitaLavoro">
+            <mat-option *ngFor="let modalitaLavoro of (modalitaLavoroAutocomplete.filteredArray$ | async)" [value]="modalitaLavoro">
               {{ modalitaLavoro.descrizione }}
             </mat-option>
           </mat-autocomplete>

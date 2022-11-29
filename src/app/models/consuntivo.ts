@@ -2,10 +2,10 @@ import { CalendarEvent } from "angular-calendar";
 import { colors } from "../calendar/utils/colors";
 
 export interface SaveConsuntivoBody {
+    dataPrecedente?: string;
     codiceAttivita: string;
     codiceCommessa: string;
     data: string;
-    dataPrecedente: string;
     fine: string;
     idAttivita: number;
     idCommessa: number;
@@ -21,11 +21,13 @@ export interface SaveConsuntivoBody {
   }
 
 export interface Commessa {
-    idAzienda: number;
-    idCommessa: number;
+    codiceAttivita: string;
     codiceCommessa: string;
-    idAttivita: number;
     descrizioneAttivita: string;
+    descrizioneCommessa: string;
+    idAzienda: number;
+    idAttivita: number;
+    idCommessa: number;
 }
 
 export interface ModalitaLavoro {
@@ -34,19 +36,40 @@ export interface ModalitaLavoro {
     inserimentoAutomatico: number;
 }
 
-export interface Presenza {
-    codiceAttivita: string;
-    codiceCommessa: string;
-    dataPresenza: string;
-    end: string;
-    idAttivita: number;
-    idCommessa: number;
-    modalitaLavoro: ModalitaLavoro;
-    note: string;
-    numeroMinuti: number;
+export interface Straordinario {
     progressivo: number;
-    start: string;
+    numeroMinuti: number;
+    idTipoStraordinari: number;
+    tipoStraordinariDescrizione: string;
+}
+
+export interface Trasferta {
+    idTrasferta: number;
+    dataInizio: string;
+    dataFine: string;
+    idTipoTrasferta: number;
+    tipoTrasferta: string;
+}
+
+export interface Presenza {
+    inizioMese: string;
+    fineMese: string;
     statoChiusura: number;
+    dataPresenza: string;
+    progressivo: number;
+    idAttivita: number;
+    codiceAttivita: string;
+    idCommessa: number;
+    codiceCommessa: string;
+    numeroMinuti: number;
+    reperibilita: boolean;
+    turni: boolean;
+    note: string;
+    start: string;
+    end: string;
+    modalitaLavoro: ModalitaLavoro;
+    straordinari: Straordinario[];
+    trasferta: Trasferta;
 }
 
 export interface ConsuntivoEventConfig {
@@ -56,7 +79,7 @@ export interface ConsuntivoEventConfig {
     presenza?: Presenza;
 }
 
-export class ConsuntivoEvent implements CalendarEvent, Presenza {
+export class ConsuntivoEvent implements CalendarEvent {
 
     // CalendarEvent
     draggable = true;
@@ -68,21 +91,24 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
     end;
     start;
 
-    // Presenza
+    // Fields extracted from Presenza
     codiceAttivita;
     codiceCommessa;
     dataPresenza;
     idAttivita;
     idCommessa;
-    modalitaLavoro;
+    idModalitaLavoro;
+    idTipoTrasferta;
     note;
     numeroMinuti;
-    presenzaOrario;
     progressivo;
-    statoChiusura = 1;
+    reperibilita;
+    statoChiusura;
+    turni;
 
     // Applicative level fields
     isLocal;
+    originalStart; // Needed to delete
 
     constructor(config: ConsuntivoEventConfig) {
         if (config.presenza)
@@ -102,7 +128,8 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         this.codiceCommessa = presenza.codiceCommessa;
         this.idAttivita = presenza.idAttivita;
         this.idCommessa = presenza.idCommessa;
-        this.modalitaLavoro = presenza.modalitaLavoro;
+        this.idModalitaLavoro = presenza.modalitaLavoro?.id;
+        this.idTipoTrasferta = presenza.trasferta?.idTipoTrasferta;
         this.note = presenza.note;
         this.progressivo = presenza.progressivo;
         this.statoChiusura = presenza.statoChiusura;
@@ -116,10 +143,12 @@ export class ConsuntivoEvent implements CalendarEvent, Presenza {
         // Adjust start and end date to provide retro-compatibility
         if (presenza.start && presenza.end) {
             this.start = new Date(presenza.start);
+            this.originalStart = this.start;
             this.end = new Date(presenza.end);
         }
         else {
             this.start = new Date(presenza.dataPresenza);
+            this.originalStart = this.start;
             const endMs = new Date(presenza.dataPresenza).getTime() + presenza.numeroMinuti * 60 * 1000;
             this.end = new Date(endMs);
         }

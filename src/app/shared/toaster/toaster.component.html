@@ -6,7 +6,6 @@
         [class.bg-success]="toast.level === ToastLevel.Success"
         [class.bg-info]="toast.level === ToastLevel.Info"
         [class.text-white]="toast.level === ToastLevel.Danger || toast.level === ToastLevel.Success || toast.level === ToastLevel.Info"
-
         *ngFor="let toast of ts.toasts"
     >
         <div class="d-flex">

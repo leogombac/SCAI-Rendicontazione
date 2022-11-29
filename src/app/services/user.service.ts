@@ -1,6 +1,6 @@
 import { HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, map, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, of, share, switchMap, tap } from 'rxjs';
 import { AziendeService, ReferenteService, CommesseService, UtenteService } from '../api/services';
 import { ModalitaLavoro } from '../models/consuntivo';
 import { Azienda, Diaria, Festivita, User, UtenteAzienda } from '../models/user';
@@ -60,12 +60,37 @@ export class UserService {
     this.createPipelineUser();
     this.createPipelineViewUser();
 
-    this.createPipelineDiarie();
-
     this.createPipelineFestivita();
 
     // This pipeline only ever emits if user is referente
     this.createPipelineUtentiAzienda();
+  }
+
+  getDiarie(idAttivita?: number) {
+    return combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewAzienda$,
+    ]).pipe(
+      filter(([ idUtente, azienda ]) => !!idUtente && !!azienda),
+      switchMap(([ idUtente, azienda ]) => {
+
+        const pl: any = {
+          idUtente,
+          idAzienda: azienda.idAzienda,
+        };
+
+        // "se azienda.attivazioneDiaria==true  inserire nel get diaria l’id attività"
+        if (azienda.attivazioneDiaria) {
+          pl.idAttivita = idAttivita;
+        }
+        
+        return this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet(pl)
+          .pipe(
+            map((d: any) => JSON.parse(d))
+          )
+      }),
+      share()
+    );
   }
 
   private createPipelineAzienda() {
@@ -187,28 +212,6 @@ export class UserService {
         const user = new User(datoOperativo);
         this.appState.viewUser$.next(user);
         console.log("View user", user);
-      })
-    )
-    .subscribe();
-  }
-
-  private createPipelineDiarie() {
-    combineLatest([
-      this.appState.viewIdUtente$,
-      this.appState.viewIdAzienda$,
-    ]).pipe(
-      filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
-      switchMap(([ idUtente, idAzienda ]) =>
-        this.aziendeService.consuntivazioneAziendeIdAziendaUtenteIdUtenteTrasferteGet({
-          idUtente,
-          idAzienda
-        }).pipe(
-          map((d: any) => JSON.parse(d))
-        )
-      ),
-      tap(diarie => {
-        this._diarie$.next(diarie);
-        console.log("Diarie", diarie);
       })
     )
     .subscribe();

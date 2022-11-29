@@ -40,72 +40,6 @@ export class ChiusureService {
     this._refresh$.next(true);
   }
 
-  private createPipelineChiusuraMese() {
-    combineLatest([
-      this.appState.viewIdUtente$,
-      this.appState.viewIdAzienda$,
-      this.appState.viewDate$,
-      this.refresh$
-    ])
-    .pipe(
-      filter(([ idUtente, idAzienda, viewDate ]) => !!idUtente && !!idAzienda && !!viewDate),
-      tap(_ => this._chiusuraMeseLoading$.next(true)),
-      switchMap(([ idUtente, idAzienda, viewDate ]) =>
-        this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseGet({
-          idUtente,
-          idAzienda: idAzienda,
-          anno: viewDate.getFullYear(),
-          mese: viewDate.getMonth() + 1
-        }).pipe(
-          map((d: any) => JSON.parse(d))
-        )
-      ),
-      share(),
-      map(chiusura =>
-        ({
-          ...chiusura,
-          presenzeGroupedByAttivita: chiusura.presenze.concatMap(presenza =>
-            presenza.attivita.concatMap(attivita =>
-              attivita.items.map(item =>
-                ({
-                  dataPresenza: presenza.dataPresenza,
-                  idTipoModalitaLavoro: presenza.idTipoModalitaLavoro,
-                  
-                  codiceAttivita: attivita.codiceAttivita,
-                  codiceCommessa: attivita.codiceCommessa,
-                  codiceSottoCommessa: attivita.codiceSottoCommessa,
-                  idAttivita: attivita.idAttivita,
-                  idCommessa: attivita.idCommessa,
-                  idSottoCommessa: attivita.idSottoCommessa,
-                  
-                  numeroMinuti: item.numeroMinuti,
-                  turni: item.turni,
-                  reperibilita: item.reperibilita,
-                  progressivo: item.progressivo
-                })  
-              )
-            )
-          )
-          .reduce(
-            (a, b) =>
-              (a[b.idAttivita]
-                ? a[b.idAttivita].push(b)
-                : a[b.idAttivita] = [b],
-              a)
-            ,
-            {}
-          )
-        })
-      ),
-      tap(chiusuraMese => {
-        this._chiusuraMese$.next(chiusuraMese);
-        console.log('Chiusura Mese', chiusuraMese);
-        this._chiusuraMeseLoading$.next(false);
-      })
-    )
-    .subscribe();
-  }
-
   async chiudiMese() {
 
     const chiudiReq = lastValueFrom(
@@ -189,8 +123,8 @@ export class ChiusureService {
           map((d: any) => JSON.parse(d))
         )
       ),
-      share(),
-      tap(_ => this._statoUtentiLoading$.next(false))
+      tap(_ => this._statoUtentiLoading$.next(false)),
+      share()
     );
   }
 
@@ -214,6 +148,71 @@ export class ChiusureService {
     catch (e) {
       this.toasterService.addToast(ToastLevel.Danger, "C'è stato un errore durante la vistatura degli utenti.");
     }
+  }
+
+  private createPipelineChiusuraMese() {
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$,
+      this.appState.viewDate$,
+      this.refresh$
+    ])
+    .pipe(
+      filter(([ idUtente, idAzienda, viewDate ]) => !!idUtente && !!idAzienda && !!viewDate),
+      tap(_ => this._chiusuraMeseLoading$.next(true)),
+      switchMap(([ idUtente, idAzienda, viewDate ]) =>
+        this.referenteAziendaService.referenteIdUtenteAziendaIdAziendaConsuntivazioneAnnoMeseGet({
+          idUtente,
+          idAzienda: idAzienda,
+          anno: viewDate.getFullYear(),
+          mese: viewDate.getMonth() + 1
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
+      ),
+      map(chiusura =>
+        ({
+          ...chiusura,
+          presenzeGroupedByAttivita: chiusura.presenze.concatMap(presenza =>
+            presenza.attivita.concatMap(attivita =>
+              attivita.items.map(item =>
+                ({
+                  dataPresenza: presenza.dataPresenza,
+                  idTipoModalitaLavoro: presenza.idTipoModalitaLavoro,
+                  
+                  codiceAttivita: attivita.codiceAttivita,
+                  codiceCommessa: attivita.codiceCommessa,
+                  codiceSottoCommessa: attivita.codiceSottoCommessa,
+                  idAttivita: attivita.idAttivita,
+                  idCommessa: attivita.idCommessa,
+                  idSottoCommessa: attivita.idSottoCommessa,
+                  
+                  numeroMinuti: item.numeroMinuti,
+                  turni: item.turni,
+                  reperibilita: item.reperibilita,
+                  progressivo: item.progressivo
+                })  
+              )
+            )
+          )
+          .reduce(
+            (a, b) =>
+              (a[b.idAttivita]
+                ? a[b.idAttivita].push(b)
+                : a[b.idAttivita] = [b],
+              a)
+            ,
+            {}
+          )
+        })
+      ),
+      tap(chiusuraMese => {
+        this._chiusuraMese$.next(chiusuraMese);
+        console.log('Chiusura Mese', chiusuraMese);
+        this._chiusuraMeseLoading$.next(false);
+      })
+    )
+    .subscribe();
   }
 
 }

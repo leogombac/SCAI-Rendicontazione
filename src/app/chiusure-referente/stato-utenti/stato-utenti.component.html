@@ -60,8 +60,8 @@
                                     formControlName="stato"
                                     [matAutocomplete]="auto"
                                 >
-                                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-                                    <mat-option *ngFor="let stato of (statoAutocomplete.filteredArray$ | async)" [value]="stato.descr">
+                                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn">
+                                    <mat-option *ngFor="let stato of (statoAutocomplete.filteredArray$ | async)" [value]="stato">
                                         {{ stato.descr }}
                                     </mat-option>
                                 </mat-autocomplete>
@@ -77,8 +77,8 @@
                                     formControlName="contratto"
                                     [matAutocomplete]="auto2"
                                 >
-                                <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete">
-                                    <mat-option *ngFor="let contratto of (contrattoAutocomplete.filteredArray$ | async)" [value]="contratto.descr">
+                                <mat-autocomplete autoActiveFirstOption #auto2="matAutocomplete" [displayWith]="displayFn">
+                                    <mat-option *ngFor="let contratto of (contrattoAutocomplete.filteredArray$ | async)" [value]="contratto">
                                         {{ contratto.descr }}
                                     </mat-option>
                                 </mat-autocomplete>

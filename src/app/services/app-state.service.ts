@@ -32,6 +32,10 @@ export class AppStateService {
     this.viewIdUtente$.next(id);
   }
 
+  get viewUser() {
+    return this.viewUser$.getValue();
+  }
+
   get viewIdAzienda() {
     return this.viewIdAzienda$.getValue();
   }

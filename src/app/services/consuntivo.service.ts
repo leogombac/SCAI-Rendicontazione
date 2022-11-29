@@ -40,82 +40,6 @@ export class ConsuntivoService {
     this.createPipelineConsuntivi();
   }
 
-  // Pipeline to force refresh of consuntivi when lastDate and viewDate are of the same month
-  private createPipelineRefresh() {
-    combineLatest([
-      this.userService.user$,
-      this.appState.viewIdUtente$,
-      this.refresh$
-    ])
-    .pipe(
-      tap(() => this.lastDate = new Date(0))
-    )
-    .subscribe();
-  }
-
-  private createPipelineConsuntivi() {
-
-    // Pipelline to clear consuntiviLocal$ on idUtente or idAzienda change
-    combineLatest([
-      this.appState.viewIdUtente$,
-      this.appState.viewIdAzienda$
-    ]).pipe(
-        filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
-        distinctUntilChanged(
-          (x, y) => x[0] !== y[0] && x[1] !== y[1]
-        ),
-        tap(() =>
-          this.calendarService._consuntiviLocal$.next([])
-        )
-      )
-      .subscribe();
-
-    combineLatest([
-      this.appState.viewIdUtente$,
-      this.appState.viewDate$,
-      this.refresh$,
-    ]).pipe(
-      filter(([ idUtente, viewDate ]) => !!idUtente && !isSameMonth(this.lastDate, viewDate)),
-      tap(([ idUtente, viewDate ]) => {
-        this._loading$.next(true);
-        this.lastDate = viewDate;
-      }),
-      switchMap(([ idUtente ]) =>
-        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
-          idUtente,
-          idAzienda: this.appState.viewIdAzienda,
-          anno: this.appState.viewDate.getFullYear(),
-          mese: this.appState.viewDate.getMonth() + 1,
-          giorno: this.appState.viewDate.getDate(),
-        }).pipe(
-          map((d: any) => JSON.parse(d))
-        )
-      ),
-      map((response: any) => {
-
-        this.appState.viewIdStato$.next(response.statoChiusura);
-
-        return response.giorni.map(giorno =>
-          new ConsuntivoEvent({
-            presenza: {
-              inizioMese: response.inizio,
-              fineMese: response.fine,
-              statoChiusura: response.statoChiusura,
-              ...giorno
-            }
-          })
-        )
-      }),
-      tap(consuntivi => {
-        this._consuntiviRemote$.next(consuntivi);
-        console.log('Consuntivi', consuntivi);
-        this._loading$.next(false);
-        this._initialized$.next(true);
-      })
-    )
-    .subscribe();
-  }
-
   refresh() {
     this._refresh$.next(true);
   }
@@ -207,14 +131,16 @@ export class ConsuntivoService {
     if (event.isLocal) return;
     
     const deleteRequest = lastValueFrom(
-      this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete({
+      this.commesseService.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete({
         idCommessa: event.idCommessa,
         idAttivita: event.idAttivita,
         progressivo: event.progressivo,
         idUtente: this.appState.viewIdUtente,
-        anno: event.start.getFullYear(),
-        mese: event.start.getMonth() + 1,
-        giorno: event.start.getDate()
+        anno: event.originalStart.getFullYear(),
+        mese: event.originalStart.getMonth() + 1,
+        giorno: event.originalStart.getDate(),
+        ore: event.originalStart.getHours(),
+        minuti: event.originalStart.getMinutes()
       })
     );
 
@@ -237,14 +163,90 @@ export class ConsuntivoService {
       giorno: date.getDate()
     })
     .pipe(
-      share(),
       map((d: any) => JSON.parse(d)),
       map(_commesse => {
         const r = [..._commesse.utente, ..._commesse.obbligatorie];
         console.log('Commesse', r);
         return r;
-      })
+      }),
+      share()
     );
+  }
+
+  // Pipeline to force refresh of consuntivi when lastDate and viewDate are of the same month
+  private createPipelineRefresh() {
+    combineLatest([
+      this.userService.user$,
+      this.appState.viewIdUtente$,
+      this.refresh$
+    ])
+    .pipe(
+      tap(() => this.lastDate = new Date(0))
+    )
+    .subscribe();
+  }
+
+  private createPipelineConsuntivi() {
+
+    // Pipelline to clear consuntiviLocal$ on idUtente or idAzienda change
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewIdAzienda$
+    ]).pipe(
+        filter(([ idUtente, idAzienda ]) => !!idUtente && !!idAzienda),
+        distinctUntilChanged(
+          (x, y) => x[0] !== y[0] && x[1] !== y[1]
+        ),
+        tap(() =>
+          this.calendarService._consuntiviLocal$.next([])
+        )
+      )
+      .subscribe();
+
+    combineLatest([
+      this.appState.viewIdUtente$,
+      this.appState.viewDate$,
+      this.refresh$,
+    ]).pipe(
+      filter(([ idUtente, viewDate ]) => !!idUtente && !isSameMonth(this.lastDate, viewDate)),
+      tap(([ idUtente, viewDate ]) => {
+        this._loading$.next(true);
+        this.lastDate = viewDate;
+      }),
+      switchMap(([ idUtente ]) =>
+        this.utenteService.consuntivazioneUtenteIdUtentePresenzeIdAziendaAnnoMeseGiornoMeseGet({
+          idUtente,
+          idAzienda: this.appState.viewIdAzienda,
+          anno: this.appState.viewDate.getFullYear(),
+          mese: this.appState.viewDate.getMonth() + 1,
+          giorno: this.appState.viewDate.getDate(),
+        }).pipe(
+          map((d: any) => JSON.parse(d))
+        )
+      ),
+      map((response: any) => {
+
+        this.appState.viewIdStato$.next(response.statoChiusura);
+
+        return response.giorni.map(giorno =>
+          new ConsuntivoEvent({
+            presenza: {
+              inizioMese: response.inizio,
+              fineMese: response.fine,
+              statoChiusura: response.statoChiusura,
+              ...giorno
+            }
+          })
+        )
+      }),
+      tap(consuntivi => {
+        this._consuntiviRemote$.next(consuntivi);
+        console.log('Consuntivi', consuntivi);
+        this._loading$.next(false);
+        this._initialized$.next(true);
+      })
+    )
+    .subscribe();
   }
  
 }

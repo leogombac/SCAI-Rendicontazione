@@ -6,10 +6,9 @@
         <h4 class="card-title">Ciao {{ userService.user.nome }} {{ userService.user.cognome }}</h4>
     </div>
     <div class="card-body">
-        <p class="h4 text-center">Stai vedendo:<br><b>{{ getNomeCognome() }}</b></p>
         <form novalidate>
             <mat-form-field appearance="fill">
-                <mat-label>ID Utente Consuntivi</mat-label>
+                <mat-label>Utente Consuntivi</mat-label>
                 <input
                     type="text" 
                     placeholder="Scegli un utente"
@@ -17,10 +16,10 @@
                     [formControl]="utenteAziendaAutocomplete.control"
                     [matAutocomplete]="auto"
                 >
-                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFnUtenteAzienda">
                     <mat-option
                         *ngFor="let utenteAzienda of (utenteAziendaAutocomplete.filteredArray$ | async)"
-                        [value]="utenteAzienda.idUtente"
+                        [value]="utenteAzienda"
                     >
                         {{ utenteAzienda.nome }} {{ utenteAzienda.cognome }}
                     </mat-option>

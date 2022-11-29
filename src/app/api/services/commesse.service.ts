@@ -272,17 +272,17 @@ export class CommesseService extends BaseService {
   }
 
   /**
-   * Path part for operation consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete
+   * Path part for operation consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete
    */
-  static readonly ConsuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDeletePath = '/consuntivazione/commesse/{idCommessa}/presenze/utente/{idUtente}/{anno}-{mese}-{giorno}/{idAttivita}/{progressivo}';
+  static readonly ConsuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDeletePath = '/consuntivazione/commesse/{idCommessa}/presenze/utente/{idUtente}/{anno}-{mese}-{giorno}/{ore}-{minuti}/{idAttivita}/{progressivo}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete()` instead.
+   * To access only the response body, use `consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete()` instead.
    *
    * This method doesn't expect any request body.
    */
-  consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete$Response(params: {
+  consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete$Response(params: {
     idCommessa: number;
     idAttivita: number;
     progressivo: number;
@@ -290,11 +290,13 @@ export class CommesseService extends BaseService {
     anno: number;
     mese: number;
     giorno: number;
+    ore: number;
+    minuti: number;
     context?: HttpContext
   }
 ): Observable<StrictHttpResponse<void>> {
 
-    const rb = new RequestBuilder(this.rootUrl, CommesseService.ConsuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDeletePath, 'delete');
+    const rb = new RequestBuilder(this.rootUrl, CommesseService.ConsuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDeletePath, 'delete');
     if (params) {
       rb.path('idCommessa', params.idCommessa, {});
       rb.path('idAttivita', params.idAttivita, {});
@@ -303,6 +305,8 @@ export class CommesseService extends BaseService {
       rb.path('anno', params.anno, {});
       rb.path('mese', params.mese, {});
       rb.path('giorno', params.giorno, {});
+      rb.path('ore', params.ore, {});
+      rb.path('minuti', params.minuti, {});
     }
 
     return this.http.request(rb.build({
@@ -319,11 +323,11 @@ export class CommesseService extends BaseService {
 
   /**
    * This method provides access to only to the response body.
-   * To access the full response (for headers, for example), `consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete$Response()` instead.
+   * To access the full response (for headers, for example), `consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete(params: {
+  consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete(params: {
     idCommessa: number;
     idAttivita: number;
     progressivo: number;
@@ -331,11 +335,13 @@ export class CommesseService extends BaseService {
     anno: number;
     mese: number;
     giorno: number;
+    ore: number;
+    minuti: number;
     context?: HttpContext
   }
 ): Observable<void> {
 
-    return this.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoIdAttivitaProgressivoDelete$Response(params).pipe(
+    return this.consuntivazioneCommesseIdCommessaPresenzeUtenteIdUtenteAnnoMeseGiornoOreMinutiIdAttivitaProgressivoDelete$Response(params).pipe(
       map((r: StrictHttpResponse<void>) => r.body as void)
     );
   }
