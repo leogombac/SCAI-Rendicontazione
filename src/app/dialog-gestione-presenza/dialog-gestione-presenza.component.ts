@@ -36,6 +36,11 @@ export class DialogGestionePresenzaComponent implements OnInit {
 
   form: FormGroup;
 
+  numeroOreControl: FormControl;
+  bancaOreControl: FormControl;
+  straordDiurniControl: FormControl;
+  straordNotturniControl: FormControl;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { event: ConsuntivoEvent, events?: ConsuntivoEvent[] },
     private dialog: MatDialogRef<DialogGestionePresenzaComponent>,
@@ -109,23 +114,56 @@ export class DialogGestionePresenzaComponent implements OnInit {
       )
     );
 
+    this.numeroOreControl = new FormControl(
+      this.data.event.hours,
+      [
+        Validators.required,
+        Validators.min(0.5)
+      ]
+    );
+    this.bancaOreControl = new FormControl(0);
+    this.straordDiurniControl = new FormControl(0);
+    this.straordNotturniControl = new FormControl(0);
+
+    this.bancaOreControl.setValidators([
+      (ctrl) => {
+        if (ctrl.value <= this.numeroOreControl.value - this.straordDiurniControl.value - this.straordNotturniControl.value)
+          return null;
+        return { bancaOreExceed: "Banca ore eccede ore totali." }
+      }
+    ]);
+    this.straordDiurniControl.setValidators([
+      (ctrl) => {
+        if (ctrl.value <= this.numeroOreControl.value - this.straordNotturniControl.value - this.bancaOreControl.value)
+          return null;
+        return { straordDiurniExceed: "Straord. diurni eccede ore totali." }
+      }
+    ]);
+    this.straordNotturniControl.setValidators([
+      (ctrl) => {
+        if (ctrl.value <= this.numeroOreControl.value - this.straordDiurniControl.value - this.bancaOreControl.value)
+          return null;
+        return { straordNotturniExceed: "Straord. notturni eccede ore totali." }
+      }
+    ]);
+
     // Map controls to form
     this.form = new FormGroup({
-      'commessa': this.commessaAutocomplete.control,
-      'diaria': this.diariaAutocomplete.control,
-      'modalitaLavoro': this.modalitaLavoroAutocomplete.control,
+      commessa: this.commessaAutocomplete.control,
+      diaria: this.diariaAutocomplete.control,
+      modalitaLavoro: this.modalitaLavoroAutocomplete.control,
       dataInizio: new FormControl(
         getTZOffsettedDate(this.data.event.start)
           .toISOString()
           .slice(0, 16), // Required because we saved timestamp without timezone and type of input is datetime-local
         [ Validators.required ]
       ),
-      numeroOre: new FormControl(
-        this.data.event.hours, [
-          Validators.required,
-          Validators.min(0.5)
-        ]
-      ),
+      numeroOre: this.numeroOreControl,
+      bancaOre: this.bancaOreControl,
+      straordinariDiurni: this.straordDiurniControl,
+      straordinariNotturni: this.straordNotturniControl,
+      reperibilita: new FormControl(this.data.event.reperibilita),
+      turni: new FormControl(this.data.event.turni),
       descrizione: new FormControl(this.data.event.note),
     });
   }

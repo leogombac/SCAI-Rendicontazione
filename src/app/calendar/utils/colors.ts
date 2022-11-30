@@ -14,4 +14,9 @@ export const colors: any = {
     secondary: '#ccc',
     secondaryText: '#333'
   },
+  darkGrey: {
+    primary: '#444',
+    secondary: '#aaa',
+    secondaryText: '#111'
+  }
 };

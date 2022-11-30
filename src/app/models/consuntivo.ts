@@ -63,6 +63,7 @@ export interface Presenza {
     idCommessa: number;
     codiceCommessa: string;
     numeroMinuti: number;
+    modificabile: boolean;
     reperibilita: boolean;
     turni: boolean;
     note: string;
@@ -101,7 +102,7 @@ export class ConsuntivoEvent implements CalendarEvent {
     idModalitaLavoro;
     idTipoTrasferta;
     note;
-    numeroMinuti;
+    modificabile;
     progressivo;
     reperibilita;
     statoChiusura;
@@ -132,6 +133,7 @@ export class ConsuntivoEvent implements CalendarEvent {
         this.idModalitaLavoro = presenza.modalitaLavoro?.id;
         this.idTipoTrasferta = presenza.trasferta?.idTipoTrasferta;
         this.note = presenza.note;
+        this.modificabile = presenza.modificabile;
         this.progressivo = presenza.progressivo;
         this.statoChiusura = presenza.statoChiusura;
 
@@ -175,8 +177,10 @@ export class ConsuntivoEvent implements CalendarEvent {
             return colors.yellow;
         if (this.statoChiusura === 2)
             return colors.grey;
-        if (this.statoChiusura === 3)
+        if (!this.modificabile)
             return colors.grey;
+        if (this.statoChiusura === 3)
+            return colors.darkGrey;
         return colors.blue;
     }
 

@@ -74,14 +74,16 @@
       </div>
       <div class="col-md-6">
         <mat-form-field appearance="fill">
-          <mat-label>Numero Ore</mat-label>
+          <mat-label>Numero Ore Totali</mat-label>
           <input
             type="number"
             matInput
-            placeholder="Numero ore"
+            placeholder="Numero ore totali"
             formControlName="numeroOre"
             step="0.5"
+            min="0"
           >
+          <mat-hint>Questo valore include straordinari e banca ore.</mat-hint>
         </mat-form-field>
       </div>
     </div>
@@ -93,8 +95,14 @@
             type="number"
             matInput
             placeholder="Banca ore"
+            formControlName="bancaOre"
             step="0.5"
+            min="0"
+            [max]="numeroOreControl.value - straordDiurniControl.value - straordNotturniControl.value"
           >
+          <mat-error *ngIf="form.get('bancaOre').hasError('bancaOreExceed')">
+            {{ form.get('bancaOre').errors.bancaOreExceed }}
+          </mat-error>
         </mat-form-field>
       </div>
     </div>
@@ -109,8 +117,14 @@
             type="number"
             matInput
             placeholder="Numero ore straord. diurni"
+            formControlName="straordinariDiurni"
             step="0.5"
+            min="0"
+            [max]="numeroOreControl.value - straordNotturniControl.value - bancaOreControl.value"
           >
+          <mat-error *ngIf="form.get('straordinariDiurni').hasError('straordDiurniExceed')">
+            {{ form.get('straordinariDiurni').errors.straordDiurniExceed }}
+          </mat-error>
         </mat-form-field>
       </div>
       <div class="col-md-6" *ngIf="appState.viewUser.turni">
@@ -120,8 +134,14 @@
             type="number"
             matInput
             placeholder="Numero ore straord. notturni"
+            formControlName="straordinariNotturni"
             step="0.5"
+            min="0"
+            [max]="numeroOreControl.value - straordDiurniControl.value - bancaOreControl.value"
           >
+          <mat-error *ngIf="form.get('straordinariNotturni').hasError('straordNotturniExceed')">
+            {{ form.get('straordinariNotturni').errors.straordNotturniExceed }}
+          </mat-error>
         </mat-form-field>
       </div>
     </div>
@@ -142,7 +162,9 @@
         <mat-checkbox disabled>Reperibilità</mat-checkbox>
       </div>
       <div class="col-12" *ngIf="appState.viewUser.turni">
-        <mat-checkbox>Turni</mat-checkbox>
+        <mat-checkbox
+          formControlName="turni"
+        >Turni</mat-checkbox>
       </div>
     </div>
     <div class="row mb-3">

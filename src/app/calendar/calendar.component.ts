@@ -234,8 +234,8 @@ export class CalendarComponent {
 
   private openDialog(event: ConsuntivoEvent, events?: ConsuntivoEvent[]) {
 
-    // Do nothing if stato is Chiuso or Vistato
-    if (this.appState.viewIdStato === 2 || this.appState.viewIdStato === 3)
+    // Do nothing if stato is Chiuso or Vistato or event is not modificabile
+    if (this.appState.viewIdStato === 2 || this.appState.viewIdStato === 3 || !event.modificabile)
       return;
 
     this.dialog.open(
