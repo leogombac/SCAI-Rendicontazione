@@ -92,6 +92,7 @@
                         [viewDate]="viewDate"
                         [events]="events"
                         [hourSegmentTemplate]="weekViewHourSegmentTemplate"
+                        [validateEventTimesChanged]="validateEventTimesChanged"
                         [weekStartsOn]="weekStartsOn"
                         (eventTimesChanged)="eventTimesChanged($event)"
                         (eventClicked)="onEventClicked($event)"
@@ -102,6 +103,7 @@
                         [viewDate]="viewDate"
                         [events]="events"
                         [hourSegmentTemplate]="weekViewHourSegmentTemplate"
+                        [validateEventTimesChanged]="validateEventTimesChanged"
                         (eventTimesChanged)="eventTimesChanged($event)"
                         (eventClicked)="onEventClicked($event)"
                         (beforeViewRender)="beforeDayViewRender($event)">

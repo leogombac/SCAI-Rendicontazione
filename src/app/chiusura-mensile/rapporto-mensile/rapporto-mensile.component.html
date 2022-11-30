@@ -43,7 +43,7 @@
                         <div class="d-flex flex-column gap-2">
 
                             <ng-container *ngIf="{
-                                loading: chiusureService.chiusuraMeseLoading$| async,
+                                loading: chiusureService.chiusuraMeseLoading$ | async,
                                 chiusuraMese: chiusuraMese$ | async
                             } as data">
                                 <div *ngIf="data.loading" class="text-center py-5">
@@ -68,9 +68,16 @@
                                         <b>Ore Mensili</b>
                                         <span>{{ data.chiusuraMese?.oreMensili }}</span>
                                     </div>
+                                    <div
+                                        *ngIf="isChiusuraAlert(data.chiusuraMese)"
+                                        class="alert alert-danger alert--btn"
+                                    >
+                                        Un mese si dovrebbe chiudere solo se le Ore Ordinarie sono uguali alle Ore Mensili.
+                                    </div>
                                     <ng-container *ngIf="data.chiusuraMese?.idStatoChiusura as idStatoChiusura">
                                         <button
                                             class="btn btn-primary"
+                                            [class.btn-danger]="isChiusuraAlert(data.chiusuraMese)"
                                             style="align-self: center;"
                                             [disabled]="idStatoChiusura === 3"
                                             (click)="idStatoChiusura === 1

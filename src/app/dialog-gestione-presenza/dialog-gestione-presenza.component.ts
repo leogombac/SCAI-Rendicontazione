@@ -121,7 +121,7 @@ export class DialogGestionePresenzaComponent implements OnInit {
         [ Validators.required ]
       ),
       numeroOre: new FormControl(
-        this.data.event.durataOre, [
+        this.data.event.hours, [
           Validators.required,
           Validators.min(0.5)
         ]

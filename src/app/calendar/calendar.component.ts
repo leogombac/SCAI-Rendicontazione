@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import {
   CalendarDayViewBeforeRenderEvent,
+  CalendarEventTimesChangedEvent,
   CalendarEventTitleFormatter,
   CalendarMonthViewBeforeRenderEvent,
   CalendarView,
@@ -170,7 +171,15 @@ export class CalendarComponent {
         const daysDiff = floorToNearest(mouseMoveEvent.clientX - segmentPosition.left, segmentPosition.width) / segmentPosition.width;
         const newEnd = addDays(addMinutes(segment.date, minutesDiff), daysDiff);
 
-        if (newEnd > segment.date && newEnd < endOfView) {
+        if (
+          newEnd > segment.date
+       && newEnd < endOfView
+       && this.validateEventTimesChanged({
+            event: dragToSelectEvent,
+            newStart: segment.date,
+            newEnd: newEnd
+          })
+        ) {
           dragToSelectEvent.end = newEnd;
           dragToSelectEvent.setTitle();
         }
@@ -190,12 +199,33 @@ export class CalendarComponent {
     this.appState.viewDate = date;
   }
 
-  eventTimesChanged({ event, newStart, newEnd, }): void {
-    event.start = newStart;
-    event.end = newEnd;
-    event.meta.tmpEvent = true;
-    event.setTitle();
-    this.refresh();
+  validateEventTimesChanged = ({ event, newStart, newEnd }) => {
+
+    // Don't allow dragging or resizing events to different days
+    const sameDay = isSameDay(newStart, newEnd);
+    if (!sameDay) return false;
+
+    // Don't allow dragging events to the same times as other events
+    const overlappingEvent = this.events.find(otherEvent =>
+        otherEvent !== event
+        && (
+            (otherEvent.start < newStart && newStart < otherEvent.end)
+         || (otherEvent.start < newEnd && newStart < otherEvent.end)
+        )
+    );
+
+    return !overlappingEvent;
+  }
+
+  eventTimesChanged(eventTimesChangedEvent) {
+    if (this.validateEventTimesChanged(eventTimesChangedEvent)) {
+      const { event, newStart, newEnd } = eventTimesChangedEvent;
+      event.start = newStart;
+      event.end = newEnd;
+      event.meta.tmpEvent = true;
+      event.setTitle();
+      this.refresh();
+    }
   }
 
   onEventClicked({ event }: { event: ConsuntivoEvent }): void {

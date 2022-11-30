@@ -38,7 +38,7 @@
                             [class.cal-bg-blue]="!consuntivo.meta.tmpEvent"
                             [class.cal-bg-grey]="appState.viewIdStato === 2 || appState.viewIdStato === 3"
                         >
-                            <td>{{ consuntivo.giorno }}</td>
+                            <td>{{ consuntivo.displayDay }}</td>
                             <td>{{ consuntivo.start | date: 'hh:mm' }}</td>
                             <td [innerHTML]="consuntivo.title"></td>
                             <td class="text-right">

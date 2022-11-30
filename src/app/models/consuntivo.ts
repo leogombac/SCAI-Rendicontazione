@@ -1,6 +1,7 @@
 import { CalendarEvent } from "angular-calendar";
 import { colors } from "../calendar/utils/colors";
 
+// All these interface exports are here because the OpenAPI doesn't offer models form responses (BUT IT SHOULD!)
 export interface SaveConsuntivoBody {
     dataPrecedente?: string;
     codiceAttivita: string;
@@ -179,33 +180,36 @@ export class ConsuntivoEvent implements CalendarEvent {
         return colors.blue;
     }
 
-    get durataOre() {
+    get hours() {
         if (!this.end) return 0;
         return (this.end.getTime() - this.start.getTime()) / 1000 / 60 / 60;
     }
 
-    get giorno() {
+    get displayDay() {
         if (!this.end)
             return this.start.toLocaleString(window.navigator.language, { weekday: 'long' });
         
-        const inizioGiorno = this.start.getDay();
-        const fineGiorno = this.end.getDay();
-        if (inizioGiorno === fineGiorno)
+        const startDay = this.start.getDay();
+        const endDay = this.end.getDay();
+        if (startDay === endDay)
             return this.start.toLocaleString(window.navigator.language, { weekday: 'long' })
-                + ' '
-                + this.start.getDate();
+                 + ' '
+                 + this.start.getDate();
         
         else
             return this.start.toLocaleString(window.navigator.language, { weekday: 'short' })
-                + ' '
-                + this.start.getDate()
-                + ' - '
-                + this.end.toLocaleString(window.navigator.language, { weekday: 'short' })
-                + ' '
-                + this.end.getDate();
+                 + ' '
+                 + this.start.getDate()
+                 + ' - '
+                 + this.end.toLocaleString(window.navigator.language, { weekday: 'short' })
+                 + ' '
+                 + this.end.getDate();
     }
 
     setTitle() {
+        const hoursMinutesPadded = (this.start.getHours()+'').padStart(2, '0')
+                                 + ':'
+                                 + (this.start.getMinutes()+'').padStart(2, '0');
         let html = '';
         if (this.meta.tmpEvent)
             html += 'Consuntivo Temporaneo<br>';
@@ -217,7 +221,8 @@ export class ConsuntivoEvent implements CalendarEvent {
             html += '<span class="badge badge-primary mr-1">'
                  + ['', 'Aperto', 'Chiuso', 'Vistato'][this.statoChiusura]
                  + '</span>';
-        html += '<span class="badge badge-primary">' + this.durataOre + ' ore</span>';
+        html += `<span class="badge badge-primary mr-1">Inizio: ${hoursMinutesPadded}</span>`;
+        html += `<span class="badge badge-primary">${this.hours} ore</span>`;
         this.title = html;
     }
 }

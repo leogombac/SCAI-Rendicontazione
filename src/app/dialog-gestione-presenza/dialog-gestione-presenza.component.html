@@ -23,7 +23,7 @@
     <div class="row mb-3">
       <div
         [class.col-md-6]="appState.viewAzienda.modalitaLavoroAttivazione === 'S'"
-        [class.col-md-12]="appState.viewAzienda.modalitaLavoroAttivazione !== 'S'"
+        [class.col-12]="appState.viewAzienda.modalitaLavoroAttivazione !== 'S'"
       >
         <mat-form-field appearance="fill">
           <mat-label>Diaria</mat-label>
@@ -99,7 +99,10 @@
       </div>
     </div>
     <div class="row mb-3">
-      <div class="col-md-6">
+      <div
+        [class.col-md-6]="appState.viewUser.turni"
+        [class.col-12]="!appState.viewUser.turni"
+      >
         <mat-form-field appearance="fill">
           <mat-label>Straordinari Diurni</mat-label>
           <input
@@ -107,11 +110,10 @@
             matInput
             placeholder="Numero ore straord. diurni"
             step="0.5"
-            disabled
           >
         </mat-form-field>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6" *ngIf="appState.viewUser.turni">
         <mat-form-field appearance="fill">
           <mat-label>Straordinari Notturni</mat-label>
           <input
@@ -119,7 +121,6 @@
             matInput
             placeholder="Numero ore straord. notturni"
             step="0.5"
-            disabled
           >
         </mat-form-field>
       </div>
@@ -140,8 +141,8 @@
       <div class="col-12">
         <mat-checkbox disabled>Reperibilità</mat-checkbox>
       </div>
-      <div class="col-12">
-        <mat-checkbox disabled>Turni</mat-checkbox>
+      <div class="col-12" *ngIf="appState.viewUser.turni">
+        <mat-checkbox>Turni</mat-checkbox>
       </div>
     </div>
     <div class="row mb-3">
