@@ -30,6 +30,7 @@ export class RapportoMensileComponent implements OnInit {
 
   isChiusuraAlert(chiusuraMese: ChiusuraMese) {
     if (!chiusuraMese) return false;
+    if (!this.appState.viewAzienda.attivazioneMonteOre) return false;
     const [hh, mm] = chiusuraMese.totaleOreOrdinarie
                                  .split(':')
                                  .map(s => +s);
