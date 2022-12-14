@@ -12,6 +12,14 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
+    <button class="btn btn-link" (click)="xlsxService.generateRapportoPresenze()">
+        Genera rapporto preseneze 
+        <i class="material-icons">spreadsheet</i>
+    </button>
+    <button class="btn btn-link" (click)="xlsxService.generateRapportoMensile()">
+        Genera rapporto mensile  
+        <i class="material-icons">spreadsheet</i>
+    </button>
     <button class="btn btn-link" (click)="consuntivoService.refresh()">
         Aggiorna 
         <i class="material-icons">refresh</i>
